@@ -20,11 +20,26 @@ The first step will deploy a MongoDB instance. The second step will deploy the a
 
 Swagger UI will be available at the following URL
 
+```
 http://localhost:8090/swagger-ui/index.html
+```
+
 
 Note: The API key can be configured in src/main/resources/config/application-dev.yml (application properties) file which can be used to interact with the API.
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
+
+## MongoDB
+There is an database init script called `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on port 27017. The scripts creates an admin user with username: admin123 and password: pass123.
+
+After the connection was established successfull it creates a new user:
+
+```
+username: user123
+password: 123pass
+```
+
+You can use this user to connect to the database with your favourite MongoDB access tool. Here we use AdminMongo. You will find more information about how to use it below.
 
 ## AdminMongo
 
@@ -32,7 +47,7 @@ AdminMongo is running in Port 8092
 
 - localhost:8092
 - Connection-Name: Verification Controller
-- Connection-String: mongodb://user123:123pass@docker_verificationcontroller-mongodb_1:27017/VerificationController?authSource=VerificationController
+- Connection-String: mongodb://user123:123pass@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController
 
 ## Building Docker Image
 

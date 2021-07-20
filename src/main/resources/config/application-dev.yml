@@ -20,7 +20,7 @@ logging:
     com.ibm.ssi.controller.hotel: DEBUG
 
 ssibk:
-  hotel:
+  verification:
     controller:
       apikey: secure
 

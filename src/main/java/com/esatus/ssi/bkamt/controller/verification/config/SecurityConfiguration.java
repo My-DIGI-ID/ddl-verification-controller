@@ -47,7 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 
-    @Value("${ssibk.hotel.controller.apikey}")
+    @Value("${ssibk.verification.controller.apikey}")
     private String apikey;
 
     public static final String API_KEY_AUTH_HEADER_NAME = "X-API-Key";

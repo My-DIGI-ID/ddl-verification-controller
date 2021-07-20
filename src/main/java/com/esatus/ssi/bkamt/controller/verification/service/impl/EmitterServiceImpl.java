@@ -34,7 +34,7 @@ public class EmitterServiceImpl implements EmitterService {
     @Autowired
     private EmitterRepository repository;
 
-    @Value("${ssibk.hotel.controller.events.connection.timeout}")
+    @Value("${ssibk.verification.controller.events.connection.timeout}")
     private long timeout;
 
     @Override
