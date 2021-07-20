@@ -39,7 +39,6 @@ import com.esatus.ssi.bkamt.controller.verification.VerificationControllerApp;
 import com.esatus.ssi.bkamt.controller.verification.domain.Authority;
 import com.esatus.ssi.bkamt.controller.verification.domain.Hotel;
 import com.esatus.ssi.bkamt.controller.verification.domain.User;
-import com.esatus.ssi.bkamt.controller.verification.repository.HotelRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.UserRepository;
 import com.esatus.ssi.bkamt.controller.verification.security.AuthoritiesConstants;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.UserCreationDTO;
@@ -70,8 +69,9 @@ public class UserControllerIT {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private HotelRepository hotelRepository;
+    // TODO: Replace with verfication?
+//    @Autowired
+//    private HotelRepository hotelRepository;
 
     @Autowired
     private MockMvc restUserMockMvc;
@@ -123,7 +123,6 @@ public class UserControllerIT {
     @BeforeEach
     public void initTest() {
         userRepository.deleteAll();
-        hotel = this.createHotel();
         user = this.createEntity();
         anotherUser = this.createAnotherEntity();
     }
@@ -131,8 +130,6 @@ public class UserControllerIT {
     @Test
     public void createUser() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
-
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         // Create the user
@@ -165,8 +162,6 @@ public class UserControllerIT {
     @Test
     public void createUserWithoutEmail() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
-
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         // Create the user
@@ -198,8 +193,6 @@ public class UserControllerIT {
     @Test
     public void createUserWithNonExistingHotelId() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
-
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         // Create the user
@@ -223,8 +216,6 @@ public class UserControllerIT {
     @Test
     public void createUserWithExistingLogin() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
-
         // Create the user
         UserCreationDTO userCreationDTO = new UserCreationDTO();
         userCreationDTO.setLogin(DEFAULT_LOGIN);
@@ -457,8 +448,7 @@ public class UserControllerIT {
     @Test
     public void updateUser() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
-        userRepository.save(user);
+       userRepository.save(user);
 
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
@@ -491,7 +481,6 @@ public class UserControllerIT {
     @Test
     public void updateUserWithNonExistingHotelId() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
 
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
@@ -515,7 +504,6 @@ public class UserControllerIT {
     @Test
     public void updateUserWithExistingLogin() throws Exception {
         // Initialize the database
-        hotelRepository.save(hotel);
         userRepository.save(user);
         userRepository.save(anotherUser);
 

@@ -17,9 +17,6 @@
 package com.esatus.ssi.bkamt.controller.verification.init;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +24,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import com.esatus.ssi.bkamt.controller.verification.domain.Address;
 import com.esatus.ssi.bkamt.controller.verification.domain.Authority;
-import com.esatus.ssi.bkamt.controller.verification.domain.Desk;
-import com.esatus.ssi.bkamt.controller.verification.domain.Hotel;
 import com.esatus.ssi.bkamt.controller.verification.domain.User;
-import com.esatus.ssi.bkamt.controller.verification.repository.HotelRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.UserRepository;
 import com.esatus.ssi.bkamt.controller.verification.security.AuthoritiesConstants;
 
@@ -42,8 +35,9 @@ public class DatabaseInit {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    HotelRepository hotelRepository;
+    // TODO: VerifitcationRepository
+    // @Autowired
+    // VerifitcationRepository verifitcationRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -51,10 +45,10 @@ public class DatabaseInit {
     @Autowired
     private Environment environment;
 
-    @Value("${ssibk.hotel.controller.admin.username}")
+    @Value("${ssibk.verification.controller.admin.username}")
     private String adminUsername;
 
-    @Value("${ssibk.hotel.controller.admin.password}")
+    @Value("${ssibk.verification.controller.admin.password}")
     private String adminPassword;
 
     @PostConstruct
@@ -63,7 +57,8 @@ public class DatabaseInit {
 
         if (environment.acceptsProfiles(Profiles.of("dev"))) {
             initUser();
-            initHotel();
+            // TODO: InitVerification
+            initVerification();
         }
     }
 
@@ -108,25 +103,25 @@ public class DatabaseInit {
         }
     }
 
-    private void initHotel() {
-        String id = "hotel-1";
-        if (this.hotelRepository.existsById(id) == false) {
-            Hotel hotel = new Hotel();
-            hotel.setId("hotel-1");
-            hotel.setName("IBM Hotel");
-            Address address = new Address();
-            address.setCity("Munich");
-            address.setHouseNumber("123");
-            address.setStreet("Berliner Strasse");
-            address.setPostalCode("123456");
-            hotel.setAddress(address);
-            List<Desk> desks = new ArrayList<Desk>();
-            desks.add(new Desk("desk1", "Blue Desk"));
-            desks.add(new Desk("desk2", "Red Desk"));
-            desks.add(new Desk("desk3", "Yellow Desk"));
-            desks.add(new Desk("desk4", "Green Desk"));
-            hotel.setDesks(desks);
-            hotelRepository.insert(hotel);
-        }
+    private void initVerification() {
+//        String id = "hotel-1";
+//        if (this.hotelRepository.existsById(id) == false) {
+//            Hotel hotel = new Hotel();
+//            hotel.setId("hotel-1");
+//            hotel.setName("IBM Hotel");
+//            Address address = new Address();
+//            address.setCity("Munich");
+//            address.setHouseNumber("123");
+//            address.setStreet("Berliner Strasse");
+//            address.setPostalCode("123456");
+//            hotel.setAddress(address);
+//            List<Desk> desks = new ArrayList<Desk>();
+//            desks.add(new Desk("desk1", "Blue Desk"));
+//            desks.add(new Desk("desk2", "Red Desk"));
+//            desks.add(new Desk("desk3", "Yellow Desk"));
+//            desks.add(new Desk("desk4", "Green Desk"));
+//            hotel.setDesks(desks);
+//            hotelRepository.insert(hotel);
+//        }
     }
 }

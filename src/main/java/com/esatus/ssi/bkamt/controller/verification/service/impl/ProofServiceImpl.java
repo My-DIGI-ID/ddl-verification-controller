@@ -18,7 +18,6 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,16 +44,11 @@ import com.esatus.ssi.bkamt.controller.verification.client.model.RequestedAttrib
 import com.esatus.ssi.bkamt.controller.verification.client.model.RequestedPredicates;
 import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesCorporateId;
 import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesMasterId;
-import com.esatus.ssi.bkamt.controller.verification.domain.CheckInCredential;
-import com.esatus.ssi.bkamt.controller.verification.service.CheckInCredentialService;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.CorporateIdDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.MasterIdDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.CheckinCredentialNotFoundException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ProofServiceImpl implements ProofService {
@@ -65,16 +59,13 @@ public class ProofServiceImpl implements ProofService {
   ACAPYClient acapyClient;
 
   @Autowired
-  CheckInCredentialService checkInCredentialService;
-
-  @Autowired
   NotificationService notificationService;
 
-  private @Value("${ssibk.hotel.controller.agent.apikey}") String apikey;
-  private @Value("${ssibk.hotel.controller.agent.endpoint}") String agentEndpoint;
-  private @Value("${ssibk.hotel.controller.agent.endpointName}") String agentEndpointName;
-  private @Value("${ssibk.hotel.controller.agent.recipientkey}") String agentRecipientKey;
-  private @Value("${ssibk.hotel.controller.agent.masterid.credential_definition_ids}") String masterIdCredDefIdsString;
+  private @Value("${ssibk.verification.controller.agent.apikey}") String apikey;
+  private @Value("${ssibk.verification.controller.agent.endpoint}") String agentEndpoint;
+  private @Value("${ssibk.verification.controller.agent.endpointName}") String agentEndpointName;
+  private @Value("${ssibk.verification.controller.agent.recipientkey}") String agentRecipientKey;
+  private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}") String masterIdCredDefIdsString;
 
   private static final String DIDCOMM_URL = "didcomm://example.org?m=";
   private static final String ARIES_MESSAGE_TYPE =
@@ -85,33 +76,7 @@ public class ProofServiceImpl implements ProofService {
 
   @Override
   public URI getProofURI(String hotelId, String deskId) {
-
-    // prepare a proof request DTO and send it to the agent
-    ProofRequestDTO connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
-    ProofResponseDTO proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
-    log.debug("agent created a proof request: {}", proofResponseDTO);
-
-    // create a new entry for this presentationExchangeId in the database
-    this.checkInCredentialService.createCheckInCredential(hotelId, deskId,
-        proofResponseDTO.getPresentationExchangeId());
-
-    // prepare a connectionless proof request
-    ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
-
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      log.debug(mapper.writeValueAsString(connectionlessProofRequest));
-      // Base64 encode the connectionless proof request
-      String encodedUrl =
-          Base64.getEncoder().encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
-
-      // return a URI that is consumable by the wallet app
-      return URI.create(DIDCOMM_URL + encodedUrl);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
-    }
-
+	  return URI.create("");
   }
 
   private ConnectionlessProofRequest prepareConnectionlessProofRequest(ProofResponseDTO proofResponseDTO) {
@@ -203,52 +168,7 @@ public class ProofServiceImpl implements ProofService {
 
   @Override
   public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) {
-
-    log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
-
-    String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
-
-    if (webhookPresentProofDTO.getState().equals("verified")) {
-      boolean proofVerified =
-          webhookPresentProofDTO.getVerified() != null && webhookPresentProofDTO.getVerified().equals("true");
-      try {
-        CheckInCredential checkInCredential =
-            this.checkInCredentialService.updateValidity(presentationExchangeId, proofVerified);
-        // inform subscribers about the new checkin credential
-        this.notificationService.sendNotificationAboutNewCheckinCredentials(checkInCredential.getHotelId(),
-            checkInCredential.getDeskId());
-      } catch (CheckinCredentialNotFoundException e) {
-        // log but do not rethrow
-        log.error("A matching CheckInCredential was not found", e);
-      } finally {
-        // Delete proof presentation info from agent
-        this.acapyClient.deleteProofRecord(apikey, presentationExchangeId);
-      }
-    } else if (webhookPresentProofDTO.getState().equals("presentation_received")) {
-      log.debug("Update mongodb entry and delete information from agent");
-      log.debug("Getting presentation information from the agent");
-
-      // get the proof record from the agent
-      ProofRecordDTO proofRecordDTO = this.acapyClient.getProofRecord(apikey, presentationExchangeId);
-
-      // construct a corporateId out of the proof
-      CorporateIdDTO corporateId = this.createCorporateIdDTO(proofRecordDTO);
-      log.debug("Created corporate id: {}", corporateId);
-
-      // construct a masterId out of the proof
-      MasterIdDTO masterId = this.createMasterIdDTO(proofRecordDTO);
-      log.debug("Created master id: {}", masterId);
-
-      try {
-        // Updating the mongo db entry with the data received via the proof
-        this.checkInCredentialService.updateCheckinCredential(presentationExchangeId, masterId, corporateId);
-      } catch (CheckinCredentialNotFoundException e) {
-        // log but do not rethrow
-        log.error("A matching CheckInCredential was not found", e);
-      }
-    } else {
-      log.debug("ignore this state");
-    }
+	  // TODO: Remove?
   }
 
   private MasterIdDTO createMasterIdDTO(ProofRecordDTO proofRecordDTO) {

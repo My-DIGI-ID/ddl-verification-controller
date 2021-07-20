@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import com.esatus.ssi.bkamt.controller.verification.domain.Authority;
 import com.esatus.ssi.bkamt.controller.verification.domain.Hotel;
 import com.esatus.ssi.bkamt.controller.verification.domain.User;
-import com.esatus.ssi.bkamt.controller.verification.repository.HotelRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.UserRepository;
 import com.esatus.ssi.bkamt.controller.verification.security.AuthoritiesConstants;
 import com.esatus.ssi.bkamt.controller.verification.service.UserService;
@@ -54,8 +53,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private HotelRepository hotelRepository;
+//    @Autowired
+//    private HotelRepository hotelRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -70,10 +69,11 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException();
         }
 
-        Optional<Hotel> existingHotel = hotelRepository.findById(userDTO.getHotelId());
-        if (!existingHotel.isPresent()) {
-            throw new HotelNotFoundException();
-        }
+        //TODO: Replace with verification?
+//        Optional<Hotel> existingHotel = hotelRepository.findById(userDTO.getHotelId());
+//        if (!existingHotel.isPresent()) {
+//            throw new HotelNotFoundException();
+//        }
 
         User user = new User();
         user.setLogin(userDTO.getLogin().toLowerCase());
@@ -111,10 +111,11 @@ public class UserServiceImpl implements UserService {
             throw new UserWithLoginAlreadyExists();
         }
 
-        Optional<Hotel> existingHotel = hotelRepository.findById(userDTO.getHotelId());
-        if (!existingHotel.isPresent()) {
-            throw new HotelNotFoundException();
-        }
+        // TODO: Replace with verification?
+//        Optional<Hotel> existingHotel = hotelRepository.findById(userDTO.getHotelId());
+//        if (!existingHotel.isPresent()) {
+//            throw new HotelNotFoundException();
+//        }
 
         String userPassword = findById.get().getPassword();
 

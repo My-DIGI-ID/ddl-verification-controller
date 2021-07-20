@@ -26,7 +26,7 @@ import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestDTO
 import com.esatus.ssi.bkamt.controller.verification.client.model.ProofResponseDTO;
 
 @Repository
-@FeignClient(name = "ACAPYClient", url = "${ssibk.hotel.controller.agent.apiurl}")
+@FeignClient(name = "ACAPYClient", url = "${ssibk.verification.controller.agent.apiurl}")
 public interface ACAPYClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/connections/create-invitation")
