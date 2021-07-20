@@ -20,6 +20,7 @@ import java.net.URI;
 
 import javax.validation.Valid;
 
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,15 +72,17 @@ public class VerificationController {
 	@PostMapping("/verifications")
 	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
 	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<VerificationDTO> createVerification(
-			@Valid @RequestBody VerificationCreationDTO verificationCreationDTO) {
+	public ResponseEntity<VerificationDTO> createVerification(@Valid @RequestBody VerificationCreationDTO verificationCreationDTO) {
 
 		log.debug("REST request to create a new verification : {}", verificationCreationDTO);
 
-		VerificationDTO createdVerification = this.verificationService.createVerification(verificationCreationDTO);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(createdVerification.getId()).toUri();
-		return ResponseEntity.created(location).body(createdVerification);
-		// TODO: Error handling
+        try {
+            VerificationDTO createdVerification = this.verificationService.createVerification(verificationCreationDTO);
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(createdVerification.getId()).toUri();
+            return ResponseEntity.created(location).body(createdVerification);
+        } catch (VerificationAlreadyExistsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
 	}
 }

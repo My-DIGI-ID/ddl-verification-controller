@@ -27,6 +27,20 @@ http://localhost:8090/swagger-ui/index.html
 
 Note: The API key can be configured in src/main/resources/config/application-dev.yml (application properties) file which can be used to interact with the API.
 
+### Default authentication against the api
+If you want to try out the api use the user you configured in ssibk->verification->controller->admin
+
+E.g
+
+```
+	ssibk:
+	      admin:
+	        username: verification-username
+	        password: verification-password
+
+```
+
+
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
 
 ## MongoDB

@@ -26,7 +26,6 @@ import com.esatus.ssi.bkamt.controller.verification.domain.User;
  * A DTO representing a user, with his authorities.
  */
 public class UserDTO {
-
     @NotNull
     private String id;
 

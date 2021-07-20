@@ -63,17 +63,10 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     public UserDTO createUser(UserCreationDTO userDTO) throws UserAlreadyExistsException, HotelNotFoundException {
-
         Optional<User> existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
         if (existingUser.isPresent()) {
             throw new UserAlreadyExistsException();
         }
-
-        //TODO: Replace with verification?
-//        Optional<Hotel> existingHotel = hotelRepository.findById(userDTO.getHotelId());
-//        if (!existingHotel.isPresent()) {
-//            throw new HotelNotFoundException();
-//        }
 
         User user = new User();
         user.setLogin(userDTO.getLogin().toLowerCase());
@@ -110,12 +103,6 @@ public class UserServiceImpl implements UserService {
         if ((loginCheck.isPresent()) && (!loginCheck.get().getId().equals(userDTO.getId()))) {
             throw new UserWithLoginAlreadyExists();
         }
-
-        // TODO: Replace with verification?
-//        Optional<Hotel> existingHotel = hotelRepository.findById(userDTO.getHotelId());
-//        if (!existingHotel.isPresent()) {
-//            throw new HotelNotFoundException();
-//        }
 
         String userPassword = findById.get().getPassword();
 
