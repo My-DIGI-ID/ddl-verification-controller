@@ -1,0 +1,40 @@
+version: '2'
+services:
+  verification-controller-mongodb:
+    image: mongo:4.2.7
+    ports:
+      - '27018:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin123
+      - MONGO_INITDB_ROOT_PASSWORD=pass123
+    volumes:
+      - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+  adminmongo:
+    image: mrvautin/adminmongo
+    ports:
+      - 8092:1234
+    depends_on:
+      - verification-controller-mongodb
+    environment:
+      - HOST=0.0.0.0
+  verification-agent:
+    image: registry.hub.docker.com/mydigiid/hotel-agent:latest
+    container_name: verification-agent
+    ports:
+      - 10080:10080
+      - 10000:10000
+    volumes:
+      - ~/ssibk/.indy_client_verify:/home/indy/.indy_client
+    environment:
+      - SSIBK_HOTEL_AGENT_IP_ADDRESS=${IP_ADDRESS}
+      - SSIBK_HOTEL_AGENT_PORT_INBOUND=10000
+      - SSIBK_HOTEL_AGENT_PORT_ADMIN=10080
+      - SSIBK_HOTEL_AGENT_WEBHOOK_IP_ADDRESS=${IP_ADDRESS}
+      - SSIBK_HOTEL_AGENT_WEBHOOK_PORT=8090
+      - SSIBK_HOTEL_AGENT_API_KEY=${VERIFY_AGENT_API_KEY}
+      - SSIBK_HOTEL_AGENT_SEED=000000000000000000000000000xxxxx
+      - SSIBK_HOTEL_AGENT_WALLET_KEY=${VERIFY_AGENT_WALLET_KEY}
+      - SSIBK_HOTEL_AGENT_WALLET_NAME=wallet
+      - SSIBK_HOTEL_AGENT_NAME="Verifier"
+      - SSIBK_HOTEL_AGENT_LOG_LEVEL=info
+      - SSIBK_HOTEL_AGENT_GENESIS_URL=${VERIFY_AGENT_GENESIS_URL}

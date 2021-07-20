@@ -1,0 +1,138 @@
+# ===================================================================
+# Spring Boot configuration for the "dev" profile.
+#
+# This configuration overrides the application.yml file.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+logging:
+  level:
+    ROOT: DEBUG
+    io.github.jhipster: DEBUG
+    com.ibm.ssi.controller.hotel: DEBUG
+
+ssibk:
+  hotel:
+    controller:
+      apikey: secure
+
+      admin:
+        username: hotel-username
+        password: hotel-password
+
+      agent:
+        apikey: secure
+        apiurl: localhost:10080 # the Hotel agent admin url
+        recipientkey: hotel-agent-key # the Hotel agent verkey, here for the seed 000...Hotel; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
+        endpoint: hotel-agent-url # the Hotel agent endpoint
+        endpointName: IBM Hotel # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
+
+        # The credential definition ids of all master ids that will be accepted in the proof
+        masterid:
+          credential_definition_ids: XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
+
+      integrationservice:
+        apiurl: http://localhost:9081/api
+        apikey: 123
+      events:
+        connection:
+          timeout: 3600000
+
+spring:
+  profiles:
+    active: dev
+    include:
+      - swagger
+      # Uncomment to activate TLS for the dev profile
+      #- tls
+  devtools:
+    restart:
+      enabled: true
+      additional-exclude: static/**
+    livereload:
+      enabled: false # we use Webpack dev server + BrowserSync for livereload
+  jackson:
+    serialization:
+      indent-output: true
+  data:
+    mongodb:
+      uri: mongodb://user123:123pass@localhost:27018/?authSource=VerificationController
+      database: VerificationController
+      auto-index-creation: false
+
+  mail:
+    host: localhost
+    port: 25
+    username:
+    password:
+  messages:
+    cache-duration: PT1S # 1 second, see the ISO 8601 standard
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8090
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+  # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
+  cors:
+    allowed-origins: '*'
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Authorization,Link,X-Total-Count'
+    allow-credentials: true
+    max-age: 1800
+  security:
+    authentication:
+      jwt:
+        # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
+        base64-secret: X2YvbN8ubmG2/FDDCSldX9I+ePNrs9O8KX/N3Utbqyg1xUhsuicpGPK4eAwmL+jXNfmSykxUWMgzVXuvP2t0Iw==
+        # Token is valid 24 hours
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
+  mail: # specific JHipster mail property, for standard properties see MailProperties
+    base-url: http://127.0.0.1:8080
+  metrics:
+    logs: # Reports metrics in the logs
+      enabled: false
+      report-frequency: 60 # in seconds
+  logging:
+    use-json-format: false # By default, logs are not in Json format
+    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+      enabled: false
+      host: localhost
+      port: 5000
+      queue-size: 512
+  audit-events:
+    retention-period: 30 # Number of days before audit events are deleted.
+
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the JHipsterProperties above
+#
+# More documentation is available at:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# application:
