@@ -37,11 +37,11 @@ public class VerificationMapper {
         }
     }
 
-    public List<VerificationDTO> addressToAddressDTOs(List<Verification> verifications) {
+    public List<VerificationDTO> verificationsToVerificationsDTO(List<Verification> verifications) {
         return verifications.stream().filter(Objects::nonNull).map(this::verificationToVerificationDTO).collect(Collectors.toList());
     }
 
-    public List<Verification> addressDTOsToAddresses(List<VerificationDTO> verificationDtos) {
+    public List<Verification> verficiationDTOsToVerifications(List<VerificationDTO> verificationDtos) {
         return verificationDtos.stream().filter(Objects::nonNull).map(this::verificationDTOToVerification).collect(Collectors.toList());
     }
 }
