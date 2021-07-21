@@ -1,8 +1,6 @@
 package com.esatus.ssi.bkamt.controller.verification.service.mapper;
 
-import com.esatus.ssi.bkamt.controller.verification.domain.User;
 import com.esatus.ssi.bkamt.controller.verification.domain.Verification;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.UserDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationDTO;
 import org.springframework.stereotype.Service;
 
