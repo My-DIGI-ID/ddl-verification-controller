@@ -45,10 +45,6 @@ public class UserDTO {
     @Email
     private String email;
 
-    @Size(min = 1, max = 50)
-    @NotNull
-    private String hotelId;
-
     public UserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -59,7 +55,6 @@ public class UserDTO {
         this.firstname = user.getFirstName();
         this.lastname = user.getLastName();
         this.email = user.getEmail();
-        this.hotelId = user.getHotelId();
     }
 
     public String getId() {
@@ -102,17 +97,9 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getHotelId() {
-        return hotelId;
-    }
-
-    public void setHotelId(String hotelId) {
-        this.hotelId = hotelId;
-    }
-
     @Override
     public String toString() {
-        return "UserDTO [email=" + email + ", firstname=" + firstname + ", hotelId=" + hotelId + ", id=" + id
+        return "UserDTO [email=" + email + ", firstname=" + firstname + ", id=" + id
                 + ", lastname=" + lastname + ", login=" + login + "]";
     }
 }

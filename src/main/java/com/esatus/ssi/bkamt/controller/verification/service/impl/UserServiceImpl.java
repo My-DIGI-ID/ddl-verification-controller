@@ -53,9 +53,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
-//    private HotelRepository hotelRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -75,7 +72,6 @@ public class UserServiceImpl implements UserService {
         if (userDTO.getEmail() != null) {
             user.setEmail(userDTO.getEmail().toLowerCase());
         }
-        user.setHotelId(userDTO.getHotelId());
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
         user.setPassword(encryptedPassword);
 
@@ -112,7 +108,6 @@ public class UserServiceImpl implements UserService {
         editedUser.setFirstName(userDTO.getFirstname());
         editedUser.setLastName(userDTO.getLastname());
         editedUser.setEmail(userDTO.getEmail());
-        editedUser.setHotelId(userDTO.getHotelId());
         editedUser.setPassword(userPassword);
 
         Set<Authority> userAuthorities = this.giveAuthority();

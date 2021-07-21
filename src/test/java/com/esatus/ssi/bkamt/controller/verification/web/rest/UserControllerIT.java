@@ -69,10 +69,6 @@ public class UserControllerIT {
     @Autowired
     private UserRepository userRepository;
 
-    // TODO: Replace with verfication?
-//    @Autowired
-//    private HotelRepository hotelRepository;
-
     @Autowired
     private MockMvc restUserMockMvc;
 
@@ -81,7 +77,6 @@ public class UserControllerIT {
 
     private User anotherUser;
     private User user;
-    private Hotel hotel;
 
     public User createEntity() {
         User user = new User();
@@ -113,13 +108,6 @@ public class UserControllerIT {
         return anotherUser;
     }
 
-    public Hotel createHotel() {
-        Hotel hotel = new Hotel();
-        hotel.setId(DEFAULT_HOTEL_ID);
-        hotel.setName("My Hotel");
-        return hotel;
-    }
-
     @BeforeEach
     public void initTest() {
         userRepository.deleteAll();
@@ -138,7 +126,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -153,7 +140,6 @@ public class UserControllerIT {
             assertThat(testUser.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
             assertThat(testUser.getLastName()).isEqualTo(DEFAULT_LASTNAME);
             assertThat(testUser.getEmail()).isEqualTo(DEFAULT_EMAIL);
-            assertThat(testUser.getHotelId()).isEqualTo(hotel.getId());
             assertThat(passwordEncoder.matches(DEFAULT_PASSWORD, testUser.getPassword())).isTrue();
 
         });
@@ -169,7 +155,6 @@ public class UserControllerIT {
         userCreationDTO.setLogin(DEFAULT_LOGIN);
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -184,7 +169,6 @@ public class UserControllerIT {
             assertThat(testUser.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
             assertThat(testUser.getLastName()).isEqualTo(DEFAULT_LASTNAME);
             assertThat(testUser.getEmail()).isNull();
-            assertThat(testUser.getHotelId()).isEqualTo(hotel.getId());
             assertThat(passwordEncoder.matches(DEFAULT_PASSWORD, testUser.getPassword())).isTrue();
 
         });
@@ -201,7 +185,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId("invalid");
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -222,7 +205,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         // 1st call should work fine
@@ -251,7 +233,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -264,7 +245,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -277,7 +257,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -290,7 +269,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(MORE_THAN_50_CHARS);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -303,7 +281,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(null);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -316,7 +293,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(MORE_THAN_50_CHARS);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -329,7 +305,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname("");
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -342,7 +317,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(MORE_THAN_254_CHARS);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -355,7 +329,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail("abc");
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -368,7 +341,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(null);
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -381,7 +353,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(MORE_THAN_50_CHARS);
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -394,7 +365,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId("");
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         restUserMockMvc
@@ -407,7 +377,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(null);
 
         restUserMockMvc
@@ -420,7 +389,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(MORE_THAN_50_CHARS);
 
         restUserMockMvc
@@ -433,7 +401,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword("1234567");
 
         restUserMockMvc
@@ -459,7 +426,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc.perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(userUpdateDTO))).andExpect(status().isOk());
@@ -473,7 +439,6 @@ public class UserControllerIT {
             assertThat(testUser.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
             assertThat(testUser.getLastName()).isEqualTo(DEFAULT_LASTNAME);
             assertThat(testUser.getEmail()).isEqualTo(DEFAULT_EMAIL);
-            assertThat(testUser.getHotelId()).isEqualTo(hotel.getId());
 
         });
     }
@@ -490,7 +455,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId("invalid");
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -516,7 +480,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -537,7 +500,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -549,7 +511,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -561,7 +522,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -573,7 +533,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(MORE_THAN_50_CHARS);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -585,7 +544,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(null);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -597,7 +555,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(MORE_THAN_50_CHARS);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -609,7 +566,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname("");
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -621,7 +577,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(MORE_THAN_254_CHARS);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -633,7 +588,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail("abc");
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -645,7 +599,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(null);
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -657,7 +610,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(MORE_THAN_50_CHARS);
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -669,7 +621,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId("");
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -681,7 +632,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -693,7 +643,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -705,7 +654,6 @@ public class UserControllerIT {
         userUpdateDTO.setFirstname(DEFAULT_FIRSTNAME);
         userUpdateDTO.setLastname(DEFAULT_LASTNAME);
         userUpdateDTO.setEmail(DEFAULT_EMAIL);
-        userUpdateDTO.setHotelId(hotel.getId());
 
         restUserMockMvc
                 .perform(put("/api/users").contentType(MediaType.APPLICATION_JSON)
@@ -777,7 +725,6 @@ public class UserControllerIT {
         userCreationDTO.setFirstname(DEFAULT_FIRSTNAME);
         userCreationDTO.setLastname(DEFAULT_LASTNAME);
         userCreationDTO.setEmail(DEFAULT_EMAIL);
-        userCreationDTO.setHotelId(hotel.getId());
         userCreationDTO.setPassword(DEFAULT_PASSWORD);
 
         // Expect this to return Forbidden as no one but an Admin can create a user

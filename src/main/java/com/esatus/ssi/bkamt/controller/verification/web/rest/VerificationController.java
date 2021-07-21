@@ -55,9 +55,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api")
 public class VerificationController {
 
-	private final Logger log = LoggerFactory.getLogger(UserController.class);
+    private final Logger log = LoggerFactory.getLogger(UserController.class);
 
-	@Autowired
+    @Autowired
 	VerificationService verificationService;
 
 	/**
@@ -73,8 +73,6 @@ public class VerificationController {
 	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
 	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<VerificationDTO> createVerification(@Valid @RequestBody VerificationCreationDTO verificationCreationDTO) {
-
-		log.debug("REST request to create a new verification : {}", verificationCreationDTO);
 
         try {
             VerificationDTO createdVerification = this.verificationService.createVerification(verificationCreationDTO);

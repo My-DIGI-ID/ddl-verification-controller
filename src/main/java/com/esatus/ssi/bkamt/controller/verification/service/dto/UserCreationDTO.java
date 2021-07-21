@@ -42,10 +42,6 @@ public class UserCreationDTO {
     @Email
     private String email;
 
-    @Size(min = 1, max = 50)
-    @NotNull
-    private String hotelId;
-
     @Size(min = 8, max = 50)
     @NotNull
     private String password;
@@ -86,14 +82,6 @@ public class UserCreationDTO {
         this.email = email;
     }
 
-    public String getHotelId() {
-        return hotelId;
-    }
-
-    public void setHotelId(String hotelId) {
-        this.hotelId = hotelId;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -110,7 +98,6 @@ public class UserCreationDTO {
             ", firstname='" + firstname + '\'' +
             ", lastname='" + lastname + '\'' +
             ", email='" + email + '\'' +
-            ", hotelId=" + hotelId +
             "}";
     }
 }
