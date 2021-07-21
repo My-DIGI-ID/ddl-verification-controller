@@ -1,6 +1,8 @@
 package com.esatus.ssi.bkamt.controller.verification.service.mapper;
 
+import com.esatus.ssi.bkamt.controller.verification.domain.User;
 import com.esatus.ssi.bkamt.controller.verification.domain.Verification;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.UserDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationDTO;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +43,16 @@ public class VerificationMapper {
         return verifications.stream().filter(Objects::nonNull).map(this::verificationToVerificationDTO).collect(Collectors.toList());
     }
 
-    public List<Verification> verficiationDTOsToVerifications(List<VerificationDTO> verificationDtos) {
+    public List<Verification> verificationDTOsToVerifications(List<VerificationDTO> verificationDtos) {
         return verificationDtos.stream().filter(Objects::nonNull).map(this::verificationDTOToVerification).collect(Collectors.toList());
+    }
+
+    public Verification verificationFromId(String id) {
+        if (id == null) {
+            return null;
+        }
+        Verification verification = new Verification();
+        verification.setId(id);
+        return verification;
     }
 }
