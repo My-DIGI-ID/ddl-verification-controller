@@ -46,7 +46,6 @@ import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrVal
 import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesMasterId;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.CorporateIdDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.MasterIdDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
 
@@ -188,21 +187,4 @@ public class ProofServiceImpl implements ProofService {
 
     return masterId;
   }
-
-  private CorporateIdDTO createCorporateIdDTO(ProofRecordDTO proofRecordDTO) {
-    CorporateIdDTO corporateId = new CorporateIdDTO();
-    this.log.debug(proofRecordDTO.toString());
-
-    RevealedAttrValuesCorporateId values =
-        proofRecordDTO.getPresentation().getRequestedProof().getRevealedAttrGroups().getCorporateId().getValues();
-    corporateId.setFirstName(values.getFirstName().getRaw());
-    corporateId.setFamilyName(values.getLastName().getRaw());
-    corporateId.setCompanyName(values.getFirmName().getRaw());
-    corporateId.setCompanySubject(values.getFirmSubject().getRaw());
-    corporateId.setCompanyAddressStreet(values.getFirmStreet().getRaw());
-    corporateId.setCompanyAddressZipCode(values.getFirmPostalcode().getRaw());
-    corporateId.setCompanyAddressCity(values.getFirmCity().getRaw());
-    return corporateId;
-  }
-
 }

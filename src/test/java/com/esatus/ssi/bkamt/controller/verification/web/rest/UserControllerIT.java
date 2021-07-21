@@ -37,13 +37,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import com.esatus.ssi.bkamt.controller.verification.VerificationControllerApp;
 import com.esatus.ssi.bkamt.controller.verification.domain.Authority;
-import com.esatus.ssi.bkamt.controller.verification.domain.Hotel;
 import com.esatus.ssi.bkamt.controller.verification.domain.User;
 import com.esatus.ssi.bkamt.controller.verification.repository.UserRepository;
 import com.esatus.ssi.bkamt.controller.verification.security.AuthoritiesConstants;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.UserCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.UserDTO;
-import com.esatus.ssi.bkamt.controller.verification.web.rest.UserController;
 
 /**
  * Integration tests for the {@link UserController} REST controller.
