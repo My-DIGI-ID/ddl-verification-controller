@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package com.esatus.ssi.bkamt.controller.verification.client.model;
+package com.esatus.ssi.bkamt.agent.model;
 
+import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestService;
+import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestThread;
+import com.esatus.ssi.bkamt.controller.verification.client.model.RequestPresentationAttach;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

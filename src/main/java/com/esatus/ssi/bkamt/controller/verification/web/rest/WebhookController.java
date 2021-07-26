@@ -16,8 +16,9 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
+import com.esatus.ssi.bkamt.agent.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.VerificationControllerApp;
-import com.esatus.ssi.bkamt.controller.verification.client.ACAPYClient;
+import com.esatus.ssi.bkamt.controller.verification.service.CheckInCredentialService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,10 +44,13 @@ public class WebhookController {
     private static final Logger log = LoggerFactory.getLogger(VerificationControllerApp.class);
 
     @Autowired
-    ACAPYClient acapyClient;
+    AgentClient acapyClient;
 
     @Autowired
     ProofService proofService;
+
+    @Autowired
+    CheckInCredentialService checkInCredentialService;
 
     @PostMapping("/present_proof")
     @Operation(security = @SecurityRequirement(name = "X-API-Key"))
