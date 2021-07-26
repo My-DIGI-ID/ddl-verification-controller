@@ -28,21 +28,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import com.esatus.ssi.bkamt.controller.verification.client.ACAPYClient;
-import com.esatus.ssi.bkamt.controller.verification.client.model.Base64Payload;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ConnectionlessProofRequest;
+import com.esatus.ssi.bkamt.agent.AgentClient;
+import com.esatus.ssi.bkamt.agent.client.model.AllOfIndyProofReqAttrSpecNonRevoked;
+import com.esatus.ssi.bkamt.agent.client.model.IndyProofReqAttrSpec;
+import com.esatus.ssi.bkamt.agent.client.model.IndyProofRequest;
+import com.esatus.ssi.bkamt.agent.client.model.V10PresentationCreateRequestRequest;
+import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
+import com.esatus.ssi.bkamt.agent.model.Base64Payload;
+import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.model.EmptyDTO;
-import com.esatus.ssi.bkamt.controller.verification.client.model.NonRevokedRestriction;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRecordDTO;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequest;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestDTO;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestProperty;
+import com.esatus.ssi.bkamt.controller.verification.client.model.Presentation;
+import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestDict;
 import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestService;
 import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestThread;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofResponseDTO;
 import com.esatus.ssi.bkamt.controller.verification.client.model.RequestPresentationAttach;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RequestedAttributes;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RequestedPredicates;
 import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesCorporateId;
 import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesMasterId;
 import com.esatus.ssi.bkamt.controller.verification.domain.CheckInCredential;
@@ -62,7 +61,7 @@ public class ProofServiceImpl implements ProofService {
   private final Logger log = LoggerFactory.getLogger(ProofServiceImpl.class);
 
   @Autowired
-  ACAPYClient acapyClient;
+  AgentClient acapyClient;
 
   @Autowired
   CheckInCredentialService checkInCredentialService;
@@ -87,8 +86,9 @@ public class ProofServiceImpl implements ProofService {
   public URI getProofURI(String hotelId, String deskId) {
 
     // prepare a proof request DTO and send it to the agent
-    ProofRequestDTO connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
-    ProofResponseDTO proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
+    V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
+    V10PresentationExchange proofResponseDTO =
+        this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
     log.debug("agent created a proof request: {}", proofResponseDTO);
 
     // create a new entry for this presentationExchangeId in the database
@@ -114,7 +114,7 @@ public class ProofServiceImpl implements ProofService {
 
   }
 
-  private ConnectionlessProofRequest prepareConnectionlessProofRequest(ProofResponseDTO proofResponseDTO) {
+  private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
     String threadId = proofResponseDTO.getThreadId();
     ConnectionlessProofRequest connectionlessProofRequest = new ConnectionlessProofRequest();
     connectionlessProofRequest.setId(threadId);
@@ -123,9 +123,12 @@ public class ProofServiceImpl implements ProofService {
     RequestPresentationAttach requestPresentationAttach = new RequestPresentationAttach();
     requestPresentationAttach.setId(ARIES_ATTACH_ID);
     requestPresentationAttach.setMimeType(MediaType.APPLICATION_JSON_VALUE);
+
+    ProofRequestDict proofRequestDict =
+        new ObjectMapper().convertValue(proofResponseDTO.getPresentationRequestDict(), ProofRequestDict.class);
+
     Base64Payload base64Payload = new Base64Payload();
-    base64Payload
-        .setBase64(proofResponseDTO.getProofRequestDict().getRequestPresentationsAttach()[0].getData().getBase64());
+    base64Payload.setBase64(proofRequestDict.getRequestPresentationsAttach()[0].getData().getBase64());
     requestPresentationAttach.setData(base64Payload);
 
     RequestPresentationAttach[] requestPresentationAttaches = new RequestPresentationAttach[1];
@@ -150,32 +153,33 @@ public class ProofServiceImpl implements ProofService {
     connectionlessProofRequest.setThread(proofRequestThread);
 
     return connectionlessProofRequest;
+
   }
 
-  private ProofRequestDTO prepareConnectionlessProofRequest() {
+  private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
 
-    RequestedPredicates requestedPredicates = new RequestedPredicates();
-
-    RequestedAttributes requestedAttributes = new RequestedAttributes();
+    Map<String, IndyProofReqAttrSpec> requestedAttributes = new HashMap<>();
     this.addMasterIdAttributes(requestedAttributes);
 
     // Composing the proof request
-    ProofRequest proofRequest = new ProofRequest();
+    IndyProofRequest proofRequest = new IndyProofRequest();
     proofRequest.setName("Proof request");
-    proofRequest.setRequestedPredicates(requestedPredicates);
+    proofRequest.setRequestedPredicates(new HashMap<>());
+
     proofRequest.setRequestedAttributes(requestedAttributes);
     proofRequest.setVersion("0.1");
     int nonce = secureRandom.nextInt();
     proofRequest.setNonce(String.valueOf(nonce));
 
-    ProofRequestDTO connectionlessProofCreationRequest = new ProofRequestDTO();
+    V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
     connectionlessProofCreationRequest.setComment("string");
     connectionlessProofCreationRequest.setProofRequest(proofRequest);
+
 
     return connectionlessProofCreationRequest;
   }
 
-  private void addMasterIdAttributes(RequestedAttributes requestedAttributes) {
+  private void addMasterIdAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
     // Restriction regarding CredDefs for masterId
     String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
     List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
@@ -185,19 +189,19 @@ public class ProofServiceImpl implements ProofService {
       masterIdRestrictions.add(temp);
     }
 
-    ProofRequestProperty proofRequestMasterId = new ProofRequestProperty();
+    IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
     List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
         "addressCity", "dateOfExpiry", "dateOfBirth");
     proofRequestMasterId.setNames(names);
 
     // Restriction regarding Revocation
-    NonRevokedRestriction nonRevokedRestriction = new NonRevokedRestriction();
-    nonRevokedRestriction.setFrom(0);
+    AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
     nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
 
-    proofRequestMasterId.setNonRevokedRestriction(nonRevokedRestriction);
+    proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
     proofRequestMasterId.setRestrictions(masterIdRestrictions);
-    requestedAttributes.setMasterId(proofRequestMasterId);
+
+    requestedAttributes.put("masterId", proofRequestMasterId);
   }
 
 
@@ -229,7 +233,7 @@ public class ProofServiceImpl implements ProofService {
       log.debug("Getting presentation information from the agent");
 
       // get the proof record from the agent
-      ProofRecordDTO proofRecordDTO = this.acapyClient.getProofRecord(apikey, presentationExchangeId);
+      V10PresentationExchange proofRecordDTO = this.acapyClient.getProofRecord(apikey, presentationExchangeId);
 
       // construct a corporateId out of the proof
       CorporateIdDTO corporateId = this.createCorporateIdDTO(proofRecordDTO);
@@ -251,38 +255,57 @@ public class ProofServiceImpl implements ProofService {
     }
   }
 
-  private MasterIdDTO createMasterIdDTO(ProofRecordDTO proofRecordDTO) {
+  private MasterIdDTO createMasterIdDTO(V10PresentationExchange proofRecordDTO) {
     MasterIdDTO masterId = new MasterIdDTO();
     this.log.debug(proofRecordDTO.toString());
 
-    RevealedAttrValuesMasterId values =
-        proofRecordDTO.getPresentation().getRequestedProof().getRevealedAttrGroups().getMasterId().getValues();
-    masterId.setFirstName(values.getFirstName().getRaw());
-    masterId.setFamilyName(values.getFamilyName().getRaw());
-    masterId.setAddressStreet(values.getAddressStreet().getRaw());
-    masterId.setAddressZipCode(values.getAddressZipCode().getRaw());
-    masterId.setAddressCity(values.getAddressCity().getRaw());
-    masterId.setAddressCountry(values.getAddressCountry().getRaw());
-    masterId.setDateOfExpiryFromString(values.getDateOfExpiry().getRaw());
-    masterId.setDateOfBirthFromString(values.getDateOfBirth().getRaw());
+    ObjectMapper mapper = new ObjectMapper();
 
-    return masterId;
+    try {
+      // TODO if it is a map, use mapper.convertValue!
+      Presentation presentation = mapper.readValue(proofRecordDTO.getPresentation().toString(), Presentation.class);
+
+      RevealedAttrValuesMasterId values =
+          presentation.getRequestedProof().getRevealedAttrGroups().getMasterId().getValues();
+      masterId.setFirstName(values.getFirstName().getRaw());
+      masterId.setFamilyName(values.getFamilyName().getRaw());
+      masterId.setAddressStreet(values.getAddressStreet().getRaw());
+      masterId.setAddressZipCode(values.getAddressZipCode().getRaw());
+      masterId.setAddressCity(values.getAddressCity().getRaw());
+      masterId.setAddressCountry(values.getAddressCountry().getRaw());
+      masterId.setDateOfExpiryFromString(values.getDateOfExpiry().getRaw());
+      masterId.setDateOfBirthFromString(values.getDateOfBirth().getRaw());
+
+      return masterId;
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+      throw new RuntimeException();
+    }
   }
 
-  private CorporateIdDTO createCorporateIdDTO(ProofRecordDTO proofRecordDTO) {
+  private CorporateIdDTO createCorporateIdDTO(V10PresentationExchange proofRecordDTO) {
     CorporateIdDTO corporateId = new CorporateIdDTO();
     this.log.debug(proofRecordDTO.toString());
 
-    RevealedAttrValuesCorporateId values =
-        proofRecordDTO.getPresentation().getRequestedProof().getRevealedAttrGroups().getCorporateId().getValues();
-    corporateId.setFirstName(values.getFirstName().getRaw());
-    corporateId.setFamilyName(values.getLastName().getRaw());
-    corporateId.setCompanyName(values.getFirmName().getRaw());
-    corporateId.setCompanySubject(values.getFirmSubject().getRaw());
-    corporateId.setCompanyAddressStreet(values.getFirmStreet().getRaw());
-    corporateId.setCompanyAddressZipCode(values.getFirmPostalcode().getRaw());
-    corporateId.setCompanyAddressCity(values.getFirmCity().getRaw());
-    return corporateId;
-  }
+    ObjectMapper mapper = new ObjectMapper();
 
+    try {
+      // TODO if it is a map, use mapper.convertValue!
+      Presentation presentation = mapper.readValue(proofRecordDTO.getPresentation().toString(), Presentation.class);
+
+      RevealedAttrValuesCorporateId values =
+          presentation.getRequestedProof().getRevealedAttrGroups().getCorporateId().getValues();
+      corporateId.setFirstName(values.getFirstName().getRaw());
+      corporateId.setFamilyName(values.getLastName().getRaw());
+      corporateId.setCompanyName(values.getFirmName().getRaw());
+      corporateId.setCompanySubject(values.getFirmSubject().getRaw());
+      corporateId.setCompanyAddressStreet(values.getFirmStreet().getRaw());
+      corporateId.setCompanyAddressZipCode(values.getFirmPostalcode().getRaw());
+      corporateId.setCompanyAddressCity(values.getFirmCity().getRaw());
+      return corporateId;
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+      throw new RuntimeException();
+    }
+  }
 }
