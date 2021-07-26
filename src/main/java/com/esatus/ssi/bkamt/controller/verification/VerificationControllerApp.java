@@ -25,6 +25,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import com.esatus.ssi.bkamt.controller.verification.config.ApplicationProperties;
 import io.github.jhipster.config.DefaultProfileUtil;
@@ -33,6 +34,7 @@ import io.github.jhipster.config.JHipsterConstants;
 @SpringBootApplication
 @EnableFeignClients
 @EnableConfigurationProperties({ApplicationProperties.class})
+@ComponentScan(basePackages = {"com.esatus.ssi.bkamt"})
 public class VerificationControllerApp {
 
   private static final Logger log = LoggerFactory.getLogger(VerificationControllerApp.class);
