@@ -59,7 +59,7 @@ public class VerificationController {
 	/**
 	 * {@code POST  /verification} : Create a new verification
 	 *
-	 * @param verificationDTO the verification to create
+	 * @param verificationCreationDTO the verification to create
 	 * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
 	 *         the body the new verification, or with status
 	 *         {@code 400 (Bad Request)} {@code 400 (Bad Request)} if a verification
@@ -77,13 +77,13 @@ public class VerificationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 	}
-	
+
 	/**
 	 * {@code GET  /verifications/{apiKey} : Returns the verification with the given api key.
 	 *
 	 * @param apiKey the api key of the verification to retrieve.
 	 * @return the {@link ResponseEntity}  with status {@code 200 (OK)} and with body
-     *         the hotel, or with status {@code 404 (Not Found)}.
+     *         the verification, or with status {@code 404 (Not Found)}.
 	 */
 	@GetMapping("/verifications/{apiKey}")
 	public ResponseEntity<VerificationDTO> getVerification(@PathVariable String apiKey) {
