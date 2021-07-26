@@ -16,6 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
+import com.esatus.ssi.bkamt.controller.verification.service.VerificationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -40,6 +42,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 
+    @Autowired
+    VerificationService verificationService;
+
     @Value("${ssibk.verification.controller.apikey}")
     private String apikey;
 
@@ -62,7 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
 
         AuthFilter filter = new AuthFilter(API_KEY_AUTH_HEADER_NAME);
-        filter.setAuthenticationManager(new AuthManager(apikey));
+        filter.setAuthenticationManager(new AuthManager(verificationService));
         // @formatter:off
         http
             .csrf()
