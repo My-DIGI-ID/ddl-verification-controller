@@ -55,7 +55,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api")
 public class VerificationController {
 
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
+    private final Logger log = LoggerFactory.getLogger(VerificationController.class);
 
     @Autowired
 	VerificationService verificationService;
@@ -70,8 +70,6 @@ public class VerificationController {
 	 *         with the given name does already exist.
 	 */
 	@PostMapping("/verifications")
-	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<VerificationDTO> createVerification(@Valid @RequestBody VerificationCreationDTO verificationCreationDTO) {
 
         try {
