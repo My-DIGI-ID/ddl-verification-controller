@@ -25,6 +25,5 @@ import com.esatus.ssi.bkamt.controller.verification.service.exceptions.Verificat
 public interface VerificationService {
 	VerificationDTO createVerification(VerificationCreationDTO verificationDto) throws VerificationAlreadyExistsException;
 	Optional<VerificationDTO> getVerification(String apiKey);
-	void deleteVerification(String id);
     boolean verificationExists(String apiKey);
 }
