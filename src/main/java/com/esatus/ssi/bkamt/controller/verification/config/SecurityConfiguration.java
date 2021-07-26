@@ -87,16 +87,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
             .authorizeRequests()
-            .antMatchers("/api/authenticate").permitAll()
             .antMatchers("/api/request-proof").permitAll()
             .antMatchers("/api/checkin-credentials/subscribe").permitAll()
-            .antMatchers("/topic/*").authenticated()
             .antMatchers("/api/**").authenticated()
-            .antMatchers("/topic/**").permitAll()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/info").permitAll()
-            .antMatchers("/management/prometheus").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
         .and()
             .httpBasic();
         // @formatter:on
