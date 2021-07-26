@@ -79,7 +79,6 @@
 		<junit.utReportFolder>${project.testresult.directory}/test</junit.utReportFolder>
 		<junit.itReportFolder>${project.testresult.directory}/integrationTest</junit.itReportFolder>
 		<swagger-codegen-maven-plugin-version>3.0.27</swagger-codegen-maven-plugin-version>
-		<gson.version>2.8.7</gson.version>
 		<swagger.annotations.version>2.1.10</swagger.annotations.version>
 		<!-- jhipster-needle-maven-property -->
 		<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
@@ -272,11 +271,6 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>${gson.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations</artifactId>
 			<version>${swagger.annotations.version}</version>
@@ -381,8 +375,10 @@
 							</goals>
 							<configuration>
 								<inputSpec>${project.basedir}/src/main/resources/swagger/agent.json</inputSpec>
-								<language>spring</language>
-								<!-- <apiPackage>${default.package}.handler</apiPackage> -->
+								<!-- <language>spring</language>-->
+								<language>java</language>
+								<!-- <library>spring-boot</library>-->
+								<library>resttemplate</library>
 								<modelPackage>com.esatus.ssi.bkamt.agent.client.model</modelPackage>
 								<generateApis>false</generateApis>
 								<generateApiTests>false</generateApiTests>

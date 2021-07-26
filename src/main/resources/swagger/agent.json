@@ -7714,7 +7714,7 @@
          ],
          "type":"object"
       },
-      "Schema":{
+      "IndySchema":{
          "properties":{
             "attrNames":{
                "description":"Schema attribute names",
@@ -7761,7 +7761,7 @@
       "SchemaGetResult":{
          "properties":{
             "schema":{
-               "$ref":"#/definitions/Schema"
+               "$ref":"#/definitions/IndySchema"
             }
          },
          "type":"object"
