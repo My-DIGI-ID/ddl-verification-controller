@@ -16,6 +16,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.client.model;
 
+import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RequestPresentationAttach {
