@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.esatus.ssi.bkamt.agent;
+package com.esatus.ssi.bkamt.controller.verification.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Repository;

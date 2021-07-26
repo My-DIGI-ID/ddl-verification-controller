@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import com.esatus.ssi.bkamt.agent.AgentClient;
 import com.esatus.ssi.bkamt.agent.client.model.AllOfIndyProofReqAttrSpecNonRevoked;
 import com.esatus.ssi.bkamt.agent.client.model.IndyProofReqAttrSpec;
 import com.esatus.ssi.bkamt.agent.client.model.IndyProofRequest;
@@ -36,6 +35,7 @@ import com.esatus.ssi.bkamt.agent.client.model.V10PresentationCreateRequestReque
 import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
+import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.client.model.EmptyDTO;
 import com.esatus.ssi.bkamt.controller.verification.client.model.Presentation;
 import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestDict;
