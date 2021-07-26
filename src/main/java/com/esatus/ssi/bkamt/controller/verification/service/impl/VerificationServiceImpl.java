@@ -45,12 +45,6 @@ public class VerificationServiceImpl implements VerificationService  {
         return this.verificationMapper.verificationToVerificationDTO(verification);
 	}
 
-	@Override
-	public void deleteVerification(String id) {
-		log.debug("delete verification");
-        this.verificationRepository.deleteById(id);
-	}
-
     @Override
     public boolean verificationExists(String apiKey) {
         log.debug("check if verification record with apiKey exists");
