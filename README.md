@@ -181,3 +181,7 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [running tests page]: https://www.jhipster.tech/documentation-archive/v6.10.5/running-tests/
 [code quality page]: https://www.jhipster.tech/documentation-archive/v6.10.5/code-quality/
 [setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v6.10.5/setting-up-ci/
+
+## Troubleshooting
+### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException... 
+- Remove the .m2 folder in your user directory and rebuild with ``mvnw``

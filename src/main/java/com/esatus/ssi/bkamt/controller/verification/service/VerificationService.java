@@ -16,12 +16,14 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
+import java.util.Optional;
+
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationAlreadyExistsException;
 
 public interface VerificationService {
-	// public UserDTO createUser(UserCreationDTO userDTO) throws UserAlreadyExistsException, HotelNotFoundException;
 	public VerificationDTO createVerification(VerificationCreationDTO verificationDto) throws VerificationAlreadyExistsException;
+	Optional<VerificationDTO> getVerification(String apiKey);
 	void deleteVerification(String id);
 }

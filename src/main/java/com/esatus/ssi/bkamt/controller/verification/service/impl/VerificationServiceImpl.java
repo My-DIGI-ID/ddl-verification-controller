@@ -47,6 +47,13 @@ public class VerificationServiceImpl implements VerificationService  {
 
 	@Override
 	public void deleteVerification(String id) {
-		// TODO Auto-generated method stub
+		log.debug("delete verification");
+        this.verificationRepository.deleteById(id);
+	}
+
+	@Override
+	public Optional<VerificationDTO> getVerification(String apiKey) {
+		log.debug("get verification by apiKey");
+		return verificationRepository.findByApiKey(apiKey).map(verificationMapper::verificationToVerificationDTO);
 	}
 }

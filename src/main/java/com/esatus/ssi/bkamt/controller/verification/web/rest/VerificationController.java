@@ -17,6 +17,7 @@
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
 import java.net.URI;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +39,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationDTO;
+
+import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -72,4 +77,18 @@ public class VerificationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 	}
+	
+	/**
+	 * {@code GET  /verifications/{apiKey} : Returns the verification with the given api key.
+	 *
+	 * @param apiKey the api key of the verification to retrieve.
+	 * @return the {@link ResponseEntity}  with status {@code 200 (OK)} and with body
+     *         the hotel, or with status {@code 404 (Not Found)}.
+	 */
+	@GetMapping("/verifications/{apiKey}")
+	public ResponseEntity<VerificationDTO> getVerification(@PathVariable String apiKey) {
+        log.debug("REST request to get hotel : {}", apiKey);
+        Optional<VerificationDTO> verificationDTO = this.verificationService.getVerification(apiKey);
+        return ResponseUtil.wrapOrNotFound(verificationDTO);
+    }
 }
