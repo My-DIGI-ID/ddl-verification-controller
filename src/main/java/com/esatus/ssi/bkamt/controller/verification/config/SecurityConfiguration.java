@@ -17,7 +17,6 @@
 package com.esatus.ssi.bkamt.controller.verification.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -26,8 +25,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
@@ -35,7 +32,6 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 import com.esatus.ssi.bkamt.controller.verification.security.*;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
-import com.esatus.ssi.bkamt.controller.verification.security.jwt.*;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
