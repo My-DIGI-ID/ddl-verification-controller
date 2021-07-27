@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface VerifierRepository extends MongoRepository<Verifier, String> {
-
     Optional<Verifier> findOneByName(String name);
-
 	Optional<Verifier> findByApiKey(String apiKey);
 }

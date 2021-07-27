@@ -4,6 +4,5 @@ import com.esatus.ssi.bkamt.controller.verification.service.dto.PresentationRequ
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
 
 public interface PresentationRequestService {
-    // TODO: Which errors can occur?
     PresentationRequestDTO createPresentationRequest(PresentationRequestDTO presentationRequestDTO) throws PresentationRequestsAlreadyExists;
 }

@@ -46,7 +46,7 @@ public class VerificationControllerApp {
   }
 
   /**
-   * Initializes HotelController.
+   * Initializes VerificationController.
    * <p>
    * Spring profiles can be configured with a program argument --spring.profiles.active=your-active-profile
    * <p>
