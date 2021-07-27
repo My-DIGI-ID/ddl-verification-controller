@@ -3,32 +3,32 @@ package com.esatus.ssi.bkamt.controller.verification.service.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.esatus.ssi.bkamt.controller.verification.domain.Verification;
+import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 
 
 /**
- * A DTO representing a verification
+ * A DTO representing a verifier
  */
-public class VerificationDTO {
+public class VerifierDTO {
 	@NotNull
     private String id;
-	
+
 	@NotBlank
     @NotNull
     private String apiKey;
-	
+
 	@NotBlank
     @NotNull
     private String name;
-	
-	public VerificationDTO() {
+
+	public VerifierDTO() {
         // Empty constructor needed for Jackson.
     }
-	
-	public VerificationDTO(Verification verification) {
-        this.id = verification.getId();
-        this.apiKey = verification.getApiKey();
-        this.name = verification.getName();
+
+	public VerifierDTO(Verifier verifier) {
+        this.id = verifier.getId();
+        this.apiKey = verifier.getApiKey();
+        this.name = verifier.getName();
     }
 
 	public String getId() {

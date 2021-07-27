@@ -7,21 +7,21 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 
 /**
- * A verification.
+ * A verifier.
  */
-@org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_verification")
-public class Verification {
-	
+@org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_verifier")
+public class Verifier {
+
 	@Id
     private String id;
-	
+
 	@NotNull
 	@Field("api_key")
     private String apiKey;
-	
+
 	@NotNull
     private String name;
-	
+
 	public String getId() {
 		return id;
 	}

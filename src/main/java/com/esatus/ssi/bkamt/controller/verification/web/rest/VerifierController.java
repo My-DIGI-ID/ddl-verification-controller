@@ -37,21 +37,21 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationCreationDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * REST controller for managing verifications.
+ * REST controller for managing verifiers.
  */
-@Tag(name = "Verification", description = "Manage verification")
+@Tag(name = "Verifier", description = "Manage Verifier")
 @RestController
 @RequestMapping("/api")
-public class VerificationController {
+public class VerifierController {
 
-    private final Logger log = LoggerFactory.getLogger(VerificationController.class);
+    private final Logger log = LoggerFactory.getLogger(VerifierController.class);
 
     @Autowired
 	VerificationService verificationService;
@@ -59,17 +59,17 @@ public class VerificationController {
 	/**
 	 * {@code POST  /verification} : Create a new verification
 	 *
-	 * @param verificationCreationDTO the verification to create
+	 * @param verifierCreationDTO the verification to create
 	 * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
 	 *         the body the new verification, or with status
 	 *         {@code 400 (Bad Request)} {@code 400 (Bad Request)} if a verification
 	 *         with the given name does already exist.
 	 */
-	@PostMapping("/verifications")
-	public ResponseEntity<VerificationDTO> createVerification(@Valid @RequestBody VerificationCreationDTO verificationCreationDTO) {
+	@PostMapping("/verifier")
+	public ResponseEntity<VerifierDTO> createVerification(@Valid @RequestBody VerifierCreationDTO verifierCreationDTO) {
 
         try {
-            VerificationDTO createdVerification = this.verificationService.createVerification(verificationCreationDTO);
+            VerifierDTO createdVerification = this.verificationService.createVerification(verifierCreationDTO);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdVerification.getId()).toUri();
             return ResponseEntity.created(location).body(createdVerification);
@@ -79,16 +79,16 @@ public class VerificationController {
 	}
 
 	/**
-	 * {@code GET  /verifications/{apiKey} : Returns the verification with the given api key.
+	 * {@code GET  /verifier/{apiKey} : Returns the verification with the given api key.
 	 *
 	 * @param apiKey the api key of the verification to retrieve.
 	 * @return the {@link ResponseEntity}  with status {@code 200 (OK)} and with body
      *         the verification, or with status {@code 404 (Not Found)}.
 	 */
-	@GetMapping("/verifications/{apiKey}")
-	public ResponseEntity<VerificationDTO> getVerification(@PathVariable String apiKey) {
+	@GetMapping("/verifier/{apiKey}")
+	public ResponseEntity<VerifierDTO> getVerification(@PathVariable String apiKey) {
         log.debug("REST request to get hotel : {}", apiKey);
-        Optional<VerificationDTO> verificationDTO = this.verificationService.getVerification(apiKey);
+        Optional<VerifierDTO> verificationDTO = this.verificationService.getVerification(apiKey);
         return ResponseUtil.wrapOrNotFound(verificationDTO);
     }
 }

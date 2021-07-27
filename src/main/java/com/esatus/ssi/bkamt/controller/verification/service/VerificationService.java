@@ -18,12 +18,12 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 
 import java.util.Optional;
 
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationCreationDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationAlreadyExistsException;
 
 public interface VerificationService {
-	VerificationDTO createVerification(VerificationCreationDTO verificationDto) throws VerificationAlreadyExistsException;
-	Optional<VerificationDTO> getVerification(String apiKey);
+	VerifierDTO createVerification(VerifierCreationDTO verificationDto) throws VerificationAlreadyExistsException;
+	Optional<VerifierDTO> getVerification(String apiKey);
     boolean verificationExists(String apiKey);
 }

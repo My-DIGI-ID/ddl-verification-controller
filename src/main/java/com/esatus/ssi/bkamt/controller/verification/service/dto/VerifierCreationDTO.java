@@ -3,7 +3,7 @@ package com.esatus.ssi.bkamt.controller.verification.service.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class VerificationCreationDTO {
+public class VerifierCreationDTO {
 	@NotNull
     private String id;
 
@@ -15,7 +15,7 @@ public class VerificationCreationDTO {
     @NotNull
     private String name;
 
-	public VerificationCreationDTO() {
+	public VerifierCreationDTO() {
         // Empty constructor needed for Jackson.
     }
 
@@ -45,7 +45,7 @@ public class VerificationCreationDTO {
 
     @Override
     public String toString() {
-        return "VerificationDTO{" +
+        return "VerifierDTO{" +
             "id='" + id + '\'' +
             ", apiKey='" + apiKey + '\'' +
             ", name='" + name +

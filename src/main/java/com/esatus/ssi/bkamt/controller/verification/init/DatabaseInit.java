@@ -21,13 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
-import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRepository;
+import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
 
 @Component
 public class DatabaseInit {
 
     @Autowired
-    VerificationRepository verificationRepository;
+    VerifierRepository verifierRepository;
 
     @Autowired
     private Environment environment;
