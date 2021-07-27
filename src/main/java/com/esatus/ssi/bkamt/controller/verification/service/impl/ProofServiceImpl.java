@@ -13,41 +13,27 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
-import java.net.URI;
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.esatus.ssi.bkamt.agent.client.model.*;
+import com.esatus.ssi.bkamt.agent.model.Base64Payload;
+import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
+import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
+import com.esatus.ssi.bkamt.controller.verification.client.model.*;
+import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
+import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import com.esatus.ssi.bkamt.agent.client.model.AllOfIndyProofReqAttrSpecNonRevoked;
-import com.esatus.ssi.bkamt.agent.client.model.IndyProofReqAttrSpec;
-import com.esatus.ssi.bkamt.agent.client.model.IndyProofRequest;
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationCreateRequestRequest;
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
-import com.esatus.ssi.bkamt.agent.model.Base64Payload;
-import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
-import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
-import com.esatus.ssi.bkamt.controller.verification.client.model.EmptyDTO;
-import com.esatus.ssi.bkamt.controller.verification.client.model.Presentation;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestDict;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestService;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestThread;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RequestPresentationAttach;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesMasterId;
-import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
-import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.net.URI;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.*;
 
 @Service
 public class ProofServiceImpl implements ProofService {
@@ -146,7 +132,7 @@ public class ProofServiceImpl implements ProofService {
   private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
 
     Map<String, IndyProofReqAttrSpec> requestedAttributes = new HashMap<>();
-    this.addMasterIdAttributes(requestedAttributes);
+    // this.addMasterIdAttributes(requestedAttributes);
 
     // Composing the proof request
     IndyProofRequest proofRequest = new IndyProofRequest();
@@ -205,34 +191,6 @@ public class ProofServiceImpl implements ProofService {
 
     } else {
       log.debug("ignore this state");
-    }
-  }
-
-  private MasterIdDTO createMasterIdDTO(V10PresentationExchange proofRecordDTO) {
-    MasterIdDTO masterId = new MasterIdDTO();
-    this.log.debug(proofRecordDTO.toString());
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    try {
-      // TODO if it is a map, use mapper.convertValue!
-      Presentation presentation = mapper.readValue(proofRecordDTO.getPresentation().toString(), Presentation.class);
-
-      RevealedAttrValuesMasterId values =
-          presentation.getRequestedProof().getRevealedAttrGroups().getMasterId().getValues();
-      masterId.setFirstName(values.getFirstName().getRaw());
-      masterId.setFamilyName(values.getFamilyName().getRaw());
-      masterId.setAddressStreet(values.getAddressStreet().getRaw());
-      masterId.setAddressZipCode(values.getAddressZipCode().getRaw());
-      masterId.setAddressCity(values.getAddressCity().getRaw());
-      masterId.setAddressCountry(values.getAddressCountry().getRaw());
-      masterId.setDateOfExpiryFromString(values.getDateOfExpiry().getRaw());
-      masterId.setDateOfBirthFromString(values.getDateOfBirth().getRaw());
-
-      return masterId;
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
     }
   }
 }
