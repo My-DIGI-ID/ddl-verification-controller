@@ -87,9 +87,8 @@ public class VerifierController {
 	 * @return status {@code 200 (Ok)} when the invalidation was successful or with status
      *         {@code 400 (Bad Request)} when the invalidation failed
 	 */
-	@PostMapping("/invalidate}")
+	@PostMapping("/invalidate")
 	public ResponseEntity<Void> invalidateVerification(@RequestParam(name = "verificationId") String verificationId) {
-
         log.debug("REST request to invalid meta data for verification with id {}", verificationId);
 
         try {

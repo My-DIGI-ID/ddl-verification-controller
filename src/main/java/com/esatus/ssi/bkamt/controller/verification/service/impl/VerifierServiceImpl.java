@@ -18,6 +18,7 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
+import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
@@ -43,6 +44,9 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Autowired
     private VerifierRepository verifierRepository;
+
+    @Autowired
+    private VerificationRequestRepository verificationRequestRepository;
 
     @Autowired
     private VerifierMapper verifierMapper;
@@ -76,7 +80,7 @@ public class VerifierServiceImpl implements VerifierService {
 	    // TODO: Do we need to delete the whole verification or do we just empty the metadata?
         // For now we will delete the whole record from the database
         log.debug("invalidate verification with id {}", verificationId);
-        verifierRepository.deleteById(verificationId);
+        verificationRequestRepository.deleteById(verificationId);
     }
 
     @Override
