@@ -26,7 +26,7 @@ import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @Repository
-@FeignClient(name = "ACAPYClient", url = "${ssibk.hotel.controller.agent.apiurl}")
+@FeignClient(name = "ACAPYClient", url = "${ssibk.verification.controller.agent.apiurl}")
 public interface AgentClient {
 
   @RequestMapping(method = RequestMethod.POST, value = "/connections/create-invitation")

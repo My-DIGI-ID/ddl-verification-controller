@@ -61,11 +61,11 @@ public class ProofServiceImpl implements ProofService {
   @Autowired
   NotificationService notificationService;
 
-  private @Value("${ssibk.hotel.controller.agent.apikey}") String apikey;
-  private @Value("${ssibk.hotel.controller.agent.endpoint}") String agentEndpoint;
-  private @Value("${ssibk.hotel.controller.agent.endpointName}") String agentEndpointName;
-  private @Value("${ssibk.hotel.controller.agent.recipientkey}") String agentRecipientKey;
-  private @Value("${ssibk.hotel.controller.agent.masterid.credential_definition_ids}") String masterIdCredDefIdsString;
+  private @Value("${ssibk.verification.controller.agent.apikey}") String apikey;
+  private @Value("${ssibk.verification.controller.agent.endpoint}") String agentEndpoint;
+  private @Value("${ssibk.verification.controller.agent.endpointName}") String agentEndpointName;
+  private @Value("${ssibk.verification.controller.agent.recipientkey}") String agentRecipientKey;
+  private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}") String masterIdCredDefIdsString;
 
   private static final String DIDCOMM_URL = "didcomm://example.org?m=";
   private static final String ARIES_MESSAGE_TYPE =
