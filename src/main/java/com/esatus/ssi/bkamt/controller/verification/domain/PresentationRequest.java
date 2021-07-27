@@ -32,8 +32,6 @@ public class PresentationRequest {
     @NotNull
     private String threadId;
 
-    // TODO: Defined more attributes
-
     public String getId() {
         return id;
     }
@@ -49,4 +47,7 @@ public class PresentationRequest {
     public void setThreadId(String threadId) {
         this.threadId = threadId;
     }
+
+    // TODO: Defined more attributes
+
 }
