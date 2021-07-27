@@ -23,13 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.esatus.ssi.bkamt.controller.verification.VerificationControllerApp;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
-import com.esatus.ssi.bkamt.controller.verification.service.CheckInCredentialService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-// import com.esatus.ssi.bkamt.controller.verification.service.impl.GuestServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Webhooks for ACAPY",
@@ -45,9 +43,6 @@ public class WebhookController {
 
   @Autowired
   ProofService proofService;
-
-  @Autowired
-  CheckInCredentialService checkInCredentialService;
 
   @PostMapping("/present_proof")
   @Operation(security = @SecurityRequirement(name = "X-API-Key"))
