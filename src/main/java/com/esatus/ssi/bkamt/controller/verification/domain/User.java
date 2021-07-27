@@ -73,7 +73,6 @@ public class User extends AbstractAuditingEntity {
     @JsonIgnore
     private Set<Authority> authorities = new HashSet<>();
 
-
     public String getId() {
         return id;
     }

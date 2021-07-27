@@ -16,9 +16,12 @@
 
 package com.esatus.ssi.bkamt.controller.verification.domain;
 
+import com.mongodb.BasicDBObject;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Represents a presentation request for a digital driver license from any id wallet.
@@ -31,6 +34,9 @@ public class PresentationRequest {
 
     @NotNull
     private String threadId;
+
+    @Field("data")
+    private List<BasicDBObject> data;
 
     public String getId() {
         return id;
@@ -48,6 +54,11 @@ public class PresentationRequest {
         this.threadId = threadId;
     }
 
-    // TODO: Defined more attributes
+    public List<BasicDBObject> getData() {
+        return data;
+    }
 
+    public void setData(List<BasicDBObject> data) {
+        this.data = data;
+    }
 }
