@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationAlreadyExistsException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.esatus.ssi.bkamt.controller.verification.service.VerificationService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 
@@ -54,7 +54,7 @@ public class VerifierController {
     private final Logger log = LoggerFactory.getLogger(VerifierController.class);
 
     @Autowired
-	VerificationService verificationService;
+    VerifierService verifierService;
 
 	/**
 	 * {@code POST  /verification} : Create a new verification
@@ -69,11 +69,11 @@ public class VerifierController {
 	public ResponseEntity<VerifierDTO> createVerification(@Valid @RequestBody VerifierCreationDTO verifierCreationDTO) {
 
         try {
-            VerifierDTO createdVerification = this.verificationService.createVerification(verifierCreationDTO);
+            VerifierDTO createdVerification = this.verifierService.createVerifier(verifierCreationDTO);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdVerification.getId()).toUri();
             return ResponseEntity.created(location).body(createdVerification);
-        } catch (VerificationAlreadyExistsException e) {
+        } catch (VerifierAlreadyExistsException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 	}
@@ -88,7 +88,7 @@ public class VerifierController {
 	@GetMapping("/verifier/{apiKey}")
 	public ResponseEntity<VerifierDTO> getVerification(@PathVariable String apiKey) {
         log.debug("REST request to get hotel : {}", apiKey);
-        Optional<VerifierDTO> verificationDTO = this.verificationService.getVerification(apiKey);
+        Optional<VerifierDTO> verificationDTO = this.verifierService.getVerifier(apiKey);
         return ResponseUtil.wrapOrNotFound(verificationDTO);
     }
 }

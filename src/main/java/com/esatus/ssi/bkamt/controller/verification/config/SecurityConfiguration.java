@@ -16,7 +16,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
-import com.esatus.ssi.bkamt.controller.verification.service.VerificationService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Import;
@@ -31,7 +31,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
-import com.esatus.ssi.bkamt.controller.verification.security.*;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
 
@@ -43,7 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final SecurityProblemSupport problemSupport;
 
     @Autowired
-    VerificationService verificationService;
+    VerifierService verifierService;
 
     @Value("${ssibk.verification.controller.apikey}")
     private String apikey;
@@ -67,7 +66,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
 
         AuthFilter filter = new AuthFilter(API_KEY_AUTH_HEADER_NAME);
-        filter.setAuthenticationManager(new AuthManager(verificationService));
+        filter.setAuthenticationManager(new AuthManager(verifierService));
         // @formatter:off
         http
             .csrf()

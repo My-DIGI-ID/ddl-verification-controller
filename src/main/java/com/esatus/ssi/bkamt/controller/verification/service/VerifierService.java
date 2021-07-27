@@ -20,10 +20,10 @@ import java.util.Optional;
 
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationAlreadyExistsException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
 
-public interface VerificationService {
-	VerifierDTO createVerification(VerifierCreationDTO verificationDto) throws VerificationAlreadyExistsException;
-	Optional<VerifierDTO> getVerification(String apiKey);
-    boolean verificationExists(String apiKey);
+public interface VerifierService {
+	VerifierDTO createVerifier(VerifierCreationDTO verifierCreationDTO) throws VerifierAlreadyExistsException;
+	Optional<VerifierDTO> getVerifier(String apiKey);
+    boolean verifierExists(String apiKey);
 }

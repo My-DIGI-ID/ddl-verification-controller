@@ -16,7 +16,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.security.apikey;
 
-import com.esatus.ssi.bkamt.controller.verification.service.VerificationService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -24,17 +24,17 @@ import org.springframework.security.core.AuthenticationException;
 
 public class AuthManager implements AuthenticationManager {
 
-    private final VerificationService verificationService;
+    private final VerifierService verifierService;
 
-    public AuthManager(VerificationService verificationService) {
-        this.verificationService = verificationService;
+    public AuthManager(VerifierService verifierService) {
+        this.verifierService = verifierService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String principal = (String) authentication.getPrincipal();
         // Check if there is a verification in the database with the given API KEY
-        boolean entityExists = verificationService.verificationExists(principal);
+        boolean entityExists = verifierService.verifierExists(principal);
 
         if (entityExists) {
             // If there is a record with the given api key, we are authenticated
