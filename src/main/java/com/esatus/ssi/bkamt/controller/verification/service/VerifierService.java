@@ -23,7 +23,10 @@ import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
 
 public interface VerifierService {
-	VerifierDTO createVerifier(VerifierCreationDTO verifierCreationDTO) throws VerifierAlreadyExistsException;
-	Optional<VerifierDTO> getVerifier(String apiKey);
     boolean verifierExists(String apiKey);
+    void invalidateVerification(String verificationId);
+    Optional<VerifierDTO> getVerifier(String apiKey);
+
+    // TODO: I think we can delete these methods
+    VerifierDTO createVerifier(VerifierCreationDTO verifierCreationDTO) throws VerifierAlreadyExistsException;
 }

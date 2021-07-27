@@ -16,31 +16,15 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
-import java.net.URI;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.*;
 
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 
-import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -57,38 +41,22 @@ public class VerifierController {
     VerifierService verifierService;
 
 	/**
-	 * {@code POST  /verification} : Create a new verification
+	 * {@code POST  /invalidate/{verificationId}} : Invalidates metadata
 	 *
-	 * @param verifierCreationDTO the verification to create
-	 * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
-	 *         the body the new verification, or with status
-	 *         {@code 400 (Bad Request)} {@code 400 (Bad Request)} if a verification
-	 *         with the given name does already exist.
+	 * @param verificationId id of the verfication to invalidate the meta data for
+	 * @return status {@code 200 (Ok)} when the invalidation was successfull or with status
+     *         {@code 400 (Bad Request)} when the invalidation failed
 	 */
-	@PostMapping("/verifier")
-	public ResponseEntity<VerifierDTO> createVerification(@Valid @RequestBody VerifierCreationDTO verifierCreationDTO) {
+	@PostMapping("/invalidate/{verificationId}")
+	public ResponseEntity<Void> invalidateMetadataByVerificationId(@RequestParam(name = "verificationId") String verificationId) {
+
+        log.debug("REST request to invalid meta data for verification with id {}", verificationId);
 
         try {
-            VerifierDTO createdVerification = this.verifierService.createVerifier(verifierCreationDTO);
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdVerification.getId()).toUri();
-            return ResponseEntity.created(location).body(createdVerification);
-        } catch (VerifierAlreadyExistsException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            verifierService.invalidateVerification(verificationId);
+        } catch (Exception e) {
+            return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<Void>(HttpStatus.OK);
 	}
-
-	/**
-	 * {@code GET  /verifier/{apiKey} : Returns the verification with the given api key.
-	 *
-	 * @param apiKey the api key of the verification to retrieve.
-	 * @return the {@link ResponseEntity}  with status {@code 200 (OK)} and with body
-     *         the verification, or with status {@code 404 (Not Found)}.
-	 */
-	@GetMapping("/verifier/{apiKey}")
-	public ResponseEntity<VerifierDTO> getVerification(@PathVariable String apiKey) {
-        log.debug("REST request to get hotel : {}", apiKey);
-        Optional<VerifierDTO> verificationDTO = this.verifierService.getVerifier(apiKey);
-        return ResponseUtil.wrapOrNotFound(verificationDTO);
-    }
 }
