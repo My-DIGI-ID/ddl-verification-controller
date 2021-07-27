@@ -24,11 +24,13 @@ import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreation
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
 import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerifierMapper;
+import com.mongodb.BasicDBObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -82,4 +84,10 @@ public class VerifierServiceImpl implements VerifierService {
 		log.debug("get verifier by apiKey");
 		return verifierRepository.findByApiKey(apiKey).map(verifierMapper::verifierToVerifierDTO);
 	}
+
+    @Override
+    public boolean chekMetaDataCompliance(List<BasicDBObject> data) {
+	    // TODO: Implement compliance check
+        return true;
+    }
 }

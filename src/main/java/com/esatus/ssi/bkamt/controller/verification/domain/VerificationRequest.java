@@ -26,8 +26,8 @@ import java.util.List;
 /**
  * Represents a presentation request for a digital driver license from any id wallet.
  */
-@org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_ddl_presentation_request")
-public class PresentationRequest {
+@org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_ddl_verification_request")
+public class VerificationRequest {
 
     @Id
     private String id;
@@ -35,10 +35,13 @@ public class PresentationRequest {
     @NotNull
     private String threadId;
 
+    @NotNull
+    private String callbackUrl;
+
     @Field("data")
     private List<BasicDBObject> data;
 
-    public String getId() {
+    public String  getId() {
         return id;
     }
 
@@ -60,5 +63,13 @@ public class PresentationRequest {
 
     public void setData(List<BasicDBObject> data) {
         this.data = data;
+    }
+
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
+    public void setCallbackUrl(String callbackUrl) {
+        this.callbackUrl = callbackUrl;
     }
 }

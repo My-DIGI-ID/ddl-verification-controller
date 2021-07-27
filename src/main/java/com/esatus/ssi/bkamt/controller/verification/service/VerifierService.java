@@ -16,17 +16,21 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
+import com.mongodb.BasicDBObject;
 
 public interface VerifierService {
     boolean verifierExists(String apiKey);
     void invalidateVerification(String verificationId);
     Optional<VerifierDTO> getVerifier(String apiKey);
+    boolean chekMetaDataCompliance(List<BasicDBObject> data);
 
     // TODO: I think we can delete these methods
     VerifierDTO createVerifier(VerifierCreationDTO verifierCreationDTO) throws VerifierAlreadyExistsException;
+
 }
