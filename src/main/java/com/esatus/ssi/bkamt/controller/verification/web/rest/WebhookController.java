@@ -44,6 +44,7 @@ public class WebhookController {
   @Autowired
   ProofService proofService;
 
+  // TODO: Do we need the @Operation here? Routes are globally protected via AuthManager.
   @PostMapping("/present_proof")
   @Operation(security = @SecurityRequirement(name = "X-API-Key"))
   public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)

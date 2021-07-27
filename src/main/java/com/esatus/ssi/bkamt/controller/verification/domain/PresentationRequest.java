@@ -14,39 +14,23 @@
  * limitations under the License.
  */
 
-package com.esatus.ssi.bkamt.controller.verification.service.dto;
+package com.esatus.ssi.bkamt.controller.verification.domain;
+
+import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-public class FeedbackDTO {
+/**
+ * Represents a presentation request for a digital driver license from any id wallet.
+ */
+@org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_ddl_presentation_request")
+public class PresentationRequest {
+
+    @Id
+    private String id;
 
     @NotNull
-    private String topic;
+    private String threadId;
 
-    @NotNull
-    @Size(max = 500, min = 15)
-    private String feedback;
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public String getFeedback() {
-        return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
-    }
-
-    @Override
-    public String toString() {
-        return "FeedbackDTO [feedback=" + feedback + ", topic=" + topic + "]";
-    }
-
+    // TODO: Defined more attributes
 }

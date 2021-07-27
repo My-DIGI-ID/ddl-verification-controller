@@ -24,8 +24,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.esatus.ssi.bkamt.controller.verification.domain.User;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.UserDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.mapper.UserMapper;
 
 /**
  * Unit tests for {@link UserMapper}.

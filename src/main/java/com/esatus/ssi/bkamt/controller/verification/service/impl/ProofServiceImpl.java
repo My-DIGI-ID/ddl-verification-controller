@@ -45,7 +45,6 @@ import com.esatus.ssi.bkamt.controller.verification.client.model.RequestPresenta
 import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesMasterId;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.MasterIdDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
