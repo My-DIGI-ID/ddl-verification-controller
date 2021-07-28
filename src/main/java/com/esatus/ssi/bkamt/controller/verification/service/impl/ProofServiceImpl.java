@@ -69,7 +69,7 @@ public class ProofServiceImpl implements ProofService {
     SecureRandom secureRandom = new SecureRandom();
 
     @Override
-    public URI getProofURI(String hotelId, String deskId) {
+    public URI getProofURI(String verificationId) {
 
         // prepare a proof request DTO and send it to the agent
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();

@@ -20,9 +20,7 @@ import java.net.URI;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
 
 public interface ProofService {
-
-    URI getProofURI(String hotelId, String deskId);
-
 	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO);
 
+    URI getProofURI(String verificationId);
 }

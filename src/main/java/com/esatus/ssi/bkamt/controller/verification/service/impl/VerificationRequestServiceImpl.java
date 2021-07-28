@@ -20,6 +20,7 @@ import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
 import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerificationRequestMapper;
 import org.slf4j.Logger;
@@ -61,5 +62,11 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
         this.verificationRepository.save(verificationRequest);
         log.debug("Created verification request: {}", verificationRequest);
         return this.verificationRequestMapper.verificationRequestToVerificationRequestDTO(verificationRequest);
+    }
+
+    @Override
+    public Optional<VerificationRequestDTO> getById(String id) {
+        log.debug("get verification request by id {}", id);
+        return verificationRepository.findById(id).map(verificationRequestMapper::verificationRequestToVerificationRequestDTO);
     }
 }

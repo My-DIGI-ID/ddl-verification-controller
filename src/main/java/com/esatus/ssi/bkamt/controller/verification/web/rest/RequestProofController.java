@@ -46,16 +46,16 @@ public class RequestProofController {
     ProofService proofService;
 
     // The method for requesting a connectionless proof
-    @GetMapping(value = "/proof")
-    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "hotelId") String hotelId, @RequestParam(name = "deskId") String deskId) throws JsonProcessingException {
-
-        log.debug("REST request to log-in at desk {} and hotel {}", deskId, hotelId);
-
-        URI proofURI = this.proofService.getProofURI(hotelId, deskId);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(proofURI);
-
-        return new ResponseEntity<Void>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
-    }
+//    @GetMapping(value = "/proof")
+//    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "hotelId") String hotelId, @RequestParam(name = "deskId") String deskId) throws JsonProcessingException {
+//
+//        log.debug("REST request to log-in at desk {} and hotel {}", deskId, hotelId);
+//
+//        URI proofURI = this.proofService.getProofURI(hotelId, deskId);
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.setLocation(proofURI);
+//
+//        return new ResponseEntity<Void>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
+//    }
 
 }
