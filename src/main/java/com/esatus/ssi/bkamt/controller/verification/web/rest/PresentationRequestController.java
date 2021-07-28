@@ -1,7 +1,11 @@
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
+import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.RequestPresentationValidationService;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.RequestPresentationValidationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -11,8 +15,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
+import java.util.Optional;
 
 /**
  * Controller for creating a presentation request
@@ -30,15 +36,30 @@ public class PresentationRequestController {
     @Autowired
     VerificationRequestService verificationRequestService;
 
-    @PostMapping(value = "/presentation-request")
-    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws JsonProcessingException {
+    @Autowired
+    RequestPresentationValidationService requestPresentationValidationService;
 
-        log.debug("REST request to create a presentation request for verificationid {}", verificationId );
+    @PostMapping(value = "/presentation-request")
+    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws JsonProcessingException, RequestPresentationValidationFailedException {
+
+        log.debug("REST request to create a presentation request for verificationId {}", verificationId );
 
         // We have to validate the data
+        Optional<VerificationRequestDTO> verificationRequest = verificationRequestService.getById(verificationId);
 
+        if(!verificationRequest.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
-        URI proofURI = this.proofService.getProofURI(verificationId);
+        RequestPresentationValidationResult validationResult = requestPresentationValidationService.Validate(verificationRequest.get());
+
+        // When validation of the metadata failed
+        if(!validationResult.isValid()) {
+            throw new RequestPresentationValidationFailedException(String.format("Validation of verificationRequest failed {}", verificationId));
+        }
+
+        // If validation succeeded create the proof
+        URI proofURI = this.proofService.createProofRequest(verificationId);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(proofURI);
 

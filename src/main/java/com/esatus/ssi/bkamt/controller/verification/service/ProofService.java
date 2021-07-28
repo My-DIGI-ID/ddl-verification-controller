@@ -22,5 +22,5 @@ import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentPr
 public interface ProofService {
 	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO);
 
-    URI getProofURI(String verificationId);
+    URI createProofRequest(String verificationId);
 }

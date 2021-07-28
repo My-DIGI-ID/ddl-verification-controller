@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.security.SecureRandom;
-import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -69,7 +68,7 @@ public class ProofServiceImpl implements ProofService {
     SecureRandom secureRandom = new SecureRandom();
 
     @Override
-    public URI getProofURI(String verificationId) {
+    public URI createProofRequest(String verificationId) {
 
         // prepare a proof request DTO and send it to the agent
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
@@ -80,9 +79,11 @@ public class ProofServiceImpl implements ProofService {
         // prepare a connectionless proof request
         ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
+        // TODO: Do we need that?
         // create a new entry for this presentationExchangeId in the database
 //        this.verifierService.createCheckInCredential(hotelId, deskId,
 //            proofResponseDTO.getPresentationExchangeId());
+
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -97,7 +98,6 @@ public class ProofServiceImpl implements ProofService {
             e.printStackTrace();
             throw new RuntimeException();
         }
-
     }
 
     private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
@@ -139,19 +139,15 @@ public class ProofServiceImpl implements ProofService {
         connectionlessProofRequest.setThread(proofRequestThread);
 
         return connectionlessProofRequest;
-
     }
 
     private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
-
-        Map<String, IndyProofReqAttrSpec> requestedAttributes = new HashMap<>();
-        // this.addMasterIdAttributes(requestedAttributes);
+        Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes();
 
         // Composing the proof request
         IndyProofRequest proofRequest = new IndyProofRequest();
         proofRequest.setName("Proof request");
         proofRequest.setRequestedPredicates(new HashMap<>());
-
         proofRequest.setRequestedAttributes(requestedAttributes);
         proofRequest.setVersion("0.1");
         int nonce = secureRandom.nextInt();
@@ -161,35 +157,35 @@ public class ProofServiceImpl implements ProofService {
         connectionlessProofCreationRequest.setComment("string");
         connectionlessProofCreationRequest.setProofRequest(proofRequest);
 
-
         return connectionlessProofCreationRequest;
     }
 
-    private void addMasterIdAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
+    private Map<String, IndyProofReqAttrSpec> createRequestedAttributes() {
+        // TODO: Add additional attributes
+        return new HashMap<>();
         // Restriction regarding CredDefs for masterId
-        String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
-        List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
-        for (int i = 0; i < masterIdCredDefIds.length; i++) {
-            Map<String, String> temp = new HashMap<String, String>();
-            temp.put("cred_def_id", masterIdCredDefIds[i]);
-            masterIdRestrictions.add(temp);
-        }
-
-        IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
-        List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
-            "addressCity", "dateOfExpiry", "dateOfBirth");
-        proofRequestMasterId.setNames(names);
-
-        // Restriction regarding Revocation
-        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
-        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
-
-        proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
-        proofRequestMasterId.setRestrictions(masterIdRestrictions);
-
-        requestedAttributes.put("masterId", proofRequestMasterId);
+//        String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
+//        List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
+//        for (int i = 0; i < masterIdCredDefIds.length; i++) {
+//            Map<String, String> temp = new HashMap<String, String>();
+//            temp.put("cred_def_id", masterIdCredDefIds[i]);
+//            masterIdRestrictions.add(temp);
+//        }
+//
+//        IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
+//        List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
+//            "addressCity", "dateOfExpiry", "dateOfBirth");
+//        proofRequestMasterId.setNames(names);
+//
+//        // Restriction regarding Revocation
+//        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
+//        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+//
+//        proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
+//        proofRequestMasterId.setRestrictions(masterIdRestrictions);
+//
+//        requestedAttributes.put("masterId", proofRequestMasterId);
     }
-
 
     @Override
     public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) {
@@ -198,12 +194,10 @@ public class ProofServiceImpl implements ProofService {
 
         String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
 
-        if (webhookPresentProofDTO.getState().equals("verified")) {
-
-        } else if (webhookPresentProofDTO.getState().equals("presentation_received")) {
-
-        } else {
-            log.debug("ignore this state");
+        if (!webhookPresentProofDTO.getState().equals("verified")) {
+            if (!webhookPresentProofDTO.getState().equals("presentation_received")) {
+                log.debug("ignore this state");
+            }
         }
     }
 }

@@ -55,7 +55,7 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
         VerificationRequest verificationRequest = new VerificationRequest();
         verificationRequest.setThreadId(verificationRequestDTO.getThreadId());
         verificationRequest.setCallbackUrl(verificationRequestDTO.getCallbackUrl());
-        if(verificationRequestDTO.getData() != null) {
+        if(verificationRequestDTO.getData() != null || verificationRequest.getData().size() > 0) {
             verificationRequest.setData(verificationRequestDTO.getData());
         }
 

@@ -20,7 +20,6 @@ public class VerificationRequestDTO {
     @NotNull
     private String callbackUrl;
 
-    @Null
     private List<BasicDBObject> data;
 
     public VerificationRequestDTO() {
