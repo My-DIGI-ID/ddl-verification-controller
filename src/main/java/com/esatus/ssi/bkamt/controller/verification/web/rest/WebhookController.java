@@ -13,6 +13,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ public class WebhookController {
   @Autowired
   ProofService proofService;
 
-  // TODO: Do we need the @Operation here? Routes are globally protected via AuthManager.
   @PostMapping("/present_proof")
   @Operation(security = @SecurityRequirement(name = "X-API-Key"))
   public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)
@@ -54,9 +54,12 @@ public class WebhookController {
     log.debug("State of the proof: {}", webhookPresentProofDTO.getState());
     log.debug("Proof verified: {}", webhookPresentProofDTO.getVerified());
 
-    this.proofService.handleProofWebhook(webhookPresentProofDTO);
-
-    return ResponseEntity.noContent().build();
+      try {
+          this.proofService.handleProofWebhook(webhookPresentProofDTO);
+          return ResponseEntity.noContent().build();
+      } catch (VerificationNotFoundException e) {
+          log.debug("verification could not be found");
+          return ResponseEntity.notFound().build();
+      }
   }
-
 }

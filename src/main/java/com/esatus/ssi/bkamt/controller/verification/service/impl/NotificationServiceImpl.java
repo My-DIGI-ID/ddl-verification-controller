@@ -17,7 +17,14 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Map;
+
+import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,24 +41,28 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private EmitterRepository emitterRepository;
 
-    @Override
-    public void sendNotificationAboutNewCheckinCredentials(String hotelId, String deskId) {
-        log.debug("Informing subscribers about new checkin-credential for hotelId and deskId: {} {}", hotelId, deskId);
-        doSendNotification(hotelId, deskId, NEW_CHECKIN_CREDENTIAL);
-    }
+    private void doSendNotification(String url, InitiatorCallbackData callbackData) {
+        Gson gson = new Gson();
+        String json = gson.toJson(callbackData);
 
-    private void doSendNotification(String hotelId, String deskId, String event) {
-        Map<String, SseEmitter> emitters = emitterRepository.findByHotelIdAndDeskId(hotelId, deskId);
-        log.debug("Found {} emitters for hotelId and deskId: {} {}", emitters.size(), hotelId, deskId);
-        for (Map.Entry<String, SseEmitter> entry : emitters.entrySet()) {
-            try {
-                log.debug("Sending event: {} for hotelId and deskId: {} {}", event, hotelId, deskId);
-                entry.getValue().send(event);
-            } catch (IOException | IllegalStateException e) {
-                log.debug("Error while sending event: {} for hotelId and deskId: {} {} - exception: {}", event, hotelId, deskId, e);
-                this.emitterRepository.remove(entry.getKey());
-            }
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .POST(HttpRequest.BodyPublishers.ofString(json))
+            .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
+    @Override
+    public void executeCallback(String url, InitiatorCallbackData callbackData) {
+        log.debug("Informing subscribers about new checkin-credential for verification: {}", callbackData);
+        doSendNotification(url, callbackData);
+    }
 }

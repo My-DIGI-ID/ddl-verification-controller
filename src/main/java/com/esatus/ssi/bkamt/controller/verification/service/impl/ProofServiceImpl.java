@@ -18,10 +18,15 @@ import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.client.model.*;
+import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackDataValue;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -49,6 +54,9 @@ public class ProofServiceImpl implements ProofService {
     @Autowired
     NotificationService notificationService;
 
+    @Autowired
+    VerificationRequestService verificationRequestService;
+
     private @Value("${ssibk.verification.controller.agent.apikey}")
     String apikey;
     private @Value("${ssibk.verification.controller.agent.endpoint}")
@@ -69,7 +77,6 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public URI createProofRequest(String verificationId) {
-
         // prepare a proof request DTO and send it to the agent
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
         V10PresentationExchange proofResponseDTO =
@@ -81,9 +88,8 @@ public class ProofServiceImpl implements ProofService {
 
         // TODO: Do we need that?
         // create a new entry for this presentationExchangeId in the database
-//        this.verifierService.createCheckInCredential(hotelId, deskId,
-//            proofResponseDTO.getPresentationExchangeId());
-
+        // this.verifierService.createCheckInCredential(hotelId, deskId,
+        // proofResponseDTO.getPresentationExchangeId());
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -188,16 +194,43 @@ public class ProofServiceImpl implements ProofService {
     }
 
     @Override
-    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) {
+    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
 
         log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
 
-        String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
+        String currentState = webhookPresentProofDTO.getState();
 
-        if (!webhookPresentProofDTO.getState().equals("verified")) {
-            if (!webhookPresentProofDTO.getState().equals("presentation_received")) {
-                log.debug("ignore this state");
-            }
+        switch(currentState) {
+            case "verified":
+                handleVerifiedState(webhookPresentProofDTO);
+            case "presentation_received":
+                handlePresentationReceivedState(webhookPresentProofDTO);
+                return;
+            default:
+                log.debug("ignore state {}", currentState);
         }
+    }
+
+    private void handlePresentationReceivedState(WebhookPresentProofDTO webhookPresentProofDTO) {
+        log.debug("handle presentation received state {}", webhookPresentProofDTO.getState());
+    }
+
+    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
+        log.debug("handle presentation verified state {}", webhookPresentProofDTO.getState());
+        String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
+        String threadId = webhookPresentProofDTO.getThreadId();
+
+        Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
+
+        if(!vr.isPresent()) {
+            throw new VerificationNotFoundException();
+        }
+
+        // TODO: Create the callback and execute it
+        VerificationRequestDTO verificationRequest = vr.get();
+        String callbackUrl = verificationRequest.getCallbackUrl();
+
+        InitiatorCallbackData data = new InitiatorCallbackData(200, true, "", new ArrayList<InitiatorCallbackDataValue>());
+        this.notificationService.executeCallback(callbackUrl, data);
     }
 }

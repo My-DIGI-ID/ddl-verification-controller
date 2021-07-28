@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface VerificationRequestService {
     VerificationRequestDTO createVerificationRequest(VerificationRequestDTO verificationRequestDTO) throws PresentationRequestsAlreadyExists;
     Optional<VerificationRequestDTO> getById(String id);
+    Optional<VerificationRequestDTO> getByThreadId(String threadId);
 }
