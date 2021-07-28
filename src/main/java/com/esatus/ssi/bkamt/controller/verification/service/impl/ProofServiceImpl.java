@@ -20,6 +20,7 @@ import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.client.model.*;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,159 +39,171 @@ import java.util.*;
 @Service
 public class ProofServiceImpl implements ProofService {
 
-  private final Logger log = LoggerFactory.getLogger(ProofServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(ProofServiceImpl.class);
 
-  @Autowired
-  AgentClient acapyClient;
+    @Autowired
+    AgentClient acapyClient;
 
-  @Autowired
-  NotificationService notificationService;
+    @Autowired
+    VerifierService verifierService;
 
-  private @Value("${ssibk.verification.controller.agent.apikey}") String apikey;
-  private @Value("${ssibk.verification.controller.agent.endpoint}") String agentEndpoint;
-  private @Value("${ssibk.verification.controller.agent.endpointName}") String agentEndpointName;
-  private @Value("${ssibk.verification.controller.agent.recipientkey}") String agentRecipientKey;
-  private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}") String masterIdCredDefIdsString;
+    @Autowired
+    NotificationService notificationService;
 
-  private static final String DIDCOMM_URL = "didcomm://example.org?m=";
-  private static final String ARIES_MESSAGE_TYPE =
-      "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
-  private static final String ARIES_ATTACH_ID = "libindy-request-presentation-0";
+    private @Value("${ssibk.verification.controller.agent.apikey}")
+    String apikey;
+    private @Value("${ssibk.verification.controller.agent.endpoint}")
+    String agentEndpoint;
+    private @Value("${ssibk.verification.controller.agent.endpointName}")
+    String agentEndpointName;
+    private @Value("${ssibk.verification.controller.agent.recipientkey}")
+    String agentRecipientKey;
+    private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}")
+    String masterIdCredDefIdsString;
 
-  SecureRandom secureRandom = new SecureRandom();
+    private static final String DIDCOMM_URL = "didcomm://example.org?m=";
+    private static final String ARIES_MESSAGE_TYPE =
+        "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
+    private static final String ARIES_ATTACH_ID = "libindy-request-presentation-0";
 
-  @Override
-  public URI getProofURI(String hotelId, String deskId) {
+    SecureRandom secureRandom = new SecureRandom();
 
-    // prepare a proof request DTO and send it to the agent
-    V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
-    V10PresentationExchange proofResponseDTO =
-        this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
-    log.debug("agent created a proof request: {}", proofResponseDTO);
+    @Override
+    public URI getProofURI(String hotelId, String deskId) {
 
-    // prepare a connectionless proof request
-    ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
+        // prepare a proof request DTO and send it to the agent
+        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
+        V10PresentationExchange proofResponseDTO =
+            this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
+        log.debug("agent created a proof request: {}", proofResponseDTO);
 
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      log.debug(mapper.writeValueAsString(connectionlessProofRequest));
-      // Base64 encode the connectionless proof request
-      String encodedUrl =
-          Base64.getEncoder().encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
+        // prepare a connectionless proof request
+        ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
-      // return a URI that is consumable by the wallet app
-      return URI.create(DIDCOMM_URL + encodedUrl);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
+        // create a new entry for this presentationExchangeId in the database
+//        this.verifierService.createCheckInCredential(hotelId, deskId,
+//            proofResponseDTO.getPresentationExchangeId());
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            log.debug(mapper.writeValueAsString(connectionlessProofRequest));
+            // Base64 encode the connectionless proof request
+            String encodedUrl =
+                Base64.getEncoder().encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
+
+            // return a URI that is consumable by the wallet app
+            return URI.create(DIDCOMM_URL + encodedUrl);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+
     }
 
-  }
+    private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
+        String threadId = proofResponseDTO.getThreadId();
+        ConnectionlessProofRequest connectionlessProofRequest = new ConnectionlessProofRequest();
+        connectionlessProofRequest.setId(threadId);
+        connectionlessProofRequest.setType(ARIES_MESSAGE_TYPE);
 
-  private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
-    String threadId = proofResponseDTO.getThreadId();
-    ConnectionlessProofRequest connectionlessProofRequest = new ConnectionlessProofRequest();
-    connectionlessProofRequest.setId(threadId);
-    connectionlessProofRequest.setType(ARIES_MESSAGE_TYPE);
+        RequestPresentationAttach requestPresentationAttach = new RequestPresentationAttach();
+        requestPresentationAttach.setId(ARIES_ATTACH_ID);
+        requestPresentationAttach.setMimeType(MediaType.APPLICATION_JSON_VALUE);
 
-    RequestPresentationAttach requestPresentationAttach = new RequestPresentationAttach();
-    requestPresentationAttach.setId(ARIES_ATTACH_ID);
-    requestPresentationAttach.setMimeType(MediaType.APPLICATION_JSON_VALUE);
+        ProofRequestDict proofRequestDict =
+            new ObjectMapper().convertValue(proofResponseDTO.getPresentationRequestDict(), ProofRequestDict.class);
 
-    ProofRequestDict proofRequestDict =
-        new ObjectMapper().convertValue(proofResponseDTO.getPresentationRequestDict(), ProofRequestDict.class);
+        Base64Payload base64Payload = new Base64Payload();
+        base64Payload.setBase64(proofRequestDict.getRequestPresentationsAttach()[0].getData().getBase64());
+        requestPresentationAttach.setData(base64Payload);
 
-    Base64Payload base64Payload = new Base64Payload();
-    base64Payload.setBase64(proofRequestDict.getRequestPresentationsAttach()[0].getData().getBase64());
-    requestPresentationAttach.setData(base64Payload);
+        RequestPresentationAttach[] requestPresentationAttaches = new RequestPresentationAttach[1];
+        requestPresentationAttaches[0] = requestPresentationAttach;
 
-    RequestPresentationAttach[] requestPresentationAttaches = new RequestPresentationAttach[1];
-    requestPresentationAttaches[0] = requestPresentationAttach;
+        connectionlessProofRequest.setRequestPresentationAttach(requestPresentationAttaches);
 
-    connectionlessProofRequest.setRequestPresentationAttach(requestPresentationAttaches);
+        ProofRequestService proofRequestService = new ProofRequestService();
+        String[] keys = new String[1];
+        keys[0] = this.agentRecipientKey;
+        proofRequestService.setRecipientKeys(keys);
+        String[] routingKeys = new String[0];
+        proofRequestService.setRoutingKeys(routingKeys);
+        proofRequestService.setServiceEndpoint(agentEndpoint);
+        proofRequestService.setEndpointName(agentEndpointName);
+        connectionlessProofRequest.setService(proofRequestService);
 
-    ProofRequestService proofRequestService = new ProofRequestService();
-    String[] keys = new String[1];
-    keys[0] = this.agentRecipientKey;
-    proofRequestService.setRecipientKeys(keys);
-    String[] routingKeys = new String[0];
-    proofRequestService.setRoutingKeys(routingKeys);
-    proofRequestService.setServiceEndpoint(agentEndpoint);
-    proofRequestService.setEndpointName(agentEndpointName);
-    connectionlessProofRequest.setService(proofRequestService);
+        ProofRequestThread proofRequestThread = new ProofRequestThread();
+        EmptyDTO empty = new EmptyDTO();
+        proofRequestThread.setReceivedOrders(empty);
+        proofRequestThread.setThreadId(threadId);
+        connectionlessProofRequest.setThread(proofRequestThread);
 
-    ProofRequestThread proofRequestThread = new ProofRequestThread();
-    EmptyDTO empty = new EmptyDTO();
-    proofRequestThread.setReceivedOrders(empty);
-    proofRequestThread.setThreadId(threadId);
-    connectionlessProofRequest.setThread(proofRequestThread);
+        return connectionlessProofRequest;
 
-    return connectionlessProofRequest;
-
-  }
-
-  private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
-
-    Map<String, IndyProofReqAttrSpec> requestedAttributes = new HashMap<>();
-    // this.addMasterIdAttributes(requestedAttributes);
-
-    // Composing the proof request
-    IndyProofRequest proofRequest = new IndyProofRequest();
-    proofRequest.setName("Proof request");
-    proofRequest.setRequestedPredicates(new HashMap<>());
-
-    proofRequest.setRequestedAttributes(requestedAttributes);
-    proofRequest.setVersion("0.1");
-    int nonce = secureRandom.nextInt();
-    proofRequest.setNonce(String.valueOf(nonce));
-
-    V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
-    connectionlessProofCreationRequest.setComment("string");
-    connectionlessProofCreationRequest.setProofRequest(proofRequest);
-
-
-    return connectionlessProofCreationRequest;
-  }
-
-  private void addMasterIdAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
-    // Restriction regarding CredDefs for masterId
-    String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
-    List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
-    for (int i = 0; i < masterIdCredDefIds.length; i++) {
-      Map<String, String> temp = new HashMap<String, String>();
-      temp.put("cred_def_id", masterIdCredDefIds[i]);
-      masterIdRestrictions.add(temp);
     }
 
-    IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
-    List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
-        "addressCity", "dateOfExpiry", "dateOfBirth");
-    proofRequestMasterId.setNames(names);
+    private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
 
-    // Restriction regarding Revocation
-    AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
-    nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+        Map<String, IndyProofReqAttrSpec> requestedAttributes = new HashMap<>();
+        // this.addMasterIdAttributes(requestedAttributes);
 
-    proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
-    proofRequestMasterId.setRestrictions(masterIdRestrictions);
+        // Composing the proof request
+        IndyProofRequest proofRequest = new IndyProofRequest();
+        proofRequest.setName("Proof request");
+        proofRequest.setRequestedPredicates(new HashMap<>());
 
-    requestedAttributes.put("masterId", proofRequestMasterId);
-  }
+        proofRequest.setRequestedAttributes(requestedAttributes);
+        proofRequest.setVersion("0.1");
+        int nonce = secureRandom.nextInt();
+        proofRequest.setNonce(String.valueOf(nonce));
+
+        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
+        connectionlessProofCreationRequest.setComment("string");
+        connectionlessProofCreationRequest.setProofRequest(proofRequest);
 
 
-  @Override
-  public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) {
-
-    log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
-
-    String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
-
-    if (webhookPresentProofDTO.getState().equals("verified")) {
-
-    } else if (webhookPresentProofDTO.getState().equals("presentation_received")) {
-
-    } else {
-      log.debug("ignore this state");
+        return connectionlessProofCreationRequest;
     }
-  }
+
+    private void addMasterIdAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
+        // Restriction regarding CredDefs for masterId
+        String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
+        List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
+        for (int i = 0; i < masterIdCredDefIds.length; i++) {
+            Map<String, String> temp = new HashMap<String, String>();
+            temp.put("cred_def_id", masterIdCredDefIds[i]);
+            masterIdRestrictions.add(temp);
+        }
+
+        IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
+        List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
+            "addressCity", "dateOfExpiry", "dateOfBirth");
+        proofRequestMasterId.setNames(names);
+
+        // Restriction regarding Revocation
+        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
+        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+
+        proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
+        proofRequestMasterId.setRestrictions(masterIdRestrictions);
+
+        requestedAttributes.put("masterId", proofRequestMasterId);
+    }
+
+
+    @Override
+    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) {
+
+        log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
+
+        String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
+
+        if (webhookPresentProofDTO.getState().equals("verified")) {
+
+        } else if (webhookPresentProofDTO.getState().equals("presentation_received")) {
+
+        } else {
+            log.debug("ignore this state");
+        }
+    }
 }

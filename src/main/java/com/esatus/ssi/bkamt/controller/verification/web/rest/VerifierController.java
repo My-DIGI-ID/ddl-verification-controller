@@ -17,6 +17,7 @@
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.PresentationRequestCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
 import org.slf4j.Logger;
@@ -71,10 +72,10 @@ public class VerifierController {
         }
 
         try {
-            VerificationRequestDTO createdPresentationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestDTO);
+            VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestDTO);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdPresentationRequest.getId()).toUri();
-            return ResponseEntity.created(location).body(createdPresentationRequest);
+                .buildAndExpand(createdVerificationRequest.getId()).toUri();
+            return ResponseEntity.created(location).body(createdVerificationRequest);
         } catch (PresentationRequestsAlreadyExists e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
