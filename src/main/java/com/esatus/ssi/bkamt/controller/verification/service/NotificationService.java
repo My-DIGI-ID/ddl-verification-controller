@@ -16,9 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
+import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+
 public interface NotificationService {
-
-    public static final String NEW_CHECKIN_CREDENTIAL = "NEW_CHECKIN_CREDENTIAL";
-
-    void sendNotificationAboutNewCheckinCredentials(String hotelId, String deskId);
+    void executeCallback(String url, InitiatorCallbackData callbackData);
 }

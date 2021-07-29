@@ -16,117 +16,39 @@
 
 package com.esatus.ssi.bkamt.controller.verification.init;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
+
+import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import com.esatus.ssi.bkamt.controller.verification.domain.Address;
-import com.esatus.ssi.bkamt.controller.verification.domain.Authority;
-import com.esatus.ssi.bkamt.controller.verification.domain.Desk;
-import com.esatus.ssi.bkamt.controller.verification.domain.Hotel;
-import com.esatus.ssi.bkamt.controller.verification.domain.User;
-import com.esatus.ssi.bkamt.controller.verification.repository.HotelRepository;
-import com.esatus.ssi.bkamt.controller.verification.repository.UserRepository;
-import com.esatus.ssi.bkamt.controller.verification.security.AuthoritiesConstants;
+import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
 
 @Component
 public class DatabaseInit {
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    HotelRepository hotelRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    VerifierRepository verifierRepository;
 
     @Autowired
     private Environment environment;
 
-    @Value("${ssibk.hotel.controller.admin.username}")
-    private String adminUsername;
-
-    @Value("${ssibk.hotel.controller.admin.password}")
-    private String adminPassword;
-
     @PostConstruct
     public void init() {
-        initAdminUser();
-
         if (environment.acceptsProfiles(Profiles.of("dev"))) {
-            initUser();
-            initHotel();
+            initDevVerification();
         }
     }
 
-    private void initAdminUser() {
-        Authority adminAuthority = new Authority();
-        adminAuthority.setName(AuthoritiesConstants.ADMIN);
-
-        String id = "admin";
-        if (this.userRepository.existsById(id) == false) {
-            User adminUser = new User();
-            adminUser.setId(id);
-            adminUser.setLogin(adminUsername);
-            adminUser.setPassword(this.passwordEncoder.encode(adminPassword));
-            adminUser.setFirstName("admin");
-            adminUser.setLastName("Administrator");
-            adminUser.setEmail("admin@localhost");
-            adminUser.setCreatedBy("system");
-            adminUser.setCreatedDate(Instant.now());
-            adminUser.getAuthorities().add(adminAuthority);
-            userRepository.insert(adminUser);
-        }
-    }
-
-    private void initUser() {
-        Authority userAuthority = new Authority();
-        userAuthority.setName(AuthoritiesConstants.USER);
-
-        String id = "user-1";
-        if (this.userRepository.existsById(id) == false) {
-            User userUser = new User();
-            userUser.setId(id);
-            userUser.setLogin("user");
-            userUser.setPassword(this.passwordEncoder.encode("user"));
-            userUser.setFirstName("User");
-            userUser.setLastName("User");
-            userUser.setEmail("user@localhost");
-            userUser.setCreatedBy("system");
-            userUser.setCreatedDate(Instant.now());
-            userUser.getAuthorities().add(userAuthority);
-            userUser.setHotelId("hotel-1");
-            userRepository.insert(userUser);
-        }
-    }
-
-    private void initHotel() {
-        String id = "hotel-1";
-        if (this.hotelRepository.existsById(id) == false) {
-            Hotel hotel = new Hotel();
-            hotel.setId("hotel-1");
-            hotel.setName("IBM Hotel");
-            Address address = new Address();
-            address.setCity("Munich");
-            address.setHouseNumber("123");
-            address.setStreet("Berliner Strasse");
-            address.setPostalCode("123456");
-            hotel.setAddress(address);
-            List<Desk> desks = new ArrayList<Desk>();
-            desks.add(new Desk("desk1", "Blue Desk"));
-            desks.add(new Desk("desk2", "Red Desk"));
-            desks.add(new Desk("desk3", "Yellow Desk"));
-            desks.add(new Desk("desk4", "Green Desk"));
-            hotel.setDesks(desks);
-            hotelRepository.insert(hotel);
+    private void initDevVerification() {
+        String id = "b1e17511-8b7f-45e9-9212-017773719472";
+        if (!this.verifierRepository.existsById(id)) {
+            Verifier verifier = new Verifier();
+            verifier.setId(id);
+            verifier.setName("Esatus AG");
+            verifier.setApiKey("$2y$10$AW0Zit2JNBcTI0UDpPmc4OM72nm86AyvoOfV7GJOP4iropj9IuyVS");
+            verifierRepository.insert(verifier);
         }
     }
 }

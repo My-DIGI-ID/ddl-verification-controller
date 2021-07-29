@@ -20,20 +20,20 @@ logging:
     com.ibm.ssi.controller.hotel: DEBUG
 
 ssibk:
-  hotel:
+  verification:
     controller:
       apikey: secure
 
       admin:
-        username: hotel-username
-        password: hotel-password
+        username: verification-username
+        password: verification-password
 
       agent:
         apikey: secure
         apiurl: localhost:10080 # the Hotel agent admin url
-        recipientkey: hotel-agent-key # the Hotel agent verkey, here for the seed 000...Hotel; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
-        endpoint: hotel-agent-url # the Hotel agent endpoint
-        endpointName: IBM Hotel # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
+        recipientkey: verification-agent-key # the Hotel agent verkey, here for the seed 000...Hotel; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
+        endpoint: verification-agent-url # the Hotel agent endpoint
+        endpointName: IBM Verification # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
 
         # The credential definition ids of all master ids that will be accepted in the proof
         masterid:

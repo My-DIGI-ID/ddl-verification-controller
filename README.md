@@ -1,17 +1,13 @@
-# TODO
-
-# Hotel-Controller
-
-This application was generated using JHipster 6.10.5, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.10.5](https://www.jhipster.tech/documentation-archive/v6.10.5).
+# Verification-Controller
 
 ## Prerequisites
 
-Add hotel-agent-url, hotel-agent-key,credential-definition-id in application-dev.yml file.
+Add verification-agent-url, verification-agent-key,credential-definition-id in application-dev.yml file.
 For more information refer network/README.MD
 
 ## Development
 
-To start your application in the dev profile, open the terminal, navigate to the `hotel-controller` folder and run the following commands:
+To start your application in the dev profile, open the terminal, navigate to the `verification-controller` folder and run the following commands:
 
 ```
 docker-compose -f src/main/docker/mongodb.yml up -d
@@ -24,19 +20,48 @@ The first step will deploy a MongoDB instance. The second step will deploy the a
 
 Swagger UI will be available at the following URL
 
+```
 http://localhost:8090/swagger-ui/index.html
+```
+
 
 Note: The API key can be configured in src/main/resources/config/application-dev.yml (application properties) file which can be used to interact with the API.
 
+### Default authentication against the api
+If you want to try out the api use the user you configured in ssibk->verification->controller->admin
+
+E.g
+
+```
+	ssibk:
+	      admin:
+	        username: verification-username
+	        password: verification-password
+
+```
+
+
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
+
+## MongoDB
+There is an database init script called `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on port 27017. The scripts creates an admin user with username: admin123 and password: pass123.
+
+After the connection was established successfull it creates a new user:
+
+```
+username: user123
+password: 123pass
+```
+
+You can use this user to connect to the database with your favourite MongoDB access tool. Here we use AdminMongo. You will find more information about how to use it below.
 
 ## AdminMongo
 
 AdminMongo is running in Port 8092
 
 - localhost:8092
-- Connection-Name: Hotel Controller
-- Connection-String: mongodb://user123:123pass@docker_hotelcontroller-mongodb_1:27017/HotelController?authSource=HotelController
+- Connection-Name: Verification Controller
+- Connection-String: mongodb://user123:123pass@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController
 
 ## Building Docker Image
 
@@ -46,7 +71,7 @@ To build a docker dev image, run:
 ./mvnw package jib:dockerBuild
 ```
 
-This one creates a new docker image with the name hotelcontroller.
+This one creates a new docker image with the name verificationcontroller.
 To run the controller + MongoDB and the mongoadmin, run:
 
 ```
@@ -57,7 +82,7 @@ docker-compose -f src/main/docker/controller-mongo-mongoadmin.yml up -d
 
 ### Packaging as jar
 
-To build the final jar and optimize the `hotel-controller` application for production, run:
+To build the final jar and optimize the `verification-controller` application for production, run:
 
 ```
 ./mvnw -Pprod clean verify
@@ -156,3 +181,7 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [running tests page]: https://www.jhipster.tech/documentation-archive/v6.10.5/running-tests/
 [code quality page]: https://www.jhipster.tech/documentation-archive/v6.10.5/code-quality/
 [setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v6.10.5/setting-up-ci/
+
+## Troubleshooting
+### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException... 
+- Remove the .m2 folder in your user directory and rebuild with ``mvnw``

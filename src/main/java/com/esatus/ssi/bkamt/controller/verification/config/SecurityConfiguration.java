@@ -16,8 +16,9 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -26,41 +27,31 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
-import com.esatus.ssi.bkamt.controller.verification.security.*;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
-import com.esatus.ssi.bkamt.controller.verification.security.jwt.*;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    private final TokenProvider tokenProvider;
-
     private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 
-    @Value("${ssibk.hotel.controller.apikey}")
+    @Autowired
+    VerifierService verifierService;
+
+    @Value("${ssibk.verification.controller.apikey}")
     private String apikey;
 
     public static final String API_KEY_AUTH_HEADER_NAME = "X-API-Key";
 
-    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
-        this.tokenProvider = tokenProvider;
+    public SecurityConfiguration(CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Override
@@ -75,7 +66,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
 
         AuthFilter filter = new AuthFilter(API_KEY_AUTH_HEADER_NAME);
-        filter.setAuthenticationManager(new AuthManager(apikey));
+        filter.setAuthenticationManager(new AuthManager(verifierService));
         // @formatter:off
         http
             .csrf()
@@ -100,24 +91,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
             .authorizeRequests()
-            .antMatchers("/api/authenticate").permitAll()
             .antMatchers("/api/request-proof").permitAll()
             .antMatchers("/api/checkin-credentials/subscribe").permitAll()
-            .antMatchers("/topic/*").authenticated()
             .antMatchers("/api/**").authenticated()
-            .antMatchers("/topic/**").permitAll()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/info").permitAll()
-            .antMatchers("/management/prometheus").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
         .and()
-            .httpBasic()
-        .and()
-            .apply(securityConfigurerAdapter());
+            .httpBasic();
         // @formatter:on
-    }
-
-    private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider);
     }
 }

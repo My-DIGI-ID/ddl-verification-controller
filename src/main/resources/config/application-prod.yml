@@ -34,7 +34,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017
-      database: HotelController
+      database: VerificationController
   mail:
     host: localhost
     port: 25

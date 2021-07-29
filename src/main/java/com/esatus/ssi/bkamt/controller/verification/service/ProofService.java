@@ -18,11 +18,10 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 
 import java.net.URI;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 
 public interface ProofService {
+	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException;
 
-    URI getProofURI(String hotelId, String deskId);
-
-	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO);
-
+    URI createProofRequest(String verificationId);
 }

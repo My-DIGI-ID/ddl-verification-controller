@@ -49,7 +49,7 @@ server:
   address: localhost
 
 ssibk:
-  hotel:
+  verification:
     controller:
       apikey: {api-key}
 

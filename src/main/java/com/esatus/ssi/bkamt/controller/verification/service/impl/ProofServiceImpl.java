@@ -13,299 +13,225 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
-import java.net.URI;
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.esatus.ssi.bkamt.agent.client.model.*;
+import com.esatus.ssi.bkamt.agent.model.Base64Payload;
+import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
+import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
+import com.esatus.ssi.bkamt.controller.verification.client.model.*;
+import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackDataValue;
+import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
+import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import com.esatus.ssi.bkamt.agent.client.model.AllOfIndyProofReqAttrSpecNonRevoked;
-import com.esatus.ssi.bkamt.agent.client.model.IndyProofReqAttrSpec;
-import com.esatus.ssi.bkamt.agent.client.model.IndyProofRequest;
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationCreateRequestRequest;
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
-import com.esatus.ssi.bkamt.agent.model.Base64Payload;
-import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
-import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
-import com.esatus.ssi.bkamt.controller.verification.client.model.EmptyDTO;
-import com.esatus.ssi.bkamt.controller.verification.client.model.Presentation;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestDict;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestService;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestThread;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RequestPresentationAttach;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesCorporateId;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RevealedAttrValuesMasterId;
-import com.esatus.ssi.bkamt.controller.verification.domain.CheckInCredential;
-import com.esatus.ssi.bkamt.controller.verification.service.CheckInCredentialService;
-import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
-import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.CorporateIdDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.MasterIdDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.CheckinCredentialNotFoundException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.net.URI;
+import java.security.SecureRandom;
+import java.util.*;
 
 @Service
 public class ProofServiceImpl implements ProofService {
 
-  private final Logger log = LoggerFactory.getLogger(ProofServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(ProofServiceImpl.class);
 
-  @Autowired
-  AgentClient acapyClient;
+    @Autowired
+    AgentClient acapyClient;
 
-  @Autowired
-  CheckInCredentialService checkInCredentialService;
+    @Autowired
+    VerifierService verifierService;
 
-  @Autowired
-  NotificationService notificationService;
+    @Autowired
+    NotificationService notificationService;
 
-  private @Value("${ssibk.hotel.controller.agent.apikey}") String apikey;
-  private @Value("${ssibk.hotel.controller.agent.endpoint}") String agentEndpoint;
-  private @Value("${ssibk.hotel.controller.agent.endpointName}") String agentEndpointName;
-  private @Value("${ssibk.hotel.controller.agent.recipientkey}") String agentRecipientKey;
-  private @Value("${ssibk.hotel.controller.agent.masterid.credential_definition_ids}") String masterIdCredDefIdsString;
+    @Autowired
+    VerificationRequestService verificationRequestService;
 
-  private static final String DIDCOMM_URL = "didcomm://example.org?m=";
-  private static final String ARIES_MESSAGE_TYPE =
-      "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
-  private static final String ARIES_ATTACH_ID = "libindy-request-presentation-0";
+    private @Value("${ssibk.verification.controller.agent.apikey}")
+    String apikey;
+    private @Value("${ssibk.verification.controller.agent.endpoint}")
+    String agentEndpoint;
+    private @Value("${ssibk.verification.controller.agent.endpointName}")
+    String agentEndpointName;
+    private @Value("${ssibk.verification.controller.agent.recipientkey}")
+    String agentRecipientKey;
+    private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}")
+    String masterIdCredDefIdsString;
 
-  SecureRandom secureRandom = new SecureRandom();
+    private static final String DIDCOMM_URL = "didcomm://example.org?m=";
+    private static final String ARIES_MESSAGE_TYPE =
+        "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
+    private static final String ARIES_ATTACH_ID = "libindy-request-presentation-0";
 
-  @Override
-  public URI getProofURI(String hotelId, String deskId) {
+    SecureRandom secureRandom = new SecureRandom();
 
-    // prepare a proof request DTO and send it to the agent
-    V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
-    V10PresentationExchange proofResponseDTO =
-        this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
-    log.debug("agent created a proof request: {}", proofResponseDTO);
+    @Override
+    public URI createProofRequest(String verificationId) {
+        // prepare a proof request DTO and send it to the agent
+        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
+        V10PresentationExchange proofResponseDTO =
+            this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
+        log.debug("agent created a proof request: {}", proofResponseDTO);
 
-    // create a new entry for this presentationExchangeId in the database
-    this.checkInCredentialService.createCheckInCredential(hotelId, deskId,
-        proofResponseDTO.getPresentationExchangeId());
+        // prepare a connectionless proof request
+        ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
-    // prepare a connectionless proof request
-    ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
+        // TODO: Do we need that?
+        // create a new entry for this presentationExchangeId in the database
+        // this.verifierService.createCheckInCredential(hotelId, deskId,
+        // proofResponseDTO.getPresentationExchangeId());
 
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      log.debug(mapper.writeValueAsString(connectionlessProofRequest));
-      // Base64 encode the connectionless proof request
-      String encodedUrl =
-          Base64.getEncoder().encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            log.debug(mapper.writeValueAsString(connectionlessProofRequest));
+            // Base64 encode the connectionless proof request
+            String encodedUrl =
+                Base64.getEncoder().encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
 
-      // return a URI that is consumable by the wallet app
-      return URI.create(DIDCOMM_URL + encodedUrl);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
+            // return a URI that is consumable by the wallet app
+            return URI.create(DIDCOMM_URL + encodedUrl);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
     }
 
-  }
+    private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
+        String threadId = proofResponseDTO.getThreadId();
+        ConnectionlessProofRequest connectionlessProofRequest = new ConnectionlessProofRequest();
+        connectionlessProofRequest.setId(threadId);
+        connectionlessProofRequest.setType(ARIES_MESSAGE_TYPE);
 
-  private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
-    String threadId = proofResponseDTO.getThreadId();
-    ConnectionlessProofRequest connectionlessProofRequest = new ConnectionlessProofRequest();
-    connectionlessProofRequest.setId(threadId);
-    connectionlessProofRequest.setType(ARIES_MESSAGE_TYPE);
+        RequestPresentationAttach requestPresentationAttach = new RequestPresentationAttach();
+        requestPresentationAttach.setId(ARIES_ATTACH_ID);
+        requestPresentationAttach.setMimeType(MediaType.APPLICATION_JSON_VALUE);
 
-    RequestPresentationAttach requestPresentationAttach = new RequestPresentationAttach();
-    requestPresentationAttach.setId(ARIES_ATTACH_ID);
-    requestPresentationAttach.setMimeType(MediaType.APPLICATION_JSON_VALUE);
+        ProofRequestDict proofRequestDict =
+            new ObjectMapper().convertValue(proofResponseDTO.getPresentationRequestDict(), ProofRequestDict.class);
 
-    ProofRequestDict proofRequestDict =
-        new ObjectMapper().convertValue(proofResponseDTO.getPresentationRequestDict(), ProofRequestDict.class);
+        Base64Payload base64Payload = new Base64Payload();
+        base64Payload.setBase64(proofRequestDict.getRequestPresentationsAttach()[0].getData().getBase64());
+        requestPresentationAttach.setData(base64Payload);
 
-    Base64Payload base64Payload = new Base64Payload();
-    base64Payload.setBase64(proofRequestDict.getRequestPresentationsAttach()[0].getData().getBase64());
-    requestPresentationAttach.setData(base64Payload);
+        RequestPresentationAttach[] requestPresentationAttaches = new RequestPresentationAttach[1];
+        requestPresentationAttaches[0] = requestPresentationAttach;
 
-    RequestPresentationAttach[] requestPresentationAttaches = new RequestPresentationAttach[1];
-    requestPresentationAttaches[0] = requestPresentationAttach;
+        connectionlessProofRequest.setRequestPresentationAttach(requestPresentationAttaches);
 
-    connectionlessProofRequest.setRequestPresentationAttach(requestPresentationAttaches);
+        ProofRequestService proofRequestService = new ProofRequestService();
+        String[] keys = new String[1];
+        keys[0] = this.agentRecipientKey;
+        proofRequestService.setRecipientKeys(keys);
+        String[] routingKeys = new String[0];
+        proofRequestService.setRoutingKeys(routingKeys);
+        proofRequestService.setServiceEndpoint(agentEndpoint);
+        proofRequestService.setEndpointName(agentEndpointName);
+        connectionlessProofRequest.setService(proofRequestService);
 
-    ProofRequestService proofRequestService = new ProofRequestService();
-    String[] keys = new String[1];
-    keys[0] = this.agentRecipientKey;
-    proofRequestService.setRecipientKeys(keys);
-    String[] routingKeys = new String[0];
-    proofRequestService.setRoutingKeys(routingKeys);
-    proofRequestService.setServiceEndpoint(agentEndpoint);
-    proofRequestService.setEndpointName(agentEndpointName);
-    connectionlessProofRequest.setService(proofRequestService);
+        ProofRequestThread proofRequestThread = new ProofRequestThread();
+        EmptyDTO empty = new EmptyDTO();
+        proofRequestThread.setReceivedOrders(empty);
+        proofRequestThread.setThreadId(threadId);
+        connectionlessProofRequest.setThread(proofRequestThread);
 
-    ProofRequestThread proofRequestThread = new ProofRequestThread();
-    EmptyDTO empty = new EmptyDTO();
-    proofRequestThread.setReceivedOrders(empty);
-    proofRequestThread.setThreadId(threadId);
-    connectionlessProofRequest.setThread(proofRequestThread);
-
-    return connectionlessProofRequest;
-
-  }
-
-  private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
-
-    Map<String, IndyProofReqAttrSpec> requestedAttributes = new HashMap<>();
-    this.addMasterIdAttributes(requestedAttributes);
-
-    // Composing the proof request
-    IndyProofRequest proofRequest = new IndyProofRequest();
-    proofRequest.setName("Proof request");
-    proofRequest.setRequestedPredicates(new HashMap<>());
-
-    proofRequest.setRequestedAttributes(requestedAttributes);
-    proofRequest.setVersion("0.1");
-    int nonce = secureRandom.nextInt();
-    proofRequest.setNonce(String.valueOf(nonce));
-
-    V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
-    connectionlessProofCreationRequest.setComment("string");
-    connectionlessProofCreationRequest.setProofRequest(proofRequest);
-
-
-    return connectionlessProofCreationRequest;
-  }
-
-  private void addMasterIdAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
-    // Restriction regarding CredDefs for masterId
-    String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
-    List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
-    for (int i = 0; i < masterIdCredDefIds.length; i++) {
-      Map<String, String> temp = new HashMap<String, String>();
-      temp.put("cred_def_id", masterIdCredDefIds[i]);
-      masterIdRestrictions.add(temp);
+        return connectionlessProofRequest;
     }
 
-    IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
-    List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
-        "addressCity", "dateOfExpiry", "dateOfBirth");
-    proofRequestMasterId.setNames(names);
+    private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
+        Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes();
 
-    // Restriction regarding Revocation
-    AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
-    nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+        // Composing the proof request
+        IndyProofRequest proofRequest = new IndyProofRequest();
+        proofRequest.setName("Proof request");
+        proofRequest.setRequestedPredicates(new HashMap<>());
+        proofRequest.setRequestedAttributes(requestedAttributes);
+        proofRequest.setVersion("0.1");
+        int nonce = secureRandom.nextInt();
+        proofRequest.setNonce(String.valueOf(nonce));
 
-    proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
-    proofRequestMasterId.setRestrictions(masterIdRestrictions);
+        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
+        connectionlessProofCreationRequest.setComment("string");
+        connectionlessProofCreationRequest.setProofRequest(proofRequest);
 
-    requestedAttributes.put("masterId", proofRequestMasterId);
-  }
-
-
-  @Override
-  public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) {
-
-    log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
-
-    String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
-
-    if (webhookPresentProofDTO.getState().equals("verified")) {
-      boolean proofVerified =
-          webhookPresentProofDTO.getVerified() != null && webhookPresentProofDTO.getVerified().equals("true");
-      try {
-        CheckInCredential checkInCredential =
-            this.checkInCredentialService.updateValidity(presentationExchangeId, proofVerified);
-        // inform subscribers about the new checkin credential
-        this.notificationService.sendNotificationAboutNewCheckinCredentials(checkInCredential.getHotelId(),
-            checkInCredential.getDeskId());
-      } catch (CheckinCredentialNotFoundException e) {
-        // log but do not rethrow
-        log.error("A matching CheckInCredential was not found", e);
-      } finally {
-        // Delete proof presentation info from agent
-        this.acapyClient.deleteProofRecord(apikey, presentationExchangeId);
-      }
-    } else if (webhookPresentProofDTO.getState().equals("presentation_received")) {
-      log.debug("Update mongodb entry and delete information from agent");
-      log.debug("Getting presentation information from the agent");
-
-      // get the proof record from the agent
-      V10PresentationExchange proofRecordDTO = this.acapyClient.getProofRecord(apikey, presentationExchangeId);
-
-      // construct a corporateId out of the proof
-      CorporateIdDTO corporateId = this.createCorporateIdDTO(proofRecordDTO);
-      log.debug("Created corporate id: {}", corporateId);
-
-      // construct a masterId out of the proof
-      MasterIdDTO masterId = this.createMasterIdDTO(proofRecordDTO);
-      log.debug("Created master id: {}", masterId);
-
-      try {
-        // Updating the mongo db entry with the data received via the proof
-        this.checkInCredentialService.updateCheckinCredential(presentationExchangeId, masterId, corporateId);
-      } catch (CheckinCredentialNotFoundException e) {
-        // log but do not rethrow
-        log.error("A matching CheckInCredential was not found", e);
-      }
-    } else {
-      log.debug("ignore this state");
+        return connectionlessProofCreationRequest;
     }
-  }
 
-  private MasterIdDTO createMasterIdDTO(V10PresentationExchange proofRecordDTO) {
-    MasterIdDTO masterId = new MasterIdDTO();
-    this.log.debug(proofRecordDTO.toString());
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    try {
-      // TODO if it is a map, use mapper.convertValue!
-      Presentation presentation = mapper.readValue(proofRecordDTO.getPresentation().toString(), Presentation.class);
-
-      RevealedAttrValuesMasterId values =
-          presentation.getRequestedProof().getRevealedAttrGroups().getMasterId().getValues();
-      masterId.setFirstName(values.getFirstName().getRaw());
-      masterId.setFamilyName(values.getFamilyName().getRaw());
-      masterId.setAddressStreet(values.getAddressStreet().getRaw());
-      masterId.setAddressZipCode(values.getAddressZipCode().getRaw());
-      masterId.setAddressCity(values.getAddressCity().getRaw());
-      masterId.setAddressCountry(values.getAddressCountry().getRaw());
-      masterId.setDateOfExpiryFromString(values.getDateOfExpiry().getRaw());
-      masterId.setDateOfBirthFromString(values.getDateOfBirth().getRaw());
-
-      return masterId;
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
+    private Map<String, IndyProofReqAttrSpec> createRequestedAttributes() {
+        // TODO: Add additional attributes
+        return new HashMap<>();
+        // Restriction regarding CredDefs for masterId
+//        String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
+//        List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
+//        for (int i = 0; i < masterIdCredDefIds.length; i++) {
+//            Map<String, String> temp = new HashMap<String, String>();
+//            temp.put("cred_def_id", masterIdCredDefIds[i]);
+//            masterIdRestrictions.add(temp);
+//        }
+//
+//        IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
+//        List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
+//            "addressCity", "dateOfExpiry", "dateOfBirth");
+//        proofRequestMasterId.setNames(names);
+//
+//        // Restriction regarding Revocation
+//        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
+//        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+//
+//        proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
+//        proofRequestMasterId.setRestrictions(masterIdRestrictions);
+//
+//        requestedAttributes.put("masterId", proofRequestMasterId);
     }
-  }
 
-  private CorporateIdDTO createCorporateIdDTO(V10PresentationExchange proofRecordDTO) {
-    CorporateIdDTO corporateId = new CorporateIdDTO();
-    this.log.debug(proofRecordDTO.toString());
+    @Override
+    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
 
-    ObjectMapper mapper = new ObjectMapper();
+        log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
 
-    try {
-      // TODO if it is a map, use mapper.convertValue!
-      Presentation presentation = mapper.readValue(proofRecordDTO.getPresentation().toString(), Presentation.class);
+        String currentState = webhookPresentProofDTO.getState();
 
-      RevealedAttrValuesCorporateId values =
-          presentation.getRequestedProof().getRevealedAttrGroups().getCorporateId().getValues();
-      corporateId.setFirstName(values.getFirstName().getRaw());
-      corporateId.setFamilyName(values.getLastName().getRaw());
-      corporateId.setCompanyName(values.getFirmName().getRaw());
-      corporateId.setCompanySubject(values.getFirmSubject().getRaw());
-      corporateId.setCompanyAddressStreet(values.getFirmStreet().getRaw());
-      corporateId.setCompanyAddressZipCode(values.getFirmPostalcode().getRaw());
-      corporateId.setCompanyAddressCity(values.getFirmCity().getRaw());
-      return corporateId;
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
+        switch(currentState) {
+            case "verified":
+                handleVerifiedState(webhookPresentProofDTO);
+            case "presentation_received":
+                handlePresentationReceivedState(webhookPresentProofDTO);
+                return;
+            default:
+                log.debug("ignore state {}", currentState);
+        }
     }
-  }
+
+    private void handlePresentationReceivedState(WebhookPresentProofDTO webhookPresentProofDTO) {
+        log.debug("handle presentation received state {}", webhookPresentProofDTO.getState());
+    }
+
+    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
+        log.debug("handle presentation verified state {}", webhookPresentProofDTO.getState());
+        String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
+        String threadId = webhookPresentProofDTO.getThreadId();
+
+        Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
+
+        if(!vr.isPresent()) {
+            throw new VerificationNotFoundException();
+        }
+
+        // TODO: Verify received attributes
+
+        VerificationRequestDTO verificationRequest = vr.get();
+        String callbackUrl = verificationRequest.getCallbackUrl();
+
+        InitiatorCallbackData data = new InitiatorCallbackData(200, true, "", new ArrayList<InitiatorCallbackDataValue>());
+        this.notificationService.executeCallback(callbackUrl, data);
+    }
 }

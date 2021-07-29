@@ -145,4 +145,9 @@ Desktop.ini
 # ESLint
 ######################
 .eslintcache
+
+######################
+# Environment files
+######################
+.env
 src/main/docker/.env
