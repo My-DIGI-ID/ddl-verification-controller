@@ -1,0 +1,99 @@
+{
+   "$schema":"http://json-schema.org/draft-07/schema",
+   "$id":"http://example.com/verification.request.metadata.schema.json",
+   "type":"object",
+   "title":"The meta data schema definition",
+   "description":"The general schema for exchanging meta data for a proof request processing.",
+   "default":{
+      
+   },
+   "examples":[
+      {
+         "callbackURL":"https://callback.example.com/123123",
+         "validUntil":"2021-07-18T18:25:43.511Z",
+         "selfAttested":[
+            "email",
+            "purposeOfStay"
+         ],
+         "data":{
+            
+         }
+      }
+   ],
+   "required":[
+      "callbackURL"
+   ],
+   "properties":{
+      "callbackURL":{
+         "$id":"#/properties/callbackURL",
+         "type":"string",
+         "title":"The callbackURL schema",
+         "description":"An explanation about the purpose of this instance.",
+         "default":"",
+         "examples":[
+            "https://callback.example.com/123123"
+         ]
+      },
+      "validUntil":{
+         "$id":"#/properties/validUntil",
+         "type":"string",
+         "title":"The validUntil schema",
+         "description":"An explanation about the purpose of this instance.",
+         "default":"",
+         "examples":[
+            "2021-07-18T18:25:43.511Z"
+         ]
+      },
+      "selfAttested":{
+         "$id":"#/properties/selfAttested",
+         "type":"array",
+         "title":"The selfAttested schema",
+         "description":"An explanation about the purpose of this instance.",
+         "default":[
+            
+         ],
+         "examples":[
+            [
+               "email",
+               "purposeOfStay"
+            ]
+         ],
+         "additionalItems":true,
+         "items":{
+            "$id":"#/properties/selfAttested/items",
+            "anyOf":[
+               {
+                  "$id":"#/properties/selfAttested/items/anyOf/0",
+                  "type":"string",
+                  "title":"The first anyOf schema",
+                  "description":"An explanation about the purpose of this instance.",
+                  "default":"",
+                  "examples":[
+                     "email",
+                     "purposeOfStay"
+                  ]
+               }
+            ]
+         }
+      },
+      "data":{
+         "$id":"#/properties/data",
+         "type":"object",
+         "title":"The data schema",
+         "description":"An explanation about the purpose of this instance.",
+         "default":{
+            
+         },
+         "examples":[
+            {
+               
+            }
+         ],
+         "required":[
+            
+         ],
+         "additionalProperties":true
+      }
+   },
+   "additionalProperties":true
+}
