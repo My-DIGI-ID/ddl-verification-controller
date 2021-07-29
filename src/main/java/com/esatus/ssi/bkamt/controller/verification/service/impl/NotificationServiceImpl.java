@@ -21,18 +21,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Map;
 import java.util.Objects;
 
 import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.esatus.ssi.bkamt.controller.verification.repository.EmitterRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 
