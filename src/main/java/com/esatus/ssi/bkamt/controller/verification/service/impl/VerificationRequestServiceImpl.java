@@ -48,13 +48,13 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
     @Override
     public VerificationRequestDTO createVerificationRequest(VerificationRequestDTO verificationRequestDTO) throws PresentationRequestsAlreadyExists {
 
-        Optional<VerificationRequest> existingPresentation = verificationRepository.findOneByThreadId(verificationRequestDTO.getThreadId().toLowerCase());
-        if (existingPresentation.isPresent()) {
-            throw new PresentationRequestsAlreadyExists();
-        }
+//        Optional<VerificationRequest> existingPresentation = verificationRepository.findOneByThreadId(verificationRequestDTO.getThreadId().toLowerCase());
+//        if (existingPresentation.isPresent()) {
+//            throw new PresentationRequestsAlreadyExists();
+//        }
 
         VerificationRequest verificationRequest = new VerificationRequest();
-        verificationRequest.setThreadId(verificationRequestDTO.getThreadId());
+        // verificationRequest.setThreadId(verificationRequestDTO.getThreadId());
         verificationRequest.setCallbackUrl(verificationRequestDTO.getCallbackUrl());
         if(verificationRequestDTO.getData() != null || verificationRequest.getData().size() > 0) {
             verificationRequest.setData(verificationRequestDTO.getData());

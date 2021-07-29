@@ -12,8 +12,7 @@ public class VerificationRequestDTO {
     @Null
     private String id;
 
-    @NotBlank
-    @NotNull
+    @Null
     private String threadId;
 
     @NotBlank

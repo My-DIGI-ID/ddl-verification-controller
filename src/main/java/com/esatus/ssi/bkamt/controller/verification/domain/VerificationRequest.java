@@ -21,6 +21,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class VerificationRequest {
     @Id
     private String id;
 
-    @NotNull
+    @Null
     private String threadId;
 
     @NotNull
