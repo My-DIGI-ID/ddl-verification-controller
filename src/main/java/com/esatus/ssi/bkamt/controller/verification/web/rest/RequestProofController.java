@@ -22,7 +22,7 @@ import com.esatus.ssi.bkamt.controller.verification.service.RequestPresentationV
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.RequestPresentationValidationFailedException;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class RequestProofController {
     RequestPresentationValidationService requestPresentationValidationService;
 
     @PostMapping(value = "/proof")
-    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws JsonProcessingException, RequestPresentationValidationFailedException {
+    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws RequestPresentationValidationFailedException, VerificationNotFoundException {
 
         log.debug("REST request to create a presentation request for verificationId {}", verificationId );
 

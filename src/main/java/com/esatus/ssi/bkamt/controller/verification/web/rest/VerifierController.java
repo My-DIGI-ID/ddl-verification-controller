@@ -20,6 +20,7 @@ import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestS
 import com.esatus.ssi.bkamt.controller.verification.service.dto.PresentationRequestCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
+import com.mongodb.BasicDBObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 /**
  * REST controller for managing verifiers.
@@ -52,6 +55,8 @@ public class VerifierController {
     @Autowired
     VerificationRequestService verificationRequestService;
 
+    private static final String RETURN_URL = "didcomm://ssi.ddl.example.com/api/v1/proof?verificationId=";
+
     /**
      * {@code POST /init} : Initialize verification request
      *
@@ -62,7 +67,11 @@ public class VerifierController {
      *         with the given name does already exist.
      */
     @PostMapping("/init")
-    public ResponseEntity<VerificationRequestDTO> createPresentationRequest(@Valid @RequestBody VerificationRequestDTO verificationRequestDTO) {
+    public URI createPresentationRequest(@Valid @RequestBody VerificationRequestDTO verificationRequestDTO) throws URISyntaxException {
+
+        VerificationRequestDTO vr = new VerificationRequestDTO();
+        vr.setCallbackUrl("");
+        vr.setData(new ArrayList<BasicDBObject>());
 
         // TODO: Check meta data compliance and throw error if the compliance is violated
         boolean isMetaDataCompliant = verifierService.chekMetaDataCompliance(verificationRequestDTO.getData());
@@ -72,11 +81,8 @@ public class VerifierController {
         }
 
         try {
-            // TODO: Return deep link with verification ID
             VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestDTO);
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdVerificationRequest.getId()).toUri();
-            return ResponseEntity.created(location).body(createdVerificationRequest);
+            return new URI(RETURN_URL + createdVerificationRequest.getId());
         } catch (PresentationRequestsAlreadyExists e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

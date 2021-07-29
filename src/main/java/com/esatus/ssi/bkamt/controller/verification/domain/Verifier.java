@@ -25,11 +25,12 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * A verifier.
  */
 @org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_verifier")
-public class Verifier {
+public class  Verifier {
 
 	@Id
     private String id;
 
+	// TODO: Hash that value
 	@NotNull
 	@Field("api_key")
     private String apiKey;
