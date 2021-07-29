@@ -226,7 +226,8 @@ public class ProofServiceImpl implements ProofService {
             throw new VerificationNotFoundException();
         }
 
-        // TODO: Create the callback and execute it
+        // TODO: Verify received attributes
+
         VerificationRequestDTO verificationRequest = vr.get();
         String callbackUrl = verificationRequest.getCallbackUrl();
 

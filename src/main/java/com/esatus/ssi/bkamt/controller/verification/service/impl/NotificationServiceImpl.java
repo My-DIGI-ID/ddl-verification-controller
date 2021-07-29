@@ -22,8 +22,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.Objects;
 
 import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +45,20 @@ public class NotificationServiceImpl implements NotificationService {
     private EmitterRepository emitterRepository;
 
     private void doSendNotification(String url, InitiatorCallbackData callbackData) {
-        Gson gson = new Gson();
-        String json = gson.toJson(callbackData);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = null;
+
+        try {
+            json = objectMapper.writeValueAsString(callbackData);
+        } catch (JsonProcessingException e) {
+            log.debug("Error serializing the callback data");
+            e.printStackTrace();
+        }
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
-            .POST(HttpRequest.BodyPublishers.ofString(json))
+            .POST(HttpRequest.BodyPublishers.ofString(Objects.requireNonNull(json)))
             .build();
 
         try {
