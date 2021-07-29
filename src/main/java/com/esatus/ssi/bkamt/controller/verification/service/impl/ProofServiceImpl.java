@@ -76,20 +76,17 @@ public class ProofServiceImpl implements ProofService {
     SecureRandom secureRandom = new SecureRandom();
 
     @Override
-    public URI createProofRequest(String verificationId) {
+    public URI createProofRequest(String verificationId) throws VerificationNotFoundException {
         // prepare a proof request DTO and send it to the agent
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
-        V10PresentationExchange proofResponseDTO =
-            this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
+        V10PresentationExchange proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
         log.debug("agent created a proof request: {}", proofResponseDTO);
 
         // prepare a connectionless proof request
         ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
-        // TODO: Do we need that?
-        // create a new entry for this presentationExchangeId in the database
-        // this.verifierService.createCheckInCredential(hotelId, deskId,
-        // proofResponseDTO.getPresentationExchangeId());
+        String threadId = proofResponseDTO.getThreadId();
+        verificationRequestService.updateThreadId(verificationId, threadId);
 
         try {
             ObjectMapper mapper = new ObjectMapper();

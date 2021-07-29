@@ -21,7 +21,9 @@ import com.esatus.ssi.bkamt.controller.verification.repository.VerificationReque
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerificationRequestMapper;
+import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,5 +75,20 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
     public Optional<VerificationRequestDTO> getByThreadId(String threadId) {
         log.debug("get verification request by threadId {}", threadId);
         return verificationRepository.findOneByThreadId(threadId).map(verificationRequestMapper::verificationRequestToVerificationRequestDTO);
+    }
+
+    @Override
+    public void updateThreadId(String verificationId, String threadId) throws VerificationNotFoundException {
+        Optional<VerificationRequest> verificationOpt = verificationRepository.findById(verificationId);
+
+        if(verificationOpt.isEmpty()) {
+            throw new VerificationNotFoundException();
+        }
+
+        VerificationRequest vr = verificationOpt.get();
+        vr.setThreadId(threadId);
+
+        log.debug("update verification {} and set thread id {}", verificationId, threadId);
+        this.verificationRequestMapper.verificationRequestToVerificationRequestDTO(vr);
     }
 }

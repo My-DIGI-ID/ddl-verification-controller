@@ -16,24 +16,28 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
-import java.net.URI;
+import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.RequestPresentationValidationService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.RequestPresentationValidationFailedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
+import java.util.Optional;
 
 /**
- * Controller for connecting with the Indy / Aries hotel agent.
+ * Controller for creating a presentation request
  */
 @Tag(name = "Proof Requests", description = "Handle proof requests from scanned QR codes")
 @RestController
@@ -45,17 +49,35 @@ public class RequestProofController {
     @Autowired
     ProofService proofService;
 
-    // The method for requesting a connectionless proof
-//    @GetMapping(value = "/proof")
-//    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "hotelId") String hotelId, @RequestParam(name = "deskId") String deskId) throws JsonProcessingException {
-//
-//        log.debug("REST request to log-in at desk {} and hotel {}", deskId, hotelId);
-//
-//        URI proofURI = this.proofService.getProofURI(hotelId, deskId);
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.setLocation(proofURI);
-//
-//        return new ResponseEntity<Void>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
-//    }
+    @Autowired
+    VerificationRequestService verificationRequestService;
 
+    @Autowired
+    RequestPresentationValidationService requestPresentationValidationService;
+
+    @PostMapping(value = "/proof")
+    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws JsonProcessingException, RequestPresentationValidationFailedException {
+
+        log.debug("REST request to create a presentation request for verificationId {}", verificationId );
+
+        // We have to validate the data
+        Optional<VerificationRequestDTO> verificationRequest = verificationRequestService.getById(verificationId);
+
+        if(verificationRequest.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        RequestPresentationValidationResult validationResult = requestPresentationValidationService.Validate(verificationRequest.get());
+
+        // When validation of the metadata failed
+        if(!validationResult.isValid())
+            throw new RequestPresentationValidationFailedException(String.format("Validation of verificationRequest failed {}", verificationId));
+
+        // If validation succeeded create the proof
+        URI proofURI = this.proofService.createProofRequest(verificationId);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(proofURI);
+
+        return new ResponseEntity<Void>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
+    }
 }

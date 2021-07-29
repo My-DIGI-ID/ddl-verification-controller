@@ -72,6 +72,7 @@ public class VerifierController {
         }
 
         try {
+            // TODO: Return deep link with verification ID
             VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestDTO);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdVerificationRequest.getId()).toUri();
