@@ -185,3 +185,7 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 ## Troubleshooting
 ### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException... 
 - Remove the .m2 folder in your user directory and rebuild with ``mvnw``
+
+## Verifier initialization
+To create a new verifier you have to create a password hash with bcrypt with a strength factor of 12
+Password length may not be greater than 72 bytes because that the maxim password length bcrypt supports only

@@ -16,6 +16,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
+import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -45,6 +47,12 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Autowired
     private VerifierMapper verifierMapper;
+
+    @Override
+    public List<Verifier> getAll() {
+        log.debug("get all verifiers");
+        return verifierRepository.findAll();
+    }
 
     @Override
     public boolean verifierExists(String apiKey) {

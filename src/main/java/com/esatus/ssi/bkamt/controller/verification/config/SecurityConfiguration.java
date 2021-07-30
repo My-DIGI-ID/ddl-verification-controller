@@ -16,6 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
+import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
+import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +33,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
-import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
-import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
