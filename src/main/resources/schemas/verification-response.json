@@ -1,0 +1,81 @@
+{
+   "$schema":"http://json-schema.org/draft-07/schema",
+   "$id":"http://example.com/verification.response.schema.json",
+   "type":"object",
+   "title":"verification response schema",
+   "description":"The verification response schema describing the response payload after verification.",
+   "default":{
+      
+   },
+   "examples":[
+      {
+         "code":200,
+         "verified":true,
+         "data":{
+            "property1":"abc"
+         },
+         "message":""
+      }
+   ],
+   "required":[
+      "code"
+   ],
+   "properties":{
+      "code":{
+         "$id":"#/properties/code",
+         "type":"integer",
+         "title":"The code schema",
+         "description":"Represents the status code for the verification process. These codes are aligned on the http status codes, hence 200 OK, 400 Bad Request, 500 Internal Server Error",
+         "default":200,
+         "examples":[
+            200,
+            400,
+            500
+         ],
+         "minimum":100,
+         "maximum":511
+      },
+      "verified":{
+         "$id":"#/properties/verified",
+         "type":"boolean",
+         "title":"The verified schema",
+         "description":"Represents the verification process result. true means the holder has successfully proofed, that he is in possession of the requested attributes.",
+         "default":false,
+         "examples":[
+            true
+         ]
+      },
+      "data":{
+         "$id":"#/properties/data",
+         "type":"object",
+         "title":"The data schema",
+         "description":"The data payload, only provided if the code is 200, may contain any use case specific data.",
+         "default":{
+            
+         },
+         "examples":[
+            {
+               "property1":"abc"
+            }
+         ],
+         "required":[
+            
+         ],
+         "properties":{
+            
+         },
+         "additionalProperties":true
+      },
+      "message":{
+         "$id":"#/properties/message",
+         "type":"string",
+         "title":"The message schema",
+         "description":"Contains the error message in case of an response code 400 or 500.",
+         "default":"",
+         "examples":[
+            ""
+         ]
+      }
+   },
+   "additionalProperties":true
+}
