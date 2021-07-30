@@ -218,7 +218,6 @@ public class ProofServiceImpl implements ProofService {
             throw new MetaDataInvalidException();
         }
 
-
         VerificationResponse response = buildVerificationResponse(verificationRequest);
 
         String callbackUrl = verificationRequest.getCallbackUrl();
