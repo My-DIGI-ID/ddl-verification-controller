@@ -21,7 +21,6 @@ import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMe
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerifierMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service class for managing verifications.
@@ -55,26 +53,13 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     @Override
-    public boolean verifierExists(String apiKey) {
-        log.debug("check if verifier record with apiKey exists");
-        Optional<VerifierDTO> verifier = this.getVerifier(apiKey);
-        return verifier.isPresent();
-    }
-
-    @Override
     public void invalidateVerification(String verificationId) {
         log.debug("invalidate verification with id {}", verificationId);
         verificationRequestRepository.deleteById(verificationId);
     }
 
     @Override
-	public Optional<VerifierDTO> getVerifier(String apiKey) {
-		log.debug("get verifier by apiKey");
-		return verifierRepository.findByApiKey(apiKey).map(verifierMapper::verifierToVerifierDTO);
-	}
-
-    @Override
-    public boolean chekMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata) {
+    public boolean checkMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata) {
         return true;
     }
 }

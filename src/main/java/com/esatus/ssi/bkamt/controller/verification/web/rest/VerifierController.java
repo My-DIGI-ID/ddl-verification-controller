@@ -65,7 +65,7 @@ public class VerifierController {
      */
     @PostMapping("/init")
     public URI createPresentationRequest(@Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
-        boolean isMetaDataCompliant = verifierService.chekMetaDataCompliance(verificationRequestMetadata);
+        boolean isMetaDataCompliant = verifierService.checkMetaDataCompliance(verificationRequestMetadata);
 
         if(!isMetaDataCompliant) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Meta data compliance check failed");

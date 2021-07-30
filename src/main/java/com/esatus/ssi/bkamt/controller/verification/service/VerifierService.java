@@ -18,15 +18,11 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface VerifierService {
     List<Verifier> getAll();
-    boolean verifierExists(String apiKey);
     void invalidateVerification(String verificationId);
-    Optional<VerifierDTO> getVerifier(String apiKey);
-    boolean chekMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata);
+    boolean checkMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata);
 }
