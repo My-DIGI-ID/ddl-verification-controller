@@ -23,7 +23,7 @@ public class Base64Payload {
     @JsonProperty("base64")
     private String base64;
 
-    public Base64Payload() {};
+    public Base64Payload() {}
 
     public void setBase64(String base64) {
         this.base64 = base64;

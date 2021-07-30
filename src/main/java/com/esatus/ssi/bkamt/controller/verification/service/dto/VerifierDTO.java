@@ -1,9 +1,9 @@
 package com.esatus.ssi.bkamt.controller.verification.service.dto;
 
+import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 
 
 /**

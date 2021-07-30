@@ -31,7 +31,7 @@ public class InMemoryEmitterRepository implements EmitterRepository {
 
     private final Logger log = LoggerFactory.getLogger(InMemoryEmitterRepository.class);
 
-    private Map<String, Pair<String, SseEmitter>> emitterMap = new ConcurrentHashMap<>();
+    private final Map<String, Pair<String, SseEmitter>> emitterMap = new ConcurrentHashMap<>();
 
     @Override
     public void addEmitter(String uuid, String hotelId, String deskId, SseEmitter emitter) {

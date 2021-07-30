@@ -2,12 +2,10 @@ package com.esatus.ssi.bkamt.controller.verification.service.dto;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
 import com.esatus.ssi.bkamt.controller.verification.models.Data;
-import com.esatus.ssi.bkamt.controller.verification.models.Data__1;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import java.util.List;
 
 public class VerificationRequestDTO {
 

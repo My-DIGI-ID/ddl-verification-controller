@@ -19,5 +19,5 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface EmitterService {
-    public SseEmitter createEmitter(String hotelId, String deskId);
+    SseEmitter createEmitter(String hotelId, String deskId);
 }

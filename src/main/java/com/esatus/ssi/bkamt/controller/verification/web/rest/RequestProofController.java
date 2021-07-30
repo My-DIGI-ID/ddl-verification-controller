@@ -44,7 +44,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class RequestProofController {
 
-    private final Logger log = (Logger) LoggerFactory.getLogger(RequestProofController.class);
+    private final Logger log = LoggerFactory.getLogger(RequestProofController.class);
 
     @Autowired
     ProofService proofService;

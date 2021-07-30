@@ -16,14 +16,10 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerifierDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerifierAlreadyExistsException;
-import com.mongodb.BasicDBObject;
+
+import java.util.Optional;
 
 public interface VerifierService {
     boolean verifierExists(String apiKey);

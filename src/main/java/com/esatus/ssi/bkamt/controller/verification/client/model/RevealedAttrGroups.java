@@ -26,7 +26,7 @@ public class RevealedAttrGroups {
     @JsonProperty("corporateId")
     private RevealedAttrCorporateId corporateId;
 
-    public RevealedAttrGroups() {};
+    public RevealedAttrGroups() {}
 
     public RevealedAttrMasterId getMasterId() {
         return masterId;

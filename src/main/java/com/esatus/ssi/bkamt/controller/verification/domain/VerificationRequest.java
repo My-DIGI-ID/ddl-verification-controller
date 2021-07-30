@@ -32,7 +32,7 @@ public class VerificationRequest {
     @Id
     private String id;
 
-    private String verificationId;
+    private final String verificationId;
 
     @Null
     private String threadId;

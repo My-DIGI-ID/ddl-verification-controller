@@ -13,7 +13,10 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
-import com.esatus.ssi.bkamt.agent.client.model.*;
+import com.esatus.ssi.bkamt.agent.client.model.IndyProofReqAttrSpec;
+import com.esatus.ssi.bkamt.agent.client.model.IndyProofRequest;
+import com.esatus.ssi.bkamt.agent.client.model.V10PresentationCreateRequestRequest;
+import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
@@ -39,7 +42,10 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProofServiceImpl implements ProofService {

@@ -21,7 +21,6 @@ import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMe
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerificationRequestMapper;
 import org.slf4j.Logger;
