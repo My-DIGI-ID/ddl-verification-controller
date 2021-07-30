@@ -24,12 +24,10 @@ import com.esatus.ssi.bkamt.controller.verification.client.model.*;
 import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import com.esatus.ssi.bkamt.controller.verification.models.Data__1;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationResponse;
-import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
-import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
-import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
+import com.esatus.ssi.bkamt.controller.verification.service.*;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +40,10 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProofServiceImpl implements ProofService {
@@ -57,6 +58,9 @@ public class ProofServiceImpl implements ProofService {
 
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    MetaDataValidator metaDataValidator;
 
     @Autowired
     VerificationRequestService verificationRequestService;
@@ -83,7 +87,6 @@ public class ProofServiceImpl implements ProofService {
     public URI createProofRequest(String verificationId) throws VerificationNotFoundException {
 
         var verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
-
         var verificationRequest = verificationRequestOptional.get();
 
         // prepare a proof request DTO and send it to the agent
@@ -173,11 +176,12 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private Map<String, IndyProofReqAttrSpec> createRequestedAttributes(VerificationRequestDTO verificationRequest) {
+        // TODO: Add additional attributes?
         return new HashMap<String, IndyProofReqAttrSpec>();
     }
 
     @Override
-    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
+    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException {
 
         log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
 
@@ -198,18 +202,20 @@ public class ProofServiceImpl implements ProofService {
         log.debug("handle presentation received state {}", webhookPresentProofDTO.getState());
     }
 
-    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
-        log.debug("handle presentation verified state {}", webhookPresentProofDTO.getState());
-        String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
+    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException {
         String threadId = webhookPresentProofDTO.getThreadId();
-
         Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
 
         if (vr.isEmpty()) {
             throw new VerificationNotFoundException();
         }
 
-        // TODO: Verify received attributes
+        var metaDataValid = metaDataValidator.validateMetaData();
+
+        if(!metaDataValid) {
+            throw new MetaDataInvalidException();
+        }
+
         VerificationRequestDTO verificationRequest = vr.get();
         VerificationResponse response = buildVerificationResponse(verificationRequest);
 

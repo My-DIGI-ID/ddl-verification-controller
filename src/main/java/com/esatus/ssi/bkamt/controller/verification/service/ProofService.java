@@ -18,9 +18,10 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 
 import java.net.URI;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 
 public interface ProofService {
-	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException;
+	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException;
     URI createProofRequest(String verificationId) throws VerificationNotFoundException;
 }
