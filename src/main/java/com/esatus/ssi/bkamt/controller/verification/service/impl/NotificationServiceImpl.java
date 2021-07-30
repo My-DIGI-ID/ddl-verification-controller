@@ -23,14 +23,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Objects;
 
-import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.esatus.ssi.bkamt.controller.verification.repository.EmitterRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 
 @Service
@@ -38,15 +36,12 @@ public class NotificationServiceImpl implements NotificationService {
 
 	private final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
-    @Autowired
-    private EmitterRepository emitterRepository;
-
-    private void doSendNotification(String url, InitiatorCallbackData callbackData) {
+    private void doSendNotification(String url, VerificationResponse verificationResponse) {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = null;
 
         try {
-            json = objectMapper.writeValueAsString(callbackData);
+            json = objectMapper.writeValueAsString(verificationResponse);
         } catch (JsonProcessingException e) {
             log.debug("Error serializing the callback data");
             e.printStackTrace();
@@ -59,17 +54,15 @@ public class NotificationServiceImpl implements NotificationService {
             .build();
 
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void executeCallback(String url, InitiatorCallbackData callbackData) {
-        log.debug("Informing subscribers about new checkin-credential for verification: {}", callbackData);
-        doSendNotification(url, callbackData);
+    public void executeCallback(String url, VerificationResponse response) {
+        log.debug("Informing subscribers about new checkin-credential for verification: {}", response);
+        doSendNotification(url, response);
     }
 }

@@ -18,6 +18,7 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
@@ -51,23 +52,6 @@ public class VerifierServiceImpl implements VerifierService {
     @Autowired
     private VerifierMapper verifierMapper;
 
-	@Override
-	public VerifierDTO createVerifier(VerifierCreationDTO verifierCreationDTO) throws VerifierAlreadyExistsException {
-        Optional<Verifier> existingVerification = verifierRepository.findOneByName(verifierCreationDTO.getName().toLowerCase());
-        if (existingVerification.isPresent()) {
-            throw new VerifierAlreadyExistsException();
-        }
-
-        Verifier verifier = new Verifier();
-        verifier.setId(verifierCreationDTO.getId().toLowerCase());
-        verifier.setName(verifierCreationDTO.getName());
-        verifier.setApiKey(verifierCreationDTO.getApiKey());
-
-        verifierRepository.save(verifier);
-        log.debug("Created Information for verifier: {}", verifier);
-        return this.verifierMapper.verifierToVerifierDTO(verifier);
-	}
-
     @Override
     public boolean verifierExists(String apiKey) {
         log.debug("check if verifier record with apiKey exists");
@@ -90,7 +74,7 @@ public class VerifierServiceImpl implements VerifierService {
 	}
 
     @Override
-    public boolean chekMetaDataCompliance(List<BasicDBObject> data) {
+    public boolean chekMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata) {
 	    // TODO: Implement compliance check
         return true;
     }

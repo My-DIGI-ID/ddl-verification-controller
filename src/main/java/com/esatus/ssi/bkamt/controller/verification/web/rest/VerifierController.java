@@ -16,8 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.PresentationRequestCreationDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
 import com.mongodb.BasicDBObject;
@@ -32,7 +32,6 @@ import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -60,28 +59,22 @@ public class VerifierController {
     /**
      * {@code POST /init} : Initialize verification request
      *
-     * @param verificationRequestDTO the verification to create
+     * @param verificationRequestMetadata the verification to create
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
      *         the body the new presentation requests, or with status
      *         {@code 400 (Bad Request)} {@code 400 (Bad Request)} if a presentation request
      *         with the given name does already exist.
      */
     @PostMapping("/init")
-    public URI createPresentationRequest(@Valid @RequestBody VerificationRequestDTO verificationRequestDTO) throws URISyntaxException {
-
-        VerificationRequestDTO vr = new VerificationRequestDTO();
-        vr.setCallbackUrl("");
-        vr.setData(new ArrayList<BasicDBObject>());
-
-        // TODO: Check meta data compliance and throw error if the compliance is violated
-        boolean isMetaDataCompliant = verifierService.chekMetaDataCompliance(verificationRequestDTO.getData());
+    public URI createPresentationRequest(@Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
+        boolean isMetaDataCompliant = verifierService.chekMetaDataCompliance(verificationRequestMetadata);
 
         if(!isMetaDataCompliant) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Meta data compliance check failed");
         }
 
         try {
-            VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestDTO);
+            VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestMetadata);
             return new URI(RETURN_URL + createdVerificationRequest.getId());
         } catch (PresentationRequestsAlreadyExists e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

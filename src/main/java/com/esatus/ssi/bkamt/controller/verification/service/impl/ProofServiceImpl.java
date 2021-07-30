@@ -18,8 +18,9 @@ import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.client.model.*;
-import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
-import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackDataValue;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
+import com.esatus.ssi.bkamt.controller.verification.models.Data__1;
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationResponse;
 import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
@@ -219,16 +220,36 @@ public class ProofServiceImpl implements ProofService {
 
         Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
 
-        if(!vr.isPresent()) {
+        if(vr.isEmpty()) {
             throw new VerificationNotFoundException();
         }
 
         // TODO: Verify received attributes
-
         VerificationRequestDTO verificationRequest = vr.get();
-        String callbackUrl = verificationRequest.getCallbackUrl();
+        VerificationResponse response = buildVerificationResponse(verificationRequest);
 
-        InitiatorCallbackData data = new InitiatorCallbackData(200, true, "", new ArrayList<InitiatorCallbackDataValue>());
-        this.notificationService.executeCallback(callbackUrl, data);
+        String callbackUrl = verificationRequest.getCallbackUrl();
+        this.notificationService.executeCallback(callbackUrl, response);
+    }
+
+    private VerificationResponse buildVerificationResponse(VerificationRequestDTO verificationRequest) {
+        VerificationResponse response = new VerificationResponse();
+        response.setCode(200);
+        response.setVerified(true);
+
+        Data__1 data1 = buildResponseData(verificationRequest);
+
+        response.setData(data1);
+        return response;
+    }
+
+    private Data__1 buildResponseData(VerificationRequestDTO verificationRequest) {
+        Data data = verificationRequest.getData();
+        Data__1 data1 = new Data__1();
+
+        for (var additionalProperty : data.getAdditionalProperties().entrySet()) {
+            data1.setAdditionalProperty(additionalProperty.getKey(), additionalProperty.getValue());
+        }
+        return data1;
     }
 }

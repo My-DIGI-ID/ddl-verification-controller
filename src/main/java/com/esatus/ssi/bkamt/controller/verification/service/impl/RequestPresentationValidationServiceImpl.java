@@ -6,6 +6,7 @@ import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequ
 import com.mongodb.BasicDBObject;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,9 +17,8 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
     @Override
     public RequestPresentationValidationResult Validate(VerificationRequestDTO verificationRequestDTO) {
         // Unpack the data
-        List<BasicDBObject> metaData = verificationRequestDTO.getData();
+        List<BasicDBObject> metaData = new ArrayList<BasicDBObject>();
 
-        // TODO: Implement validation logic
         boolean dataValid = this.validateData(metaData);
 
         if(!dataValid) {

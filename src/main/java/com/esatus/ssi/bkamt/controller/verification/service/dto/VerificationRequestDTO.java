@@ -1,7 +1,8 @@
 package com.esatus.ssi.bkamt.controller.verification.service.dto;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
-import com.mongodb.BasicDBObject;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
+import com.esatus.ssi.bkamt.controller.verification.models.Data__1;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Null;
 import java.util.List;
 
 public class VerificationRequestDTO {
+
     @Null
     private String id;
 
@@ -19,7 +21,7 @@ public class VerificationRequestDTO {
     @NotNull
     private String callbackUrl;
 
-    private List<BasicDBObject> data;
+    private Data data;
 
     public VerificationRequestDTO() {
         // Empty constructor needed for Jackson.
@@ -56,11 +58,11 @@ public class VerificationRequestDTO {
         this.callbackUrl = callbackUrl;
     }
 
-    public List<BasicDBObject> getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setData(List<BasicDBObject> data) {
+    public void setData(Data data) {
         this.data = data;
     }
 }

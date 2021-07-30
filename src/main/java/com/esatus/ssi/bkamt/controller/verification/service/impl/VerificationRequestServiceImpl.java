@@ -17,13 +17,13 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerificationRequestMapper;
-import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +46,11 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
     private VerificationRequestMapper verificationRequestMapper;
 
     @Override
-    public VerificationRequestDTO createVerificationRequest(VerificationRequestDTO verificationRequestDTO) throws PresentationRequestsAlreadyExists {
-
-//        Optional<VerificationRequest> existingPresentation = verificationRepository.findOneByThreadId(verificationRequestDTO.getThreadId().toLowerCase());
-//        if (existingPresentation.isPresent()) {
-//            throw new PresentationRequestsAlreadyExists();
-//        }
-
+    public VerificationRequestDTO createVerificationRequest(VerificationRequestMetadata verificationRequestMetadata) {
         VerificationRequest verificationRequest = new VerificationRequest();
-        // verificationRequest.setThreadId(verificationRequestDTO.getThreadId());
-        verificationRequest.setCallbackUrl(verificationRequestDTO.getCallbackUrl());
-        if(verificationRequestDTO.getData() != null || verificationRequest.getData().size() > 0) {
-            verificationRequest.setData(verificationRequestDTO.getData());
-        }
+        verificationRequest.setCallbackUrl(verificationRequestMetadata.getCallbackURL());
+        verificationRequest.setValidUntil(verificationRequestMetadata.getValidUntil());
+        verificationRequest.setData(verificationRequestMetadata.getData());
 
         this.verificationRepository.save(verificationRequest);
         log.debug("Created verification request: {}", verificationRequest);
@@ -79,9 +71,9 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
 
     @Override
     public void updateThreadId(String verificationId, String threadId) throws VerificationNotFoundException {
-        Optional<VerificationRequest> verificationOpt = verificationRepository.findById(verificationId);
+        Optional<VerificationRequest> verificationOpt = verificationRepository.findByVerificationId(verificationId);
 
-        if(verificationOpt.isEmpty()) {
+        if (verificationOpt.isEmpty()) {
             throw new VerificationNotFoundException();
         }
 

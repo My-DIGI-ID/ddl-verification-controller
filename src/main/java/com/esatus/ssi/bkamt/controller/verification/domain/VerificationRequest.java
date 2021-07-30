@@ -16,13 +16,12 @@
 
 package com.esatus.ssi.bkamt.controller.verification.domain;
 
-import com.mongodb.BasicDBObject;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import java.util.List;
+import java.util.UUID;
 
 /**
  * Represents a presentation request for a digital driver license from any id wallet.
@@ -33,14 +32,21 @@ public class VerificationRequest {
     @Id
     private String id;
 
+    private String verificationId;
+
     @Null
     private String threadId;
 
     @NotNull
     private String callbackUrl;
 
-    @Field("data")
-    private List<BasicDBObject> data;
+    private String ValidUntil;
+
+    private Data data;
+
+    public VerificationRequest() {
+        this.verificationId = UUID.randomUUID().toString();
+    }
 
     public String  getId() {
         return id;
@@ -58,19 +64,27 @@ public class VerificationRequest {
         this.threadId = threadId;
     }
 
-    public List<BasicDBObject> getData() {
-        return data;
-    }
-
-    public void setData(List<BasicDBObject> data) {
-        this.data = data;
-    }
-
     public String getCallbackUrl() {
         return callbackUrl;
     }
 
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
+    }
+
+    public String getValidUntil() {
+        return ValidUntil;
+    }
+
+    public void setValidUntil(String validUntil) {
+        ValidUntil = validUntil;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
     }
 }
