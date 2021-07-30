@@ -22,6 +22,5 @@ import com.esatus.ssi.bkamt.controller.verification.service.exceptions.Verificat
 
 public interface ProofService {
 	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException;
-
     URI createProofRequest(String verificationId) throws VerificationNotFoundException;
 }
