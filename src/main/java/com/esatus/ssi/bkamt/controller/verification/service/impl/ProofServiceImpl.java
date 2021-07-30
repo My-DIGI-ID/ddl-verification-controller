@@ -210,13 +210,15 @@ public class ProofServiceImpl implements ProofService {
             throw new VerificationNotFoundException();
         }
 
-        var metaDataValid = metaDataValidator.validateMetaData();
+        VerificationRequestDTO verificationRequest = vr.get();
+
+        var metaDataValid = metaDataValidator.validateMetaData(verificationRequest);
 
         if(!metaDataValid) {
             throw new MetaDataInvalidException();
         }
 
-        VerificationRequestDTO verificationRequest = vr.get();
+
         VerificationResponse response = buildVerificationResponse(verificationRequest);
 
         String callbackUrl = verificationRequest.getCallbackUrl();
