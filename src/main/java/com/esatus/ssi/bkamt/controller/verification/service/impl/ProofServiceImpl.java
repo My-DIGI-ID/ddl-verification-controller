@@ -42,10 +42,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProofServiceImpl implements ProofService {
@@ -84,8 +81,13 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public URI createProofRequest(String verificationId) throws VerificationNotFoundException {
+
+        var verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
+
+        var verificationRequest = verificationRequestOptional.get();
+
         // prepare a proof request DTO and send it to the agent
-        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
+        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest(verificationRequest);
         V10PresentationExchange proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
         log.debug("agent created a proof request: {}", proofResponseDTO);
 
@@ -151,8 +153,8 @@ public class ProofServiceImpl implements ProofService {
         return connectionlessProofRequest;
     }
 
-    private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
-        Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes();
+    private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest(VerificationRequestDTO verificationRequest) {
+        Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes(verificationRequest);
 
         // Composing the proof request
         IndyProofRequest proofRequest = new IndyProofRequest();
@@ -170,31 +172,8 @@ public class ProofServiceImpl implements ProofService {
         return connectionlessProofCreationRequest;
     }
 
-    private Map<String, IndyProofReqAttrSpec> createRequestedAttributes() {
-        // TODO: Add additional attributes
-        return new HashMap<>();
-        // Restriction regarding CredDefs for masterId
-//        String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
-//        List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
-//        for (int i = 0; i < masterIdCredDefIds.length; i++) {
-//            Map<String, String> temp = new HashMap<String, String>();
-//            temp.put("cred_def_id", masterIdCredDefIds[i]);
-//            masterIdRestrictions.add(temp);
-//        }
-//
-//        IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
-//        List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
-//            "addressCity", "dateOfExpiry", "dateOfBirth");
-//        proofRequestMasterId.setNames(names);
-//
-//        // Restriction regarding Revocation
-//        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
-//        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
-//
-//        proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
-//        proofRequestMasterId.setRestrictions(masterIdRestrictions);
-//
-//        requestedAttributes.put("masterId", proofRequestMasterId);
+    private Map<String, IndyProofReqAttrSpec> createRequestedAttributes(VerificationRequestDTO verificationRequest) {
+        return new HashMap<String, IndyProofReqAttrSpec>();
     }
 
     @Override
@@ -204,7 +183,7 @@ public class ProofServiceImpl implements ProofService {
 
         String currentState = webhookPresentProofDTO.getState();
 
-        switch(currentState) {
+        switch (currentState) {
             case "verified":
                 handleVerifiedState(webhookPresentProofDTO);
             case "presentation_received":
@@ -226,7 +205,7 @@ public class ProofServiceImpl implements ProofService {
 
         Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
 
-        if(vr.isEmpty()) {
+        if (vr.isEmpty()) {
             throw new VerificationNotFoundException();
         }
 

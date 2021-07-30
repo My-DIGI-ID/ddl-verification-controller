@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
@@ -56,8 +55,6 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Override
     public void invalidateVerification(String verificationId) {
-	    // TODO: Do we need to delete the whole verification or do we just empty the metadata?
-        // For now we will delete the whole record from the database
         log.debug("invalidate verification with id {}", verificationId);
         verificationRequestRepository.deleteById(verificationId);
     }
@@ -70,7 +67,6 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Override
     public boolean chekMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata) {
-	    // TODO: Implement compliance check
         return true;
     }
 }

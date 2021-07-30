@@ -61,6 +61,11 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
         log.debug("get verification request by id {}", id);
         return verificationRepository.findById(id).map(verificationRequestMapper::verificationRequestToVerificationRequestDTO);
     }
+    @Override
+    public Optional<VerificationRequestDTO> getByVerificationId(String verificationId) {
+        log.debug("get verification request by verificationId {}", verificationId);
+        return verificationRepository.findByVerificationId(verificationId).map(verificationRequestMapper::verificationRequestToVerificationRequestDTO);
+    }
 
     @Override
     public Optional<VerificationRequestDTO> getByThreadId(String threadId) {
