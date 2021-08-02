@@ -16,9 +16,9 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
+import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 
 public interface RequestPresentationValidationService {
-    RequestPresentationValidationResult Validate(VerificationRequestDTO verificationRequestDTO);
+    RequestPresentationValidationResult validatePresentationExchange(V10PresentationExchange presentationExchange);
 }

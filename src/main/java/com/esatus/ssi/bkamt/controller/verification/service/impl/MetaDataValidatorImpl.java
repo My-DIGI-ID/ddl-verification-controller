@@ -16,7 +16,6 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import com.esatus.ssi.bkamt.controller.verification.service.MetaDataValidator;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
@@ -36,11 +35,6 @@ public class MetaDataValidatorImpl implements MetaDataValidator {
             return true;
         }
 
-        return true;
-    }
-
-    @Override
-    public boolean validatePresentationExchange(V10PresentationExchange presentationExchange) {
         return true;
     }
 }

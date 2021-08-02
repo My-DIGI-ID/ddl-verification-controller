@@ -21,6 +21,7 @@ import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.client.model.*;
+import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
 import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import com.esatus.ssi.bkamt.controller.verification.models.Data__1;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationResponse;
@@ -67,6 +68,9 @@ public class ProofServiceImpl implements ProofService {
 
     @Autowired
     MetaDataValidator metaDataValidator;
+
+    @Autowired
+    RequestPresentationValidationService requestPresentationValidationService;
 
     @Autowired
     VerificationRequestService verificationRequestService;
@@ -269,12 +273,15 @@ public class ProofServiceImpl implements ProofService {
 
         String callbackUrl = verificationRequest.getCallbackUrl();
         this.notificationService.executeCallback(callbackUrl, response);
+
+        // TODO: Do we need to delete the proof?
+        this.acapyClient.deleteProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
     }
 
     private void ValidatePresentationExchange(V10PresentationExchange presentationExchange) throws PresentationExchangeInvalidException {
-        var presentationExchangeValid = metaDataValidator.validatePresentationExchange(presentationExchange);
+        RequestPresentationValidationResult validationResult = requestPresentationValidationService.validatePresentationExchange(presentationExchange);
 
-        if(!presentationExchangeValid) {
+        if(!validationResult.isValid()) {
             throw new PresentationExchangeInvalidException();
         }
     }

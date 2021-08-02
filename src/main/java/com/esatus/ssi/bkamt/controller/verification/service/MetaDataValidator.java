@@ -16,10 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 
 public interface MetaDataValidator {
     boolean validateMetaData(VerificationRequestDTO verificationRequest);
-    boolean validatePresentationExchange(V10PresentationExchange presentationExchange);
 }
