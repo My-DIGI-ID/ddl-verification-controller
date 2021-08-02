@@ -18,14 +18,15 @@ import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.client.model.*;
-import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
-import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackDataValue;
-import com.esatus.ssi.bkamt.controller.verification.service.NotificationService;
-import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
-import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
+import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
+import com.esatus.ssi.bkamt.controller.verification.models.Data__1;
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationResponse;
+import com.esatus.ssi.bkamt.controller.verification.service.*;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationExchangeInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,9 +37,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.net.URI;
+import java.security.DrbgParameters;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.*;
+
+import static java.security.DrbgParameters.Capability.RESEED_ONLY;
 
 @Service
 public class ProofServiceImpl implements ProofService {
@@ -55,6 +62,12 @@ public class ProofServiceImpl implements ProofService {
     NotificationService notificationService;
 
     @Autowired
+    MetaDataValidator metaDataValidator;
+
+    @Autowired
+    RequestPresentationValidationService requestPresentationValidationService;
+
+    @Autowired
     VerificationRequestService verificationRequestService;
 
     private @Value("${ssibk.verification.controller.agent.apikey}")
@@ -65,35 +78,30 @@ public class ProofServiceImpl implements ProofService {
     String agentEndpointName;
     private @Value("${ssibk.verification.controller.agent.recipientkey}")
     String agentRecipientKey;
-    private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}")
-    String masterIdCredDefIdsString;
+    private @Value("${ssibk.verification.controller.agent.ddl.credential_definition_ids}")
+    String[] ddlCredDefIdsString;
+    private @Value("${ssibk.verification.controller.agent.ddl.requested_attributes}")
+    String[] ddlRequestedAttributes;
 
     private static final String DIDCOMM_URL = "didcomm://example.org?m=";
-    private static final String ARIES_MESSAGE_TYPE =
-        "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
+    private static final String ARIES_MESSAGE_TYPE = "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
     private static final String ARIES_ATTACH_ID = "libindy-request-presentation-0";
 
     SecureRandom secureRandom = new SecureRandom();
 
     @Override
-    public URI createProofRequest(String verificationId) {
-        // prepare a proof request DTO and send it to the agent
-        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.prepareConnectionlessProofRequest();
-        V10PresentationExchange proofResponseDTO =
-            this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
-        log.debug("agent created a proof request: {}", proofResponseDTO);
-
-        // prepare a connectionless proof request
+    public URI createProofRequest(String verificationId) throws VerificationNotFoundException {
+        VerificationRequestDTO verificationRequest = GetVerificationById(verificationId);
+        V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.createPresentation(verificationRequest);
+        V10PresentationExchange proofResponseDTO = SendProofRequest(connectionlessProofCreationRequest);
         ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
-        // TODO: Do we need that?
-        // create a new entry for this presentationExchangeId in the database
-        // this.verifierService.createCheckInCredential(hotelId, deskId,
-        // proofResponseDTO.getPresentationExchangeId());
+        UpdateVerificationByPresentationExchangeId(verificationId, proofResponseDTO.getPresentationExchangeId());
 
         try {
             ObjectMapper mapper = new ObjectMapper();
             log.debug(mapper.writeValueAsString(connectionlessProofRequest));
+
             // Base64 encode the connectionless proof request
             String encodedUrl =
                 Base64.getEncoder().encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
@@ -104,6 +112,31 @@ public class ProofServiceImpl implements ProofService {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    private VerificationRequestDTO GetVerificationById(String verificationId) throws VerificationNotFoundException {
+        var verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
+
+        if(verificationRequestOptional.isEmpty()) {
+            throw new VerificationNotFoundException();
+        }
+        return verificationRequestOptional.get();
+    }
+
+    private V10PresentationExchange SendProofRequest(V10PresentationCreateRequestRequest connectionlessProofCreationRequest) {
+        V10PresentationExchange proofResponseDTO = null;
+        try {
+            proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
+            log.debug("agent created a proof request: {}", proofResponseDTO);
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+
+        return proofResponseDTO;
+    }
+
+    private void UpdateVerificationByPresentationExchangeId(String verificationId, String threadId) throws VerificationNotFoundException {
+        verificationRequestService.updatePresentationExchangeId(verificationId, threadId);
     }
 
     private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
@@ -147,8 +180,8 @@ public class ProofServiceImpl implements ProofService {
         return connectionlessProofRequest;
     }
 
-    private V10PresentationCreateRequestRequest prepareConnectionlessProofRequest() {
-        Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes();
+    private V10PresentationCreateRequestRequest createPresentation(VerificationRequestDTO verificationRequest) {
+        Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes(verificationRequest);
 
         // Composing the proof request
         IndyProofRequest proofRequest = new IndyProofRequest();
@@ -156,8 +189,7 @@ public class ProofServiceImpl implements ProofService {
         proofRequest.setRequestedPredicates(new HashMap<>());
         proofRequest.setRequestedAttributes(requestedAttributes);
         proofRequest.setVersion("0.1");
-        int nonce = secureRandom.nextInt();
-        proofRequest.setNonce(String.valueOf(nonce));
+        proofRequest.setNonce(generateNonce(80));
 
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
         connectionlessProofCreationRequest.setComment("string");
@@ -166,41 +198,82 @@ public class ProofServiceImpl implements ProofService {
         return connectionlessProofCreationRequest;
     }
 
-    private Map<String, IndyProofReqAttrSpec> createRequestedAttributes() {
-        // TODO: Add additional attributes
-        return new HashMap<>();
-        // Restriction regarding CredDefs for masterId
-//        String[] masterIdCredDefIds = masterIdCredDefIdsString.split(",");
-//        List<Map<String, String>> masterIdRestrictions = new ArrayList<Map<String, String>>(masterIdCredDefIds.length);
-//        for (int i = 0; i < masterIdCredDefIds.length; i++) {
-//            Map<String, String> temp = new HashMap<String, String>();
-//            temp.put("cred_def_id", masterIdCredDefIds[i]);
-//            masterIdRestrictions.add(temp);
-//        }
-//
-//        IndyProofReqAttrSpec proofRequestMasterId = new IndyProofReqAttrSpec();
-//        List<String> names = Arrays.asList("firstName", "familyName", "addressStreet", "addressZipCode", "addressCountry",
-//            "addressCity", "dateOfExpiry", "dateOfBirth");
-//        proofRequestMasterId.setNames(names);
-//
-//        // Restriction regarding Revocation
-//        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
-//        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
-//
-//        proofRequestMasterId.setNonRevoked(nonRevokedRestriction);
-//        proofRequestMasterId.setRestrictions(masterIdRestrictions);
-//
-//        requestedAttributes.put("masterId", proofRequestMasterId);
+    /**
+     * Generate a decimal nonce, using SecureRandom and DRBG algorithm
+     * @param numberOfBits The length of the nonce in bit
+     * @return A string representation of the nonce
+     */
+    public String generateNonce(int numberOfBits) {
+        byte[] nonce = new byte[numberOfBits / 8];
+        SecureRandom rand = null;
+        try {
+            rand = SecureRandom.getInstance("DRBG",
+                DrbgParameters.instantiation(128, RESEED_ONLY, null));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (rand != null) {
+            rand.nextBytes(nonce);
+        }
+        BigInteger r = new BigInteger(nonce);
+
+        return r.toString();
+    }
+
+    private void addDDLAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
+        List<Map<String, String>> ddlRestrictions = new ArrayList<Map<String, String>>(ddlCredDefIdsString.length);
+
+        for (int i = 0; i < ddlCredDefIdsString.length; i++) {
+            Map<String, String> temp = new HashMap<String, String>();
+            temp.put("cred_def_id", ddlCredDefIdsString[i]);
+            ddlRestrictions.add(temp);
+        }
+
+        IndyProofReqAttrSpec proofRequestDdl = new IndyProofReqAttrSpec();
+        List<String> reqAttributes = Arrays.asList(ddlRequestedAttributes);
+        proofRequestDdl.setNames(reqAttributes);
+
+        // Restriction regarding Revocation
+        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked ();
+        // nonRevokedRestriction.setFrom(0);
+        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+
+        proofRequestDdl.setNonRevoked(nonRevokedRestriction);
+        proofRequestDdl.setRestrictions(ddlRestrictions);
+        requestedAttributes.put("ddl", proofRequestDdl);
+    }
+
+
+
+    private Map<String, IndyProofReqAttrSpec> createRequestedAttributes(VerificationRequestDTO verificationRequest) {
+        Data data = verificationRequest.getData();
+
+        if(data == null) {
+            return new HashMap<String, IndyProofReqAttrSpec>();
+        }
+
+        var additionalProperties = verificationRequest.getData().getAdditionalProperties();
+
+        var requestedAttributes = new HashMap<String, IndyProofReqAttrSpec>();
+
+        for (String key : additionalProperties.keySet()){
+            var attribute = new IndyProofReqAttrSpec();
+            attribute.setName(key.toLowerCase());
+            requestedAttributes.put(attribute.getName(), attribute);
+        }
+
+        addDDLAttributes(requestedAttributes);
+
+        return requestedAttributes;
     }
 
     @Override
-    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
-
+    public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException {
         log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
 
         String currentState = webhookPresentProofDTO.getState();
 
-        switch(currentState) {
+        switch (currentState) {
             case "verified":
                 handleVerifiedState(webhookPresentProofDTO);
             case "presentation_received":
@@ -212,26 +285,75 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private void handlePresentationReceivedState(WebhookPresentProofDTO webhookPresentProofDTO) {
-        log.debug("handle presentation received state {}", webhookPresentProofDTO.getState());
+
     }
 
-    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException {
-        log.debug("handle presentation verified state {}", webhookPresentProofDTO.getState());
-        String presentationExchangeId = webhookPresentProofDTO.getPresentationExchangeId();
-        String threadId = webhookPresentProofDTO.getThreadId();
+    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException {
+        V10PresentationExchange presentationExchange = this.acapyClient.getProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
 
-        Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
+        ValidatePresentationExchange(presentationExchange);
 
-        if(!vr.isPresent()) {
-            throw new VerificationNotFoundException();
-        }
+        VerificationRequestDTO verificationRequest = GetVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
 
-        // TODO: Verify received attributes
+        RunMetaDataValidation(verificationRequest);
 
-        VerificationRequestDTO verificationRequest = vr.get();
+        VerificationResponse response = buildVerificationResponse(verificationRequest, presentationExchange);
+
         String callbackUrl = verificationRequest.getCallbackUrl();
+        this.notificationService.executeCallback(callbackUrl, response);
 
-        InitiatorCallbackData data = new InitiatorCallbackData(200, true, "", new ArrayList<InitiatorCallbackDataValue>());
-        this.notificationService.executeCallback(callbackUrl, data);
+        // TODO: Do we need to delete the proof?
+        this.acapyClient.deleteProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
+    }
+
+    private void ValidatePresentationExchange(V10PresentationExchange presentationExchange) throws PresentationExchangeInvalidException {
+        RequestPresentationValidationResult validationResult = requestPresentationValidationService.validatePresentationExchange(presentationExchange);
+
+        if(!validationResult.isValid()) {
+            throw new PresentationExchangeInvalidException();
+        }
+    }
+
+    private void RunMetaDataValidation(VerificationRequestDTO verificationRequest) throws MetaDataInvalidException {
+        var metaDataValid = metaDataValidator.validateMetaData(verificationRequest);
+
+        if(!metaDataValid) {
+            throw new MetaDataInvalidException();
+        }
+    }
+
+    private VerificationRequestDTO GetVerificationRequestByPresentationExchangeId(String presentationExchangeId) throws VerificationNotFoundException {
+        Optional<VerificationRequestDTO> vr = verificationRequestService.getByPresentationExchangeId(presentationExchangeId);
+
+        if (vr.isEmpty()) throw new VerificationNotFoundException();
+
+        return vr.get();
+    }
+
+    private VerificationResponse buildVerificationResponse(VerificationRequestDTO verificationRequest, V10PresentationExchange presentationExchange) {
+        VerificationResponse response = new VerificationResponse();
+        response.setCode(200);
+        response.setVerified(true);
+
+        Presentation presentation = new ObjectMapper().convertValue(presentationExchange.getPresentation(), Presentation.class);
+
+        Data__1 data = new Data__1();
+        data.setAdditionalProperty("name", presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getName().getRaw());
+        // TODO: Check Ausstellungsdatum
+        data.setAdditionalProperty("ausstellungsdatum", presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw());
+
+        response.setData(data);
+        return response;
+    }
+
+    // Is not currently supported by ID Wallet
+    private Data__1 buildResponseData(VerificationRequestDTO verificationRequest) {
+        Data data = verificationRequest.getData();
+        Data__1 data1 = new Data__1();
+
+        for (var additionalProperty : data.getAdditionalProperties().entrySet()) {
+            data1.setAdditionalProperty(additionalProperty.getKey(), additionalProperty.getValue());
+        }
+        return data1;
     }
 }

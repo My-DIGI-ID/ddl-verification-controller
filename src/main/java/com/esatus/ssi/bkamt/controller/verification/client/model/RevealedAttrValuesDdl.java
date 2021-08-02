@@ -18,35 +18,35 @@ package com.esatus.ssi.bkamt.controller.verification.client.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RevealedAttrMasterId {
+public class RevealedAttrValuesDdl {
 
-    @JsonProperty("sub_proof_index")
-    private Integer subProofIndex;
+    @JsonProperty("Name")
+    private Property name;
 
-    @JsonProperty("values")
-    private RevealedAttrValuesMasterId values;
+    @JsonProperty("Ausstellungsdatum")
+    private Property ausstellungsdatum;
 
-    public RevealedAttrMasterId() {}
-
-    public Integer getSubProofIndex() {
-        return subProofIndex;
+    public Property getName() {
+        return name;
     }
 
-    public void setSubProofIndex(Integer subProofIndex) {
-        this.subProofIndex = subProofIndex;
+    public void setName(Property name) {
+        this.name = name;
     }
 
-    public RevealedAttrValuesMasterId getValues() {
-        return values;
+    public Property getAusstellungsdatum() {
+        return ausstellungsdatum;
     }
 
-    public void setValues(RevealedAttrValuesMasterId values) {
-        this.values = values;
+    public void setAusstellungsdatum(Property ausstellungsdatum) {
+        this.ausstellungsdatum = ausstellungsdatum;
     }
 
     @Override
     public String toString() {
-        return "RevealedAttrMasterId [subProofIndex=" + subProofIndex + ", values=" + values + "]";
+        return "RevealedAttrValuesDdl{" +
+            "name=" + name +
+            ", ausstellungsdatum=" + ausstellungsdatum +
+            '}';
     }
-
 }

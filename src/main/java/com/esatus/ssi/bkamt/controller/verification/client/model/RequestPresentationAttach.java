@@ -30,7 +30,7 @@ public class RequestPresentationAttach {
     @JsonProperty("data")
     private Base64Payload data;
 
-    public RequestPresentationAttach() {};
+    public RequestPresentationAttach() {}
 
     public void setId(String id) {
         this.id = id;

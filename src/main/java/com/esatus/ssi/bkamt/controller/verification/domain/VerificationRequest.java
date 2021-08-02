@@ -16,12 +16,11 @@
 
 package com.esatus.ssi.bkamt.controller.verification.domain;
 
-import com.mongodb.BasicDBObject;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.UUID;
 
 /**
  * Represents a presentation request for a digital driver license from any id wallet.
@@ -32,14 +31,20 @@ public class VerificationRequest {
     @Id
     private String id;
 
-    @NotNull
-    private String threadId;
+    private String verificationId;
+
+    private String presentationExchangeId;
 
     @NotNull
     private String callbackUrl;
 
-    @Field("data")
-    private List<BasicDBObject> data;
+    private String validUntil;
+
+    private Data data;
+
+    public VerificationRequest() {
+        this.verificationId = UUID.randomUUID().toString();
+    }
 
     public String  getId() {
         return id;
@@ -49,20 +54,12 @@ public class VerificationRequest {
         this.id = id;
     }
 
-    public String getThreadId() {
-        return threadId;
+    public String getPresentationExchangeId() {
+        return presentationExchangeId;
     }
 
-    public void setThreadId(String threadId) {
-        this.threadId = threadId;
-    }
-
-    public List<BasicDBObject> getData() {
-        return data;
-    }
-
-    public void setData(List<BasicDBObject> data) {
-        this.data = data;
+    public void setPresentationExchangeId(String presentationExchangeId) {
+        this.presentationExchangeId = presentationExchangeId;
     }
 
     public String getCallbackUrl() {
@@ -71,5 +68,29 @@ public class VerificationRequest {
 
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
+    }
+
+    public String getValidUntil() {
+        return validUntil;
+    }
+
+    public void setValidUntil(String validUntil) {
+        validUntil = validUntil;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public String getVerificationId() {
+        return verificationId;
+    }
+
+    public void setVerificationId(String verificationId) {
+        this.verificationId = verificationId;
     }
 }

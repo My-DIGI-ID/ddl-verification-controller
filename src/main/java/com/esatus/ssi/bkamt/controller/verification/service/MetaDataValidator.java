@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.esatus.ssi.bkamt.controller.verification.repository;
+package com.esatus.ssi.bkamt.controller.verification.service;
 
-import java.util.Map;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-public interface EmitterRepository {
-
-    void addEmitter(String uuid, String hotelId, String deskId, SseEmitter emitter);
-
-    void remove(String uuid);
-
-    Map<String, SseEmitter> findByHotelIdAndDeskId(String hotelId, String deskId);
+public interface MetaDataValidator {
+    boolean validateMetaData(VerificationRequestDTO verificationRequest);
 }

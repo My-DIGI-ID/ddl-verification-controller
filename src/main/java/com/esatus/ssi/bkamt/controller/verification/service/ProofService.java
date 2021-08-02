@@ -18,10 +18,11 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 
 import java.net.URI;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationExchangeInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 
 public interface ProofService {
-	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException;
-
-    URI createProofRequest(String verificationId);
+	void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException;
+    URI createProofRequest(String verificationId) throws VerificationNotFoundException;
 }

@@ -17,7 +17,7 @@ logging:
   level:
     ROOT: DEBUG
     io.github.jhipster: DEBUG
-    com.ibm.ssi.controller.hotel: DEBUG
+    com.ibm.ssi.controller.verification: DEBUG
 
 ssibk:
   verification:
@@ -30,18 +30,17 @@ ssibk:
 
       agent:
         apikey: secure
-        apiurl: localhost:10080 # the Hotel agent admin url
-        recipientkey: verification-agent-key # the Hotel agent verkey, here for the seed 000...Hotel; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
-        endpoint: verification-agent-url # the Hotel agent endpoint
-        endpointName: IBM Verification # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
+        apiurl: localhost:10080 # the DDL agent admin url
+        recipientkey: CmXTKRddBz5mXxVvJjWv4XzSW8rTotCXPjA9cHdQb6X1 # the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
+        # endpoint: http://7d023a55580f.ngrok.io # the DDL agent endpoint
+        endpoint: http://8391b04db2ca.ngrok.io # the DDL agent endpoint
+        endpointName: DDL Verification # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
 
-        # The credential definition ids of all master ids that will be accepted in the proof
-        masterid:
+        # The credential definition ids of all ddl ids that will be accepted in the proof
+        ddl:
           credential_definition_ids: XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
+          requested_attributes: Ausstellungsdatum,Name
 
-      integrationservice:
-        apiurl: http://localhost:9081/api
-        apikey: 123
       events:
         connection:
           timeout: 3600000

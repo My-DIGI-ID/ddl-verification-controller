@@ -1,26 +1,26 @@
 package com.esatus.ssi.bkamt.controller.verification.service.dto;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
-import com.mongodb.BasicDBObject;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import java.util.List;
 
 public class VerificationRequestDTO {
     @Null
     private String id;
 
-    @NotBlank
-    @NotNull
-    private String threadId;
+    @Null
+    private String presentationExchangeId;
 
     @NotBlank
     @NotNull
     private String callbackUrl;
 
-    private List<BasicDBObject> data;
+    private String verificationId;
+
+    private Data data;
 
     public VerificationRequestDTO() {
         // Empty constructor needed for Jackson.
@@ -28,9 +28,10 @@ public class VerificationRequestDTO {
 
     public VerificationRequestDTO(VerificationRequest verificationRequest) {
         this.id = verificationRequest.getId();
-        this.threadId = verificationRequest.getThreadId();
+        this.presentationExchangeId = verificationRequest.getPresentationExchangeId();
         this.callbackUrl = verificationRequest.getCallbackUrl();
         this.data = verificationRequest.getData();
+        this.verificationId = verificationRequest.getVerificationId();
     }
 
     public String  getId() {
@@ -41,12 +42,12 @@ public class VerificationRequestDTO {
         this.id = id;
     }
 
-    public String getThreadId() {
-        return threadId;
+    public String getPresentationExchangeId() {
+        return presentationExchangeId;
     }
 
-    public void setThreadId(String threadId) {
-        this.threadId = threadId;
+    public void setPresentationExchangeId(String presentationExchangeId) {
+        this.presentationExchangeId = presentationExchangeId;
     }
 
     public String getCallbackUrl() {
@@ -57,11 +58,19 @@ public class VerificationRequestDTO {
         this.callbackUrl = callbackUrl;
     }
 
-    public List<BasicDBObject> getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setData(List<BasicDBObject> data) {
+    public void setData(Data data) {
         this.data = data;
+    }
+
+    public String getVerificationId() {
+        return verificationId;
+    }
+
+    public void setVerificationId(String verificationId) {
+        this.verificationId = verificationId;
     }
 }

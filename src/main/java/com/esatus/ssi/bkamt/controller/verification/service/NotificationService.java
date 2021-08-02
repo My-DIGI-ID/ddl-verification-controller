@@ -16,8 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service;
 
-import com.esatus.ssi.bkamt.controller.verification.models.InitiatorCallbackData;
+import com.esatus.ssi.bkamt.controller.verification.models.VerificationResponse;
 
 public interface NotificationService {
-    void executeCallback(String url, InitiatorCallbackData callbackData);
+    void executeCallback(String url, VerificationResponse response);
 }

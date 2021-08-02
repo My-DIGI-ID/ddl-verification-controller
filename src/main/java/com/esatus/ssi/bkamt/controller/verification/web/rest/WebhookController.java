@@ -13,7 +13,15 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
+import com.esatus.ssi.bkamt.controller.verification.VerificationControllerApp;
+import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
+import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationExchangeInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +30,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.esatus.ssi.bkamt.controller.verification.VerificationControllerApp;
-import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
-import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
-import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Webhooks for ACAPY",
     description = "https://github.com/hyperledger/aries-cloudagent-python/blob/master/AdminAPI.md#administration-api-webhooks")
@@ -37,29 +37,31 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/topic")
 public class WebhookController {
 
-  private static final Logger log = LoggerFactory.getLogger(VerificationControllerApp.class);
+    private static final Logger log = LoggerFactory.getLogger(VerificationControllerApp.class);
 
-  @Autowired
-  AgentClient acapyClient;
+    @Autowired
+    AgentClient acapyClient;
 
-  @Autowired
-  ProofService proofService;
+    @Autowired
+    ProofService proofService;
 
-  @PostMapping("/present_proof")
-  @Operation(security = @SecurityRequirement(name = "X-API-Key"))
-  public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)
-      throws JsonProcessingException {
+    @PostMapping("/present_proof")
+//    @Operation(security = @SecurityRequirement(name = "X-API-Key"))
+    public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)
+        throws JsonProcessingException {
 
-    log.debug("Webhook for proof request with thread_id {}", webhookPresentProofDTO.getThreadId());
-    log.debug("State of the proof: {}", webhookPresentProofDTO.getState());
-    log.debug("Proof verified: {}", webhookPresentProofDTO.getVerified());
+        log.debug("Webhook for proof request with thread_id {}", webhookPresentProofDTO.getThreadId());
+        log.debug("State of the proof: {}", webhookPresentProofDTO.getState());
+        log.debug("Proof verified: {}", webhookPresentProofDTO.getVerified());
 
-      try {
-          this.proofService.handleProofWebhook(webhookPresentProofDTO);
-          return ResponseEntity.noContent().build();
-      } catch (VerificationNotFoundException e) {
-          log.debug("verification could not be found");
-          return ResponseEntity.notFound().build();
-      }
-  }
+        try {
+            this.proofService.handleProofWebhook(webhookPresentProofDTO);
+            return ResponseEntity.noContent().build();
+        } catch (VerificationNotFoundException e) {
+            log.debug("verification could not be found");
+            return ResponseEntity.notFound().build();
+        } catch (MetaDataInvalidException | PresentationExchangeInvalidException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

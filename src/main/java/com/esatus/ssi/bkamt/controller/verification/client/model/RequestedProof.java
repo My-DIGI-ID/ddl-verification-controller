@@ -23,6 +23,18 @@ public class RequestedProof {
     @JsonProperty("revealed_attr_groups")
     private RevealedAttrGroups revealedAttrGroups;
 
+    @JsonProperty("revealed_attrs")
+    private Object revealedAttrs;
+
+    @JsonProperty("unrevealed_attrs")
+    private Object unrevealed_attrs;
+
+    @JsonProperty("self_attested_attrs")
+    private Object selfAttestedAttrs;
+
+    @JsonProperty("predicates")
+    private Object predicates;
+
     public RequestedProof() {}
 
     public RevealedAttrGroups getRevealedAttrGroups() {
