@@ -32,7 +32,7 @@ public class VerificationRequest {
     @Id
     private String id;
 
-    private final String verificationId;
+    private String verificationId;
 
     @Null
     private String threadId;
@@ -86,5 +86,13 @@ public class VerificationRequest {
 
     public void setData(Data data) {
         this.data = data;
+    }
+
+    public String getVerificationId() {
+        return verificationId;
+    }
+
+    public void setVerificationId(String verificationId) {
+        this.verificationId = verificationId;
     }
 }

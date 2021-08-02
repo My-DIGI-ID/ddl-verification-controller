@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 public class VerificationRequestDTO {
-
     @Null
     private String id;
 
@@ -18,6 +17,8 @@ public class VerificationRequestDTO {
     @NotBlank
     @NotNull
     private String callbackUrl;
+
+    private String verificationId;
 
     private Data data;
 
@@ -30,6 +31,7 @@ public class VerificationRequestDTO {
         this.threadId = verificationRequest.getThreadId();
         this.callbackUrl = verificationRequest.getCallbackUrl();
         this.data = verificationRequest.getData();
+        this.verificationId = verificationRequest.getVerificationId();
     }
 
     public String  getId() {
@@ -62,5 +64,13 @@ public class VerificationRequestDTO {
 
     public void setData(Data data) {
         this.data = data;
+    }
+
+    public String getVerificationId() {
+        return verificationId;
+    }
+
+    public void setVerificationId(String verificationId) {
+        this.verificationId = verificationId;
     }
 }

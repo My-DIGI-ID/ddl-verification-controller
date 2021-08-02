@@ -38,12 +38,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.net.URI;
+import java.security.DrbgParameters;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.security.DrbgParameters.Capability.RESEED_ONLY;
 
 @Service
 public class ProofServiceImpl implements ProofService {
@@ -85,8 +90,12 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public URI createProofRequest(String verificationId) throws VerificationNotFoundException {
-
         var verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
+
+        if(verificationRequestOptional.isEmpty()) {
+            throw new VerificationNotFoundException();
+        }
+
         var verificationRequest = verificationRequestOptional.get();
 
         // prepare a proof request DTO and send it to the agent
@@ -165,8 +174,7 @@ public class ProofServiceImpl implements ProofService {
         proofRequest.setRequestedPredicates(new HashMap<>());
         proofRequest.setRequestedAttributes(requestedAttributes);
         proofRequest.setVersion("0.1");
-        int nonce = secureRandom.nextInt();
-        proofRequest.setNonce(String.valueOf(nonce));
+        proofRequest.setNonce(generateNonce(80));
 
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
         connectionlessProofCreationRequest.setComment("string");
@@ -174,6 +182,28 @@ public class ProofServiceImpl implements ProofService {
 
         return connectionlessProofCreationRequest;
     }
+
+    /**
+     * Generate a decimal nonce, using SecureRandom and DRBG algorithm
+     * @param numberOfBits The length of the nonce in bit
+     * @return A string representation of the nonce
+     */
+    public String generateNonce(int numberOfBits) {
+        byte[] nonce = new byte[numberOfBits / 8];
+        SecureRandom rand = null;
+        try {
+            rand = SecureRandom.getInstance("DRBG",
+                DrbgParameters.instantiation(128, RESEED_ONLY, null));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        rand.nextBytes(nonce);
+        BigInteger r = new BigInteger(nonce);
+        String convertedString = r.toString();
+
+        return convertedString;
+    }
+
 
     private Map<String, IndyProofReqAttrSpec> createRequestedAttributes(VerificationRequestDTO verificationRequest) {
         // TODO: Add additional attributes?

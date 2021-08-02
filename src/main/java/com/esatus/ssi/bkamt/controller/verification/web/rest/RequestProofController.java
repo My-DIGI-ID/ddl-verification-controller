@@ -61,7 +61,7 @@ public class RequestProofController {
         log.debug("REST request to create a presentation request for verificationId {}", verificationId );
 
         // We have to validate the data
-        Optional<VerificationRequestDTO> verificationRequest = verificationRequestService.getById(verificationId);
+        Optional<VerificationRequestDTO> verificationRequest = verificationRequestService.getByVerificationId(verificationId);
 
         if(verificationRequest.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -73,11 +73,17 @@ public class RequestProofController {
         if(!validationResult.isValid())
             throw new RequestPresentationValidationFailedException(String.format("Validation of verificationRequest failed {}", verificationId));
 
+        // TODO: Catch error when ACA-Py is not available
         // If validation succeeded create the proof
-        URI proofURI = this.proofService.createProofRequest(verificationId);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(proofURI);
+        try {
+            URI proofURI = this.proofService.createProofRequest(verificationId);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setLocation(proofURI);
 
-        return new ResponseEntity<Void>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
+            return new ResponseEntity<>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
+        } catch (Exception e) {
+            log.debug("Error creating proof request");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
