@@ -27,6 +27,6 @@ import java.util.Optional;
  */
 @Repository
 public interface VerificationRequestRepository extends MongoRepository<VerificationRequest, String> {
-    Optional<VerificationRequest> findOneByThreadId(String threadId);
+    Optional<VerificationRequest> findOneByPresentationExchangeId(String presentationExchangeId);
     Optional<VerificationRequest> findByVerificationId(String verificationId);
 }

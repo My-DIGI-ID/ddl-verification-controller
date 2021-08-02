@@ -13,10 +13,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
-import com.esatus.ssi.bkamt.agent.client.model.IndyProofReqAttrSpec;
-import com.esatus.ssi.bkamt.agent.client.model.IndyProofRequest;
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationCreateRequestRequest;
-import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
+import com.esatus.ssi.bkamt.agent.client.model.*;
 import com.esatus.ssi.bkamt.agent.model.Base64Payload;
 import com.esatus.ssi.bkamt.agent.model.ConnectionlessProofRequest;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
@@ -45,10 +42,8 @@ import java.net.URI;
 import java.security.DrbgParameters;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
 
 import static java.security.DrbgParameters.Capability.RESEED_ONLY;
 
@@ -83,8 +78,10 @@ public class ProofServiceImpl implements ProofService {
     String agentEndpointName;
     private @Value("${ssibk.verification.controller.agent.recipientkey}")
     String agentRecipientKey;
-    private @Value("${ssibk.verification.controller.agent.masterid.credential_definition_ids}")
-    String masterIdCredDefIdsString;
+    private @Value("${ssibk.verification.controller.agent.ddl.credential_definition_ids}")
+    String[] ddlCredDefIdsString;
+    private @Value("${ssibk.verification.controller.agent.ddl.requested_attributes}")
+    String[] ddlRequestedAttributes;
 
     private static final String DIDCOMM_URL = "didcomm://example.org?m=";
     private static final String ARIES_MESSAGE_TYPE = "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/present-proof/1.0/request-presentation";
@@ -99,7 +96,7 @@ public class ProofServiceImpl implements ProofService {
         V10PresentationExchange proofResponseDTO = SendProofRequest(connectionlessProofCreationRequest);
         ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
-        UpdateVerificationThreadId(verificationId, proofResponseDTO.getThreadId());
+        UpdateVerificationByPresentationExchangeId(verificationId, proofResponseDTO.getPresentationExchangeId());
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -127,13 +124,19 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private V10PresentationExchange SendProofRequest(V10PresentationCreateRequestRequest connectionlessProofCreationRequest) {
-        V10PresentationExchange proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
-        log.debug("agent created a proof request: {}", proofResponseDTO);
+        V10PresentationExchange proofResponseDTO = null;
+        try {
+            proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
+            log.debug("agent created a proof request: {}", proofResponseDTO);
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+
         return proofResponseDTO;
     }
 
-    private void UpdateVerificationThreadId(String verificationId, String threadId) throws VerificationNotFoundException {
-        verificationRequestService.updateThreadId(verificationId, threadId);
+    private void UpdateVerificationByPresentationExchangeId(String verificationId, String threadId) throws VerificationNotFoundException {
+        verificationRequestService.updatePresentationExchangeId(verificationId, threadId);
     }
 
     private ConnectionlessProofRequest prepareConnectionlessProofRequest(V10PresentationExchange proofResponseDTO) {
@@ -217,9 +220,32 @@ public class ProofServiceImpl implements ProofService {
         return r.toString();
     }
 
+    private void addDDLAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
+        List<Map<String, String>> ddlRestrictions = new ArrayList<Map<String, String>>(ddlCredDefIdsString.length);
+
+        for (int i = 0; i < ddlCredDefIdsString.length; i++) {
+            Map<String, String> temp = new HashMap<String, String>();
+            temp.put("cred_def_id", ddlCredDefIdsString[i]);
+            ddlRestrictions.add(temp);
+        }
+
+        IndyProofReqAttrSpec proofRequestDdl = new IndyProofReqAttrSpec();
+        List<String> reqAttributes = Arrays.asList(ddlRequestedAttributes);
+        proofRequestDdl.setNames(reqAttributes);
+
+        // Restriction regarding Revocation
+        AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked ();
+        // nonRevokedRestriction.setFrom(0);
+        nonRevokedRestriction.setTo((int) Instant.now().getEpochSecond());
+
+        proofRequestDdl.setNonRevoked(nonRevokedRestriction);
+        proofRequestDdl.setRestrictions(ddlRestrictions);
+        requestedAttributes.put("ddl", proofRequestDdl);
+    }
+
+
 
     private Map<String, IndyProofReqAttrSpec> createRequestedAttributes(VerificationRequestDTO verificationRequest) {
-
         Data data = verificationRequest.getData();
 
         if(data == null) {
@@ -235,6 +261,8 @@ public class ProofServiceImpl implements ProofService {
             attribute.setName(key.toLowerCase());
             requestedAttributes.put(attribute.getName(), attribute);
         }
+
+        addDDLAttributes(requestedAttributes);
 
         return requestedAttributes;
     }
@@ -265,11 +293,11 @@ public class ProofServiceImpl implements ProofService {
 
         ValidatePresentationExchange(presentationExchange);
 
-        VerificationRequestDTO verificationRequest = GetVerificationRequestByThreadId(webhookPresentProofDTO.getThreadId());
+        VerificationRequestDTO verificationRequest = GetVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
 
         RunMetaDataValidation(verificationRequest);
 
-        VerificationResponse response = buildVerificationResponse(verificationRequest);
+        VerificationResponse response = buildVerificationResponse(verificationRequest, presentationExchange);
 
         String callbackUrl = verificationRequest.getCallbackUrl();
         this.notificationService.executeCallback(callbackUrl, response);
@@ -294,25 +322,31 @@ public class ProofServiceImpl implements ProofService {
         }
     }
 
-    private VerificationRequestDTO GetVerificationRequestByThreadId(String threadId) throws VerificationNotFoundException {
-        Optional<VerificationRequestDTO> vr = verificationRequestService.getByThreadId(threadId);
+    private VerificationRequestDTO GetVerificationRequestByPresentationExchangeId(String presentationExchangeId) throws VerificationNotFoundException {
+        Optional<VerificationRequestDTO> vr = verificationRequestService.getByPresentationExchangeId(presentationExchangeId);
 
         if (vr.isEmpty()) throw new VerificationNotFoundException();
 
         return vr.get();
     }
 
-    private VerificationResponse buildVerificationResponse(VerificationRequestDTO verificationRequest) {
+    private VerificationResponse buildVerificationResponse(VerificationRequestDTO verificationRequest, V10PresentationExchange presentationExchange) {
         VerificationResponse response = new VerificationResponse();
         response.setCode(200);
         response.setVerified(true);
 
-        Data__1 data1 = buildResponseData(verificationRequest);
+        Presentation presentation = new ObjectMapper().convertValue(presentationExchange.getPresentation(), Presentation.class);
 
-        response.setData(data1);
+        Data__1 data = new Data__1();
+        data.setAdditionalProperty("name", presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getName().getRaw());
+        // TODO: Check Ausstellungsdatum
+        data.setAdditionalProperty("ausstellungsdatum", presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw());
+
+        response.setData(data);
         return response;
     }
 
+    // Is not currently supported by ID Wallet
     private Data__1 buildResponseData(VerificationRequestDTO verificationRequest) {
         Data data = verificationRequest.getData();
         Data__1 data1 = new Data__1();

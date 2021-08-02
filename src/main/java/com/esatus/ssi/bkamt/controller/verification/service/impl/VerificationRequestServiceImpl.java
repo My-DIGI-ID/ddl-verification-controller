@@ -68,13 +68,13 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
     }
 
     @Override
-    public Optional<VerificationRequestDTO> getByThreadId(String threadId) {
-        log.debug("get verification request by threadId {}", threadId);
-        return verificationRepository.findOneByThreadId(threadId).map(verificationRequestMapper::verificationRequestToVerificationRequestDTO);
+    public Optional<VerificationRequestDTO> getByPresentationExchangeId(String presentationExchangeId) {
+        log.debug("get verification request by threadId {}", presentationExchangeId);
+        return verificationRepository.findOneByPresentationExchangeId(presentationExchangeId).map(verificationRequestMapper::verificationRequestToVerificationRequestDTO);
     }
 
     @Override
-    public void updateThreadId(String verificationId, String threadId) throws VerificationNotFoundException {
+    public void updatePresentationExchangeId(String verificationId, String presentationExchangeId) throws VerificationNotFoundException {
         Optional<VerificationRequest> verificationOpt = verificationRepository.findByVerificationId(verificationId);
 
         if (verificationOpt.isEmpty()) {
@@ -82,9 +82,11 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
         }
 
         VerificationRequest vr = verificationOpt.get();
-        vr.setThreadId(threadId);
+        vr.setPresentationExchangeId(presentationExchangeId);
 
-        log.debug("update verification {} and set thread id {}", verificationId, threadId);
+        verificationRepository.save(vr);
+
+        log.debug("update verification {} and set thread id {}", verificationId, presentationExchangeId);
         this.verificationRequestMapper.verificationRequestToVerificationRequestDTO(vr);
     }
 }

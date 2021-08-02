@@ -21,8 +21,6 @@ import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataI
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationExchangeInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +46,7 @@ public class WebhookController {
     ProofService proofService;
 
     @PostMapping("/present_proof")
-    @Operation(security = @SecurityRequirement(name = "X-API-Key"))
+//    @Operation(security = @SecurityRequirement(name = "X-API-Key"))
     public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)
         throws JsonProcessingException {
 

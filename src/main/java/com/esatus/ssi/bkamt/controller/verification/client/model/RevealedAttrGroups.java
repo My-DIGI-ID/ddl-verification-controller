@@ -20,32 +20,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RevealedAttrGroups {
 
-    @JsonProperty("masterId")
-    private RevealedAttrMasterId masterId;
-
-    @JsonProperty("corporateId")
-    private RevealedAttrCorporateId corporateId;
+    @JsonProperty("ddl")
+    private RevealedAttrDdl ddl;
 
     public RevealedAttrGroups() {}
 
-    public RevealedAttrMasterId getMasterId() {
-        return masterId;
+    public RevealedAttrDdl getDdl() {
+        return ddl;
     }
 
-    public void setMasterId(RevealedAttrMasterId masterId) {
-        this.masterId = masterId;
-    }
-
-    public RevealedAttrCorporateId getCorporateId() {
-        return corporateId;
-    }
-
-    public void setCorporateId(RevealedAttrCorporateId corporateId) {
-        this.corporateId = corporateId;
+    public void setDdl(RevealedAttrDdl ddl) {
+        this.ddl = ddl;
     }
 
     @Override
     public String toString() {
-        return "RevealedAttrGroups [corporateId=" + corporateId + ", masterId=" + masterId + "]";
+        return "RevealedAttrGroups [ddl=" + ddl + "]";
     }
 }

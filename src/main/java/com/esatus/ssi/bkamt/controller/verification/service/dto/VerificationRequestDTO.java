@@ -12,7 +12,7 @@ public class VerificationRequestDTO {
     private String id;
 
     @Null
-    private String threadId;
+    private String presentationExchangeId;
 
     @NotBlank
     @NotNull
@@ -28,7 +28,7 @@ public class VerificationRequestDTO {
 
     public VerificationRequestDTO(VerificationRequest verificationRequest) {
         this.id = verificationRequest.getId();
-        this.threadId = verificationRequest.getThreadId();
+        this.presentationExchangeId = verificationRequest.getPresentationExchangeId();
         this.callbackUrl = verificationRequest.getCallbackUrl();
         this.data = verificationRequest.getData();
         this.verificationId = verificationRequest.getVerificationId();
@@ -42,12 +42,12 @@ public class VerificationRequestDTO {
         this.id = id;
     }
 
-    public String getThreadId() {
-        return threadId;
+    public String getPresentationExchangeId() {
+        return presentationExchangeId;
     }
 
-    public void setThreadId(String threadId) {
-        this.threadId = threadId;
+    public void setPresentationExchangeId(String presentationExchangeId) {
+        this.presentationExchangeId = presentationExchangeId;
     }
 
     public String getCallbackUrl() {

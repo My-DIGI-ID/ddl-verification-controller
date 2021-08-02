@@ -16,7 +16,6 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
-import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
 import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
 import com.esatus.ssi.bkamt.controller.verification.service.RequestPresentationValidationService;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
@@ -30,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
@@ -55,7 +57,7 @@ public class RequestProofController {
     @Autowired
     RequestPresentationValidationService requestPresentationValidationService;
 
-    @PostMapping(value = "/proof")
+    @GetMapping(value = "/proof")
     public ResponseEntity sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws RequestPresentationValidationFailedException, VerificationNotFoundException {
 
         log.debug("REST request to create a presentation request for verificationId {}", verificationId );
@@ -67,11 +69,11 @@ public class RequestProofController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        RequestPresentationValidationResult validationResult = requestPresentationValidationService.Validate(verificationRequest.get());
+        // RequestPresentationValidationResult validationResult = requestPresentationValidationService.validatePresentationExchange(verificationRequest.get());
 
         // When validation of the metadata failed
-        if(!validationResult.isValid())
-            throw new RequestPresentationValidationFailedException(String.format("Validation of verificationRequest failed {}", verificationId));
+       // if(!validationResult.isValid())
+            //throw new RequestPresentationValidationFailedException(String.format("Validation of verificationRequest failed {}", verificationId));
 
         // TODO: Catch error when ACA-Py is not available
         // If validation succeeded create the proof

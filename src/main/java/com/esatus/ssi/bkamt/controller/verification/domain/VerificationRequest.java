@@ -20,7 +20,6 @@ import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.util.UUID;
 
 /**
@@ -34,13 +33,12 @@ public class VerificationRequest {
 
     private String verificationId;
 
-    @Null
-    private String threadId;
+    private String presentationExchangeId;
 
     @NotNull
     private String callbackUrl;
 
-    private String ValidUntil;
+    private String validUntil;
 
     private Data data;
 
@@ -56,12 +54,12 @@ public class VerificationRequest {
         this.id = id;
     }
 
-    public String getThreadId() {
-        return threadId;
+    public String getPresentationExchangeId() {
+        return presentationExchangeId;
     }
 
-    public void setThreadId(String threadId) {
-        this.threadId = threadId;
+    public void setPresentationExchangeId(String presentationExchangeId) {
+        this.presentationExchangeId = presentationExchangeId;
     }
 
     public String getCallbackUrl() {
@@ -73,11 +71,11 @@ public class VerificationRequest {
     }
 
     public String getValidUntil() {
-        return ValidUntil;
+        return validUntil;
     }
 
     public void setValidUntil(String validUntil) {
-        ValidUntil = validUntil;
+        validUntil = validUntil;
     }
 
     public Data getData() {

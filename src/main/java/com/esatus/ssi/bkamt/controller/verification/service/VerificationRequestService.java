@@ -26,7 +26,7 @@ import java.util.Optional;
 public interface VerificationRequestService {
     VerificationRequestDTO createVerificationRequest(VerificationRequestMetadata VerificationRequestMetadata) throws PresentationRequestsAlreadyExists;
     Optional<VerificationRequestDTO> getById(String id);
-    Optional<VerificationRequestDTO> getByThreadId(String threadId);
+    Optional<VerificationRequestDTO> getByPresentationExchangeId(String presentationExchangeId);
     Optional<VerificationRequestDTO> getByVerificationId(String verificationId);
-    void updateThreadId(String verificationId, String threadId) throws VerificationNotFoundException;
+    void updatePresentationExchangeId(String verificationId, String threadId) throws VerificationNotFoundException;
 }

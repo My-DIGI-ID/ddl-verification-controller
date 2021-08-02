@@ -18,15 +18,15 @@ package com.esatus.ssi.bkamt.controller.verification.client.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RevealedAttrCorporateId {
+public class RevealedAttrDdl {
 
     @JsonProperty("sub_proof_index")
     private Integer subProofIndex;
 
     @JsonProperty("values")
-    private RevealedAttrValuesCorporateId values;
+    private RevealedAttrValuesDdl values;
 
-    public RevealedAttrCorporateId() {}
+    public RevealedAttrDdl() {}
 
     public Integer getSubProofIndex() {
         return subProofIndex;
@@ -36,17 +36,17 @@ public class RevealedAttrCorporateId {
         this.subProofIndex = subProofIndex;
     }
 
-    public RevealedAttrValuesCorporateId getValues() {
+    public RevealedAttrValuesDdl getValues() {
         return values;
     }
 
-    public void setValues(RevealedAttrValuesCorporateId values) {
+    public void setValues(RevealedAttrValuesDdl values) {
         this.values = values;
     }
 
     @Override
     public String toString() {
-        return "RevealedAttrCorporateId [subProofIndex=" + subProofIndex + ", values=" + values + "]";
+        return "RevealedAttrDdl [subProofIndex=" + subProofIndex + ", values=" + values + "]";
     }
 
 }

@@ -16,9 +16,10 @@ public class VerificationRequestMapper {
         } else {
             VerificationRequest verificationRequest = new VerificationRequest();
             verificationRequest.setId(verificationRequestDTO.getId());
-            verificationRequest.setThreadId(verificationRequestDTO.getThreadId());
+            verificationRequest.setPresentationExchangeId(verificationRequestDTO.getPresentationExchangeId());
             verificationRequest.setVerificationId(verificationRequestDTO.getVerificationId());
             verificationRequest.setData(verificationRequestDTO.getData());
+            verificationRequest.setCallbackUrl(verificationRequestDTO.getCallbackUrl());
 
             return verificationRequest;
 
@@ -31,9 +32,10 @@ public class VerificationRequestMapper {
         } else {
             VerificationRequestDTO verificationRequestDTO = new VerificationRequestDTO();
             verificationRequestDTO.setId(verificationRequest.getId());
-            verificationRequestDTO.setThreadId(verificationRequest.getThreadId());
+            verificationRequestDTO.setPresentationExchangeId(verificationRequest.getPresentationExchangeId());
             verificationRequestDTO.setVerificationId(verificationRequest.getVerificationId());
             verificationRequestDTO.setData(verificationRequest.getData());
+            verificationRequestDTO.setCallbackUrl(verificationRequest.getCallbackUrl());
 
             return verificationRequestDTO;
         }

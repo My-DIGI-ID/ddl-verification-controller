@@ -16,9 +16,9 @@
 
 package com.esatus.ssi.bkamt.controller.verification.client.model;
 
-import java.util.Arrays;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Arrays;
 
 public class Presentation {
 
@@ -27,6 +27,9 @@ public class Presentation {
 
     @JsonProperty("identifiers")
     private Identifier[] identifiers;
+
+    @JsonProperty("proof")
+    private Object proof;
 
     public Presentation() {
     }
