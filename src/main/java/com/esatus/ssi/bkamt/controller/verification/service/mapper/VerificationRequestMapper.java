@@ -17,6 +17,8 @@ public class VerificationRequestMapper {
             VerificationRequest verificationRequest = new VerificationRequest();
             verificationRequest.setId(verificationRequestDTO.getId());
             verificationRequest.setThreadId(verificationRequestDTO.getThreadId());
+            verificationRequest.setVerificationId(verificationRequestDTO.getVerificationId());
+            verificationRequest.setData(verificationRequestDTO.getData());
 
             return verificationRequest;
 
@@ -30,6 +32,8 @@ public class VerificationRequestMapper {
             VerificationRequestDTO verificationRequestDTO = new VerificationRequestDTO();
             verificationRequestDTO.setId(verificationRequest.getId());
             verificationRequestDTO.setThreadId(verificationRequest.getThreadId());
+            verificationRequestDTO.setVerificationId(verificationRequest.getVerificationId());
+            verificationRequestDTO.setData(verificationRequest.getData());
 
             return verificationRequestDTO;
         }

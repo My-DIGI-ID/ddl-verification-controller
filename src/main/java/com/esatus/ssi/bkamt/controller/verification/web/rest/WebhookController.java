@@ -14,6 +14,7 @@
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationExchangeInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,8 @@ public class WebhookController {
           log.debug("verification could not be found");
           return ResponseEntity.notFound().build();
       } catch (MetaDataInvalidException e) {
+          return ResponseEntity.badRequest().build();
+      } catch (PresentationExchangeInvalidException e) {
           return ResponseEntity.badRequest().build();
       }
   }

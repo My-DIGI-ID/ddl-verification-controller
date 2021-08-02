@@ -56,7 +56,7 @@ public class RequestProofController {
     RequestPresentationValidationService requestPresentationValidationService;
 
     @PostMapping(value = "/proof")
-    public ResponseEntity<Void> sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws RequestPresentationValidationFailedException, VerificationNotFoundException {
+    public ResponseEntity sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws RequestPresentationValidationFailedException, VerificationNotFoundException {
 
         log.debug("REST request to create a presentation request for verificationId {}", verificationId );
 
