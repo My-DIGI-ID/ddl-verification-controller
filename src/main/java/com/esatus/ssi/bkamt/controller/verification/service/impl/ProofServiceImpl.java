@@ -274,10 +274,9 @@ public class ProofServiceImpl implements ProofService {
         String currentState = webhookPresentProofDTO.getState();
 
         if ("verified".equals(currentState)) {
+            log.debug("handle state {}", currentState);
             handleVerifiedState(webhookPresentProofDTO);
         }
-
-        log.debug("ignore state {}", currentState);
     }
 
     private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException {
@@ -337,7 +336,7 @@ public class ProofServiceImpl implements ProofService {
             String attributeValue = values.get(attributeName).get("raw");
 
             if(!attributeValue.isEmpty() && !attributeValue.isBlank()) {
-                data.setAdditionalProperty("name", attributeValue);
+                data.setAdditionalProperty(attributeName, attributeValue);
             }
         });
 

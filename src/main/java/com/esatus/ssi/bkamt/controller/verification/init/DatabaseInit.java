@@ -16,14 +16,14 @@
 
 package com.esatus.ssi.bkamt.controller.verification.init;
 
-import javax.annotation.PostConstruct;
-
 import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
+import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
-import com.esatus.ssi.bkamt.controller.verification.repository.VerifierRepository;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class DatabaseInit {
@@ -46,7 +46,7 @@ public class DatabaseInit {
         if (!this.verifierRepository.existsById(id)) {
             Verifier verifier = new Verifier();
             verifier.setId(id);
-            verifier.setName("Esatus AG");
+            verifier.setName("esatus AG");
             verifier.setApiKey("$2y$10$AW0Zit2JNBcTI0UDpPmc4OM72nm86AyvoOfV7GJOP4iropj9IuyVS");
             verifierRepository.insert(verifier);
         }
