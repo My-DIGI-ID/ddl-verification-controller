@@ -19,6 +19,7 @@ import java.util.Date;
 public class RequestPresentationValidationServiceTest {
 
     public final static String DATE_FORMAT = "yyyyMMdd";
+    public final static String DATE_FORMAT_DE = "dd.MM.yyyy";
 
     @InjectMocks
     @Autowired
@@ -75,6 +76,28 @@ public class RequestPresentationValidationServiceTest {
 
         Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
         var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
+        Assertions.assertThat(isValid).isFalse();
+    }
+
+    @Test
+    public void validateDateOfIssueDateWithGermanDateFormat_IsValid_ShouldReturnTrue() {
+        Date date = Calendar.getInstance().getTime();
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT_DE);
+        String strDate = format.format(date);
+
+        Instant expirationDate = date.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE, expirationDate);
+        Assertions.assertThat(isValid).isTrue();
+    }
+
+    @Test
+    public void validateDateOfIssueDateWithGermanDateFormat_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneWeekBefore() {
+        Date date = Calendar.getInstance().getTime();
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT_DE);
+        String strDate = format.format(date);
+
+        Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE, expirationDate);
         Assertions.assertThat(isValid).isFalse();
     }
 }

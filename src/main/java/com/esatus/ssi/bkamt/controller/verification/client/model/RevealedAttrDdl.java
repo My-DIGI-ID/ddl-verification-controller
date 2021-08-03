@@ -24,7 +24,7 @@ public class RevealedAttrDdl {
     private Integer subProofIndex;
 
     @JsonProperty("values")
-    private RevealedAttrValuesDdl values;
+    private Object values;
 
     public RevealedAttrDdl() {}
 
@@ -36,11 +36,11 @@ public class RevealedAttrDdl {
         this.subProofIndex = subProofIndex;
     }
 
-    public RevealedAttrValuesDdl getValues() {
+    public Object getValues() {
         return values;
     }
 
-    public void setValues(RevealedAttrValuesDdl values) {
+    public void setValues(Object values) {
         this.values = values;
     }
 

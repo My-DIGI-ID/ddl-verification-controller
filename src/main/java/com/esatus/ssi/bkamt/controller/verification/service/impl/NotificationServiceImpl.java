@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -53,11 +52,7 @@ public class NotificationServiceImpl implements NotificationService {
             .POST(HttpRequest.BodyPublishers.ofString(Objects.requireNonNull(json)))
             .build();
 
-        try {
-            client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
     }
 
     @Override
