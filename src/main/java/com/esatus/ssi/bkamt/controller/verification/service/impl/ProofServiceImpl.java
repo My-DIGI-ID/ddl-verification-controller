@@ -221,11 +221,11 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private void addDDLAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
-        List<Map<String, String>> ddlRestrictions = new ArrayList<Map<String, String>>(ddlCredDefIdsString.length);
+        List<Map<String, String>> ddlRestrictions = new ArrayList<>(ddlCredDefIdsString.length);
 
-        for (int i = 0; i < ddlCredDefIdsString.length; i++) {
-            Map<String, String> temp = new HashMap<String, String>();
-            temp.put("cred_def_id", ddlCredDefIdsString[i]);
+        for (String s : ddlCredDefIdsString) {
+            Map<String, String> temp = new HashMap<>();
+            temp.put("cred_def_id", s);
             ddlRestrictions.add(temp);
         }
 
@@ -274,34 +274,34 @@ public class ProofServiceImpl implements ProofService {
         String currentState = webhookPresentProofDTO.getState();
 
         if ("verified".equals(currentState)) {
+            log.debug("handle state {}", currentState);
             handleVerifiedState(webhookPresentProofDTO);
         }
-
-        log.debug("ignore state {}", currentState);
     }
 
-    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException {
+    private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException {
         V10PresentationExchange presentationExchange = this.acapyClient.getProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
 
-        validatePresentationExchange(presentationExchange);
-
-        VerificationRequestDTO verificationRequest = getVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
-
-        validateVerification(verificationRequest);
-
-        VerificationResponse response = buildVerificationResponse(presentationExchange);
-
-        String callbackUrl = verificationRequest.getCallbackUrl();
-        this.notificationService.executeCallback(callbackUrl, response);
-
-        this.acapyClient.deleteProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
-    }
-
-    private void validatePresentationExchange(V10PresentationExchange presentationExchange) throws PresentationExchangeInvalidException {
         RequestPresentationValidationResult validationResult = requestPresentationValidationService.validatePresentationExchange(presentationExchange);
+        VerificationRequestDTO verificationRequest = getVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
+        String callbackUrl = verificationRequest.getCallbackUrl();
 
         if(!validationResult.isValid()) {
-            throw new PresentationExchangeInvalidException();
+            var message = validationResult.getMessage();
+
+            VerificationResponse response = new VerificationResponse();
+            response.setCode(500);
+            response.setVerified(false);
+            response.setMessage(message);
+
+            this.notificationService.executeCallback(callbackUrl, response);
+        } else {
+
+            validateVerification(verificationRequest);
+            VerificationResponse response = buildVerificationResponse(presentationExchange);
+
+            this.notificationService.executeCallback(callbackUrl, response);
+            this.acapyClient.deleteProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
         }
     }
 
@@ -329,9 +329,16 @@ public class ProofServiceImpl implements ProofService {
         Presentation presentation = new ObjectMapper().convertValue(presentationExchange.getPresentation(), Presentation.class);
 
         Data__1 data = new Data__1();
-        data.setAdditionalProperty("name", presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getName().getRaw());
-        // TODO: Check Ausstellungsdatum
-        data.setAdditionalProperty("ausstellungsdatum", presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw());
+
+        Map<String, Map<String, String>> values = (Map<String, Map<String, String>>) presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues();
+
+        Arrays.stream(ddlRequestedAttributes).forEach((String attributeName) -> {
+            String attributeValue = values.get(attributeName).get("raw");
+
+            if(!attributeValue.isEmpty() && !attributeValue.isBlank()) {
+                data.setAdditionalProperty(attributeName, attributeValue);
+            }
+        });
 
         response.setData(data);
         return response;

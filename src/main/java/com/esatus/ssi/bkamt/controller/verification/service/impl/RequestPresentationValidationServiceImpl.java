@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Service class for presentation request validation.
@@ -35,19 +36,25 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
     public RequestPresentationValidationResult validatePresentationExchange(V10PresentationExchange presentationExchange) {
         Presentation presentation = new ObjectMapper().convertValue(presentationExchange.getPresentation(), Presentation.class);
 
-        String issuedDate = presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw();
+        Map<String, Map<String, String>> values = (Map) presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues();
+        String issuedDate = values.get(expiryCheckAttribute).get("raw");
+
         Instant expirationDate = buildExpirationDate();
 
         boolean isValid = issueDateValid(issuedDate, expiryCheckFormat, expirationDate);
-        return new RequestPresentationValidationResult(isValid, "Validation of data succeeded");
+        if (isValid) {
+            return new RequestPresentationValidationResult(true, "Verification succeeded");
+        } else {
+            return new RequestPresentationValidationResult(false, "Verification failed");
+        }
     }
 
     private Instant buildExpirationDate() {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY,0);
-        cal.set(Calendar.MINUTE,0);
-        cal.set(Calendar.SECOND,0);
-        cal.set(Calendar.MILLISECOND,0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         Date d = cal.getTime();
 
         return d.toInstant().plus(Long.parseLong(expiryCheckValidity), ChronoUnit.DAYS);
