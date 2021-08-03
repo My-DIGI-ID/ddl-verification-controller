@@ -91,12 +91,12 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public URI createProofRequest(String verificationId) throws VerificationNotFoundException {
-        VerificationRequestDTO verificationRequest = GetVerificationById(verificationId);
+        VerificationRequestDTO verificationRequest = getVerificationById(verificationId);
         V10PresentationCreateRequestRequest connectionlessProofCreationRequest = this.createPresentation(verificationRequest);
-        V10PresentationExchange proofResponseDTO = SendProofRequest(connectionlessProofCreationRequest);
+        V10PresentationExchange proofResponseDTO = sendProofRequest(connectionlessProofCreationRequest);
         ConnectionlessProofRequest connectionlessProofRequest = this.prepareConnectionlessProofRequest(proofResponseDTO);
 
-        UpdateVerificationByPresentationExchangeId(verificationId, proofResponseDTO.getPresentationExchangeId());
+        updateVerificationByPresentationExchangeId(verificationId, proofResponseDTO.getPresentationExchangeId());
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -114,7 +114,7 @@ public class ProofServiceImpl implements ProofService {
         }
     }
 
-    private VerificationRequestDTO GetVerificationById(String verificationId) throws VerificationNotFoundException {
+    private VerificationRequestDTO getVerificationById(String verificationId) throws VerificationNotFoundException {
         var verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
 
         if(verificationRequestOptional.isEmpty()) {
@@ -123,7 +123,7 @@ public class ProofServiceImpl implements ProofService {
         return verificationRequestOptional.get();
     }
 
-    private V10PresentationExchange SendProofRequest(V10PresentationCreateRequestRequest connectionlessProofCreationRequest) {
+    private V10PresentationExchange sendProofRequest(V10PresentationCreateRequestRequest connectionlessProofCreationRequest) {
         V10PresentationExchange proofResponseDTO = null;
         try {
             proofResponseDTO = this.acapyClient.createProofRequest(apikey, connectionlessProofCreationRequest);
@@ -135,7 +135,7 @@ public class ProofServiceImpl implements ProofService {
         return proofResponseDTO;
     }
 
-    private void UpdateVerificationByPresentationExchangeId(String verificationId, String threadId) throws VerificationNotFoundException {
+    private void updateVerificationByPresentationExchangeId(String verificationId, String threadId) throws VerificationNotFoundException {
         verificationRequestService.updatePresentationExchangeId(verificationId, threadId);
     }
 
@@ -273,40 +273,31 @@ public class ProofServiceImpl implements ProofService {
 
         String currentState = webhookPresentProofDTO.getState();
 
-        switch (currentState) {
-            case "verified":
-                handleVerifiedState(webhookPresentProofDTO);
-            case "presentation_received":
-                handlePresentationReceivedState(webhookPresentProofDTO);
-                return;
-            default:
-                log.debug("ignore state {}", currentState);
+        if ("verified".equals(currentState)) {
+            handleVerifiedState(webhookPresentProofDTO);
         }
-    }
 
-    private void handlePresentationReceivedState(WebhookPresentProofDTO webhookPresentProofDTO) {
-
+        log.debug("ignore state {}", currentState);
     }
 
     private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException {
         V10PresentationExchange presentationExchange = this.acapyClient.getProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
 
-        ValidatePresentationExchange(presentationExchange);
+        validatePresentationExchange(presentationExchange);
 
-        VerificationRequestDTO verificationRequest = GetVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
+        VerificationRequestDTO verificationRequest = getVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
 
-        RunMetaDataValidation(verificationRequest);
+        validateVerification(verificationRequest);
 
-        VerificationResponse response = buildVerificationResponse(verificationRequest, presentationExchange);
+        VerificationResponse response = buildVerificationResponse(presentationExchange);
 
         String callbackUrl = verificationRequest.getCallbackUrl();
         this.notificationService.executeCallback(callbackUrl, response);
 
-        // TODO: Do we need to delete the proof?
         this.acapyClient.deleteProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
     }
 
-    private void ValidatePresentationExchange(V10PresentationExchange presentationExchange) throws PresentationExchangeInvalidException {
+    private void validatePresentationExchange(V10PresentationExchange presentationExchange) throws PresentationExchangeInvalidException {
         RequestPresentationValidationResult validationResult = requestPresentationValidationService.validatePresentationExchange(presentationExchange);
 
         if(!validationResult.isValid()) {
@@ -314,7 +305,7 @@ public class ProofServiceImpl implements ProofService {
         }
     }
 
-    private void RunMetaDataValidation(VerificationRequestDTO verificationRequest) throws MetaDataInvalidException {
+    private void validateVerification(VerificationRequestDTO verificationRequest) throws MetaDataInvalidException {
         var metaDataValid = metaDataValidator.validateMetaData(verificationRequest);
 
         if(!metaDataValid) {
@@ -322,7 +313,7 @@ public class ProofServiceImpl implements ProofService {
         }
     }
 
-    private VerificationRequestDTO GetVerificationRequestByPresentationExchangeId(String presentationExchangeId) throws VerificationNotFoundException {
+    private VerificationRequestDTO getVerificationRequestByPresentationExchangeId(String presentationExchangeId) throws VerificationNotFoundException {
         Optional<VerificationRequestDTO> vr = verificationRequestService.getByPresentationExchangeId(presentationExchangeId);
 
         if (vr.isEmpty()) throw new VerificationNotFoundException();
@@ -330,7 +321,7 @@ public class ProofServiceImpl implements ProofService {
         return vr.get();
     }
 
-    private VerificationResponse buildVerificationResponse(VerificationRequestDTO verificationRequest, V10PresentationExchange presentationExchange) {
+    private VerificationResponse buildVerificationResponse(V10PresentationExchange presentationExchange) {
         VerificationResponse response = new VerificationResponse();
         response.setCode(200);
         response.setVerified(true);

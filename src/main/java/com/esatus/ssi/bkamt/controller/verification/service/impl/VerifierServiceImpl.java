@@ -54,6 +54,7 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Override
     public void invalidateVerification(String verificationId) {
+        // TODO: Make sure that only the creator can invalidate the verification
         log.debug("invalidate verification with id {}", verificationId);
         verificationRequestRepository.deleteById(verificationId);
     }

@@ -46,7 +46,6 @@ public class WebhookController {
     ProofService proofService;
 
     @PostMapping("/present_proof")
-//    @Operation(security = @SecurityRequirement(name = "X-API-Key"))
     public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)
         throws JsonProcessingException {
 
