@@ -18,63 +18,63 @@ import java.util.Date;
 @RunWith(MockitoJUnitRunner.class)
 public class RequestPresentationValidationServiceTest {
 
-    private final String dateFormat = "yyyyMMdd";
+    public final static String DATE_FORMAT = "yyyyMMdd";
 
     @InjectMocks
     @Autowired
     private RequestPresentationValidationServiceImpl requestPresentationValidationService;
 
     @Test
-    public void ValidateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseNoDateWasPassed() {
+    public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseNoDateWasPassed() {
         Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("", dateFormat, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid("", DATE_FORMAT, expirationDate);
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
-    public void ValidateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseAnInvalidDateWasPassed() {
+    public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseAnInvalidDateWasPassed() {
         Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("12.20.2587", dateFormat, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid("12.20.2587", DATE_FORMAT, expirationDate);
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
-    public void ValidateDateOfIssueDate_IsValid_ShouldReturnTrueBecauseTheValidityWasSetTo1Day() {
+    public void validateDateOfIssueDate_IsValid_ShouldReturnTrueBecauseTheValidityWasSetTo1Day() {
         Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("20210803", dateFormat, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid("20210803", DATE_FORMAT, expirationDate);
         Assertions.assertThat(isValid).isTrue();
     }
 
     @Test
-    public void ValidateDateOfIssueDate_IsValid_ShouldReturnTrue() {
+    public void validateDateOfIssueDate_IsValid_ShouldReturnTrue() {
         Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(dateFormat);
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, dateFormat, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
         Assertions.assertThat(isValid).isTrue();
     }
 
     @Test
-    public void ValidateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneDayBefore() {
+    public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneDayBefore() {
         Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(dateFormat);
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().minus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, dateFormat, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
-    public void ValidateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneWeekBefore() {
+    public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneWeekBefore() {
         Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(dateFormat);
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, dateFormat, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
         Assertions.assertThat(isValid).isFalse();
     }
 }
