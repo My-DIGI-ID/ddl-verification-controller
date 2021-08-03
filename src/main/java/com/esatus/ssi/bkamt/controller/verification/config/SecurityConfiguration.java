@@ -93,10 +93,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
             .authorizeRequests()
             .antMatchers("/api/request-proof").permitAll()
-            .antMatchers("/api/checkin-credentials/subscribe").permitAll()
             .antMatchers("/api/**").permitAll()
-            .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/info").permitAll()
         .and()
             .httpBasic();
         // @formatter:on
