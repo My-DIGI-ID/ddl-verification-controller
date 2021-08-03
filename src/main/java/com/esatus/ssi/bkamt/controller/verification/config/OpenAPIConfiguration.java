@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 @OpenAPIDefinition(
     info = @Info(title = "Verification Controller", version = "v1", description = "SSI Verification Controller"))
 @SecurityScheme(name = "X-API-Key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
-@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 @ConditionalOnProperty(name = "ssibk.verification.controller.authentication_type", havingValue = "apiKey",
     matchIfMissing = true)
 public class OpenAPIConfiguration {
