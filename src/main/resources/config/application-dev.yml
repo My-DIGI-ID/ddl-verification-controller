@@ -48,7 +48,7 @@ ssibk:
       expiryCheck:
         attribute: Ausstellungsdatum
         format: yyyyMMdd
-        validity: 0
+        validity: 1
 
 
 spring:

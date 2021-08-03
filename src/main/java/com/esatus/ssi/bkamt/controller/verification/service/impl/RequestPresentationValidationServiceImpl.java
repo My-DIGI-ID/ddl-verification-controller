@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -30,17 +31,27 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
     @Value("${ssibk.verification.controller.expiryCheck.validity}")
     private String expiryCheckValidity;
 
-
     @Override
     public RequestPresentationValidationResult validatePresentationExchange(V10PresentationExchange presentationExchange) {
 
         Presentation presentation = new ObjectMapper().convertValue(presentationExchange.getPresentation(), Presentation.class);
-        String validUntil = presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw();
+        String dateOfIssue = presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw();
 
-        Instant expirationDate = new Date().toInstant().plus(Long.parseLong(expiryCheckValidity), ChronoUnit.DAYS);
-        boolean isValid = dateOfIssueDateValid(validUntil, expiryCheckFormat, expirationDate);
+        Instant expirationDate = createExpirationDate();
 
+        boolean isValid = dateOfIssueDateValid(dateOfIssue, expiryCheckFormat, expirationDate);
         return new RequestPresentationValidationResult(isValid, "Validation of data succeeded");
+    }
+
+    private Instant createExpirationDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
+        Date d = cal.getTime();
+
+        return d.toInstant().plus(Long.parseLong(expiryCheckValidity), ChronoUnit.DAYS);
     }
 
     @Override
