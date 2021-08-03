@@ -47,7 +47,7 @@ ssibk:
 
       expiryCheck:
         attribute: Ausstellungsdatum
-        format: YYYYmmdd
+        format: yyyyMMdd
         validity: 0
 
 

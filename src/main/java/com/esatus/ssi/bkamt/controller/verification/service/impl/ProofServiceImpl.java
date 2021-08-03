@@ -273,19 +273,11 @@ public class ProofServiceImpl implements ProofService {
 
         String currentState = webhookPresentProofDTO.getState();
 
-        switch (currentState) {
-            case "verified":
-                handleVerifiedState(webhookPresentProofDTO);
-            case "presentation_received":
-                handlePresentationReceivedState(webhookPresentProofDTO);
-                return;
-            default:
-                log.debug("ignore state {}", currentState);
+        if ("verified".equals(currentState)) {
+            handleVerifiedState(webhookPresentProofDTO);
         }
-    }
 
-    private void handlePresentationReceivedState(WebhookPresentProofDTO webhookPresentProofDTO) {
-
+        log.debug("ignore state {}", currentState);
     }
 
     private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException {
@@ -302,7 +294,6 @@ public class ProofServiceImpl implements ProofService {
         String callbackUrl = verificationRequest.getCallbackUrl();
         this.notificationService.executeCallback(callbackUrl, response);
 
-        // TODO: Do we need to delete the proof?
         this.acapyClient.deleteProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
     }
 
