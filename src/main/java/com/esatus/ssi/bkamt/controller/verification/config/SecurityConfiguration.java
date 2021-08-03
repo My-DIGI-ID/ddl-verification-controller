@@ -20,8 +20,9 @@ import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
 import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,28 +30,23 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
-import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
+@Configuration
+@Order(2)
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 
     @Autowired
     VerifierService verifierService;
 
-    @Value("${ssibk.verification.controller.apikey}")
-    private String apikey;
-
     public static final String API_KEY_AUTH_HEADER_NAME = "X-API-Key";
 
-    public SecurityConfiguration(CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
-        this.corsFilter = corsFilter;
+    public SecurityConfiguration(SecurityProblemSupport problemSupport) {
         this.problemSupport = problemSupport;
     }
 
@@ -72,7 +68,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .csrf()
             .disable()
-            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilter(filter)
             .exceptionHandling()
                 .authenticationEntryPoint(problemSupport)

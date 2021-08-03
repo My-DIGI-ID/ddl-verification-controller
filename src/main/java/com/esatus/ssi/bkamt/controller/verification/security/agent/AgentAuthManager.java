@@ -5,7 +5,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-public class AgentAuthManager  implements AuthenticationManager {
+public class AgentAuthManager implements AuthenticationManager {
 
     private final String apikey;
 
