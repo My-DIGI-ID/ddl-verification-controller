@@ -58,7 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/topic/present_proof")
+            .antMatchers("/api/proof")
             .antMatchers("/swagger-ui/index.html")
             .antMatchers("/test/**");
     }
@@ -92,8 +92,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
             .authorizeRequests()
-            .antMatchers("/api/request-proof").permitAll()
-            .antMatchers("/api/**").permitAll()
+            .antMatchers("/api/**").authenticated()
         .and()
             .httpBasic();
         // @formatter:on
