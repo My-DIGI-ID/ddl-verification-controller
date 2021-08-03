@@ -33,17 +33,16 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
 
     @Override
     public RequestPresentationValidationResult validatePresentationExchange(V10PresentationExchange presentationExchange) {
-
         Presentation presentation = new ObjectMapper().convertValue(presentationExchange.getPresentation(), Presentation.class);
-        String dateOfIssue = presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw();
 
-        Instant expirationDate = createExpirationDate();
+        String issuedDate = presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues().getAusstellungsdatum().getRaw();
+        Instant expirationDate = buildExpirationDate();
 
-        boolean isValid = dateOfIssueDateValid(dateOfIssue, expiryCheckFormat, expirationDate);
+        boolean isValid = issueDateValid(issuedDate, expiryCheckFormat, expirationDate);
         return new RequestPresentationValidationResult(isValid, "Validation of data succeeded");
     }
 
-    private Instant createExpirationDate() {
+    private Instant buildExpirationDate() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY,0);
         cal.set(Calendar.MINUTE,0);
@@ -55,7 +54,7 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
     }
 
     @Override
-    public boolean dateOfIssueDateValid(String validUntil, String format, Instant expirationDate) {
+    public boolean issueDateValid(String validUntil, String format, Instant expirationDate) {
         DateFormat simpleDateFormat = new SimpleDateFormat(format);
 
         try {

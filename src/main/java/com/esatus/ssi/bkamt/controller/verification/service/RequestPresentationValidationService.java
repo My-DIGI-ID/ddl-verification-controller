@@ -23,5 +23,5 @@ import java.time.Instant;
 
 public interface RequestPresentationValidationService {
     RequestPresentationValidationResult validatePresentationExchange(V10PresentationExchange presentationExchange);
-    boolean dateOfIssueDateValid(String validUntil, String format, Instant expirationDate);
+    boolean issueDateValid(String validUntil, String format, Instant expirationDate);
 }
