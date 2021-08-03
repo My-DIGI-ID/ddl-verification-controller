@@ -295,9 +295,9 @@ public class ProofServiceImpl implements ProofService {
 
         VerificationRequestDTO verificationRequest = GetVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
 
-        RunMetaDataValidation(verificationRequest);
+        ValidateVerification(verificationRequest);
 
-        VerificationResponse response = buildVerificationResponse(verificationRequest, presentationExchange);
+        VerificationResponse response = buildVerificationResponse(presentationExchange);
 
         String callbackUrl = verificationRequest.getCallbackUrl();
         this.notificationService.executeCallback(callbackUrl, response);
@@ -314,7 +314,7 @@ public class ProofServiceImpl implements ProofService {
         }
     }
 
-    private void RunMetaDataValidation(VerificationRequestDTO verificationRequest) throws MetaDataInvalidException {
+    private void ValidateVerification(VerificationRequestDTO verificationRequest) throws MetaDataInvalidException {
         var metaDataValid = metaDataValidator.validateMetaData(verificationRequest);
 
         if(!metaDataValid) {
@@ -330,7 +330,7 @@ public class ProofServiceImpl implements ProofService {
         return vr.get();
     }
 
-    private VerificationResponse buildVerificationResponse(VerificationRequestDTO verificationRequest, V10PresentationExchange presentationExchange) {
+    private VerificationResponse buildVerificationResponse(V10PresentationExchange presentationExchange) {
         VerificationResponse response = new VerificationResponse();
         response.setCode(200);
         response.setVerified(true);

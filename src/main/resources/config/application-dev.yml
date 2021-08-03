@@ -45,6 +45,12 @@ ssibk:
         connection:
           timeout: 3600000
 
+      expiryCheck:
+        attribute: Ausstellungsdatum
+        format: YYYYmmdd
+        validity: 0
+
+
 spring:
   profiles:
     active: dev
