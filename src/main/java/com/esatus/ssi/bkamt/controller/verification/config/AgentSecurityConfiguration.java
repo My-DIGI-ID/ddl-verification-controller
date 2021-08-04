@@ -50,7 +50,7 @@ public class AgentSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers("/topic/present_proof").authenticated()
         .and()
-            .authorizeRequests().anyRequest().authenticated();
+            .authorizeRequests().anyRequest().permitAll();
         // @formatter:on
     }
 }

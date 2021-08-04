@@ -16,10 +16,12 @@
 
 package com.esatus.ssi.bkamt.controller.verification.domain;
 
-import javax.validation.constraints.NotNull;
-
-import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
 /**
  * A verifier.
@@ -30,7 +32,26 @@ public class  Verifier {
 	@Id
     private String id;
 
-	// TODO: Hash that value
+    @CreatedBy
+    @Field("created_by")
+    @JsonIgnore
+    private String createdBy;
+
+    @CreatedDate
+    @Field("created_date")
+    @JsonIgnore
+    private Instant createdDate = Instant.now();
+
+    @LastModifiedBy
+    @Field("last_modified_by")
+    @JsonIgnore
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Field("last_modified_date")
+    @JsonIgnore
+    private Instant lastModifiedDate = Instant.now();
+
 	@NotNull
 	@Field("api_key")
     private String apiKey;
@@ -61,4 +82,28 @@ public class  Verifier {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 }
