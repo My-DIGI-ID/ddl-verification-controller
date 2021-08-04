@@ -14,35 +14,39 @@
  * limitations under the License.
  */
 
-package com.esatus.ssi.bkamt.controller.verification.client.model;
+package com.esatus.ssi.bkamt.agent.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RequestedProof {
+public class Property {
 
-    @JsonProperty("revealed_attr_groups")
-    private RevealedAttrGroups revealedAttrGroups;
+    @JsonProperty("raw")
+    private String raw;
 
-    @JsonProperty("revealed_attrs")
-    private Object revealedAttrs;
+    @JsonProperty("encoded")
+    private String encoded;
 
-    @JsonProperty("unrevealed_attrs")
-    private Object unrevealed_attrs;
+    public Property() {}
 
-    @JsonProperty("self_attested_attrs")
-    private Object selfAttestedAttrs;
+    public String getRaw() {
+        return raw;
+    }
 
-    @JsonProperty("predicates")
-    private Object predicates;
+    public void setRaw(String raw) {
+        this.raw = raw;
+    }
 
-    public RequestedProof() {}
+    public String getEncoded() {
+        return encoded;
+    }
 
-    public RevealedAttrGroups getRevealedAttrGroups() {
-        return this.revealedAttrGroups;
+    public void setEncoded(String encoded) {
+        this.encoded = encoded;
     }
 
     @Override
     public String toString() {
-        return "RequestedProof [revealedAttrGroups=" + revealedAttrGroups + "]";
+        return "Property [encoded=" + encoded + ", raw=" + raw + "]";
     }
+
 }

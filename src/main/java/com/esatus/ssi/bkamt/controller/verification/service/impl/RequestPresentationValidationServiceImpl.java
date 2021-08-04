@@ -1,7 +1,7 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
-import com.esatus.ssi.bkamt.controller.verification.client.model.Presentation;
+import com.esatus.ssi.bkamt.agent.model.Presentation;
 import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
 import com.esatus.ssi.bkamt.controller.verification.service.RequestPresentationValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
