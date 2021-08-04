@@ -22,10 +22,13 @@ import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationResponseDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +44,7 @@ import java.net.URISyntaxException;
 @Tag(name = "Verifier", description = "Manage Verifier")
 @RestController
 @RequestMapping("/api")
+@SecurityRequirements({@SecurityRequirement(name = "X-API-Key")})
 public class VerifierController {
 
     private final Logger log = LoggerFactory.getLogger(VerifierController.class);
@@ -51,7 +55,10 @@ public class VerifierController {
     @Autowired
     VerificationRequestService verificationRequestService;
 
-    private static final String RETURN_URL = "didcomm://ssi.ddl.example.com/api/v1/proof?verificationId=";
+    @Value("${ssibk.verification.controller.endpoint}")
+    private String endpoint;
+
+    private static final String REQUEST_PATH = "/api/proof?verificationId=";
 
     /**
      * {@code POST /init} : Initialize verification request
@@ -75,7 +82,7 @@ public class VerifierController {
             String verificationId = createdVerificationRequest.getVerificationId();
 
             VerificationResponseDTO response = new VerificationResponseDTO();
-            response.setUri(new URI(RETURN_URL + verificationId));
+            response.setUri(new URI(endpoint + REQUEST_PATH + verificationId));
             response.setVerificationId(verificationId);
 
             return ResponseEntity.ok().body(response);

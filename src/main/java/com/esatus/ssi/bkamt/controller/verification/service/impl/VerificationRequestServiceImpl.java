@@ -17,6 +17,7 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.repository.VerificationRequestRepository;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
@@ -49,7 +50,12 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
         VerificationRequest verificationRequest = new VerificationRequest();
         verificationRequest.setCallbackUrl(verificationRequestMetadata.getCallbackURL());
         verificationRequest.setValidUntil(verificationRequestMetadata.getValidUntil());
-        verificationRequest.setData(verificationRequestMetadata.getData());
+
+        if(verificationRequestMetadata.getData() == null) {
+            verificationRequest.setData(new Data());
+        } else {
+            verificationRequest.setData(verificationRequestMetadata.getData());
+        }
 
         this.verificationRepository.save(verificationRequest);
         log.debug("Created verification request: {}", verificationRequest);

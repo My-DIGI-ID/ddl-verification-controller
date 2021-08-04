@@ -150,8 +150,11 @@ To test the whole application with your mobile phone you need to make sure the f
 * You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of you favourite tools on how to use it
 
 ### Configure your IP Address
-Make sure the correct IP Address of your PC 
-
+Make sure the correct IP Address of your PC in `/src/main/docker/.env`
+```yaml
+# NETWORK
+IP_ADDRESS=192.168.152.43
+```
 
 ### Start the application and execute ngrok
 Open three terminals and navigate to the folder ngrok is located in each instance of your shell (e.g. Ngrok is in C:\dev\ngrok navigate with `cd C:\dev\ngrok`)
@@ -159,7 +162,11 @@ Open three terminals and navigate to the folder ngrok is located in each instanc
 * `.\ngrok.exe http 10000`
 * `.\ngrok.exe http 10080`
 
-Ngrok now creates three secure endpoints which are tunneled to your local endpoints
+### Open demo page
+When the application runs with dev profile there is demo website where you can generate a QR-Code to scan with your Wallet-ID App.
+To see this page call 
+
+Ngrok now creates three public endpoints which are tunneled to your local endpoints
 
 ## Building Docker Image
 

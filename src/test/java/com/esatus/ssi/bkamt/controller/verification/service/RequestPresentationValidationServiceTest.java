@@ -28,21 +28,21 @@ public class RequestPresentationValidationServiceTest {
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseNoDateWasPassed() {
         Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("", DATE_FORMAT, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid("", DATE_FORMAT);
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseAnInvalidDateWasPassed() {
         Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("12.20.2587", DATE_FORMAT, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid("12.20.2587", DATE_FORMAT);
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnTrueBecauseTheValidityWasSetTo1Day() {
         Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("20210803", DATE_FORMAT, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid("20210803", DATE_FORMAT);
         Assertions.assertThat(isValid).isTrue();
     }
 
@@ -53,7 +53,7 @@ public class RequestPresentationValidationServiceTest {
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT);
         Assertions.assertThat(isValid).isTrue();
     }
 
@@ -64,7 +64,7 @@ public class RequestPresentationValidationServiceTest {
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().minus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT);
         Assertions.assertThat(isValid).isFalse();
     }
 
@@ -75,7 +75,7 @@ public class RequestPresentationValidationServiceTest {
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT);
         Assertions.assertThat(isValid).isFalse();
     }
 
@@ -86,7 +86,7 @@ public class RequestPresentationValidationServiceTest {
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE);
         Assertions.assertThat(isValid).isTrue();
     }
 
@@ -97,7 +97,7 @@ public class RequestPresentationValidationServiceTest {
         String strDate = format.format(date);
 
         Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE, expirationDate);
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE);
         Assertions.assertThat(isValid).isFalse();
     }
 }

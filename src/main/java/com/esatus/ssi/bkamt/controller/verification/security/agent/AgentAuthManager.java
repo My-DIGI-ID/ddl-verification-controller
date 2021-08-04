@@ -23,6 +23,5 @@ public class AgentAuthManager implements AuthenticationManager {
         } else {
             throw new BadCredentialsException("The API key was not found or not the expected value.");
         }
-
     }
 }
