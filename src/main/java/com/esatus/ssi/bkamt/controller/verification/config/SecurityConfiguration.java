@@ -1,24 +1,18 @@
 /*
  * Copyright 2021 Bundesrepublik Deutschland
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
-import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
-import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
-import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -32,6 +26,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
+import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
+import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 
 @Configuration
 @Order(2)
@@ -39,32 +36,35 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private final SecurityProblemSupport problemSupport;
+  private final SecurityProblemSupport problemSupport;
 
-    @Autowired
-    VerifierService verifierService;
+  @Autowired
+  VerifierService verifierService;
 
-    public static final String API_KEY_AUTH_HEADER_NAME = "X-API-Key";
+  public static final String API_KEY_AUTH_HEADER_NAME = "X-API-Key";
 
-    public SecurityConfiguration(SecurityProblemSupport problemSupport) {
-        this.problemSupport = problemSupport;
-    }
+  public SecurityConfiguration(SecurityProblemSupport problemSupport) {
+    this.problemSupport = problemSupport;
+  }
 
-    @Override
-    public void configure(WebSecurity web) {
+  @Override
+  public void configure(WebSecurity web) {
+    // @formatter:off
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers("/api/proof")
             .antMatchers("/swagger-ui/**")
-            .antMatchers("/test/**");
-    }
+            .antMatchers("/test/**")
+            .antMatchers("/demo/**");
+     // @formatter:on
+  }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
 
-        AuthFilter filter = new AuthFilter(API_KEY_AUTH_HEADER_NAME);
-        filter.setAuthenticationManager(new AuthManager(verifierService));
-        // @formatter:off
+    AuthFilter filter = new AuthFilter(API_KEY_AUTH_HEADER_NAME);
+    filter.setAuthenticationManager(new AuthManager(verifierService));
+    // @formatter:off
         http
             .csrf()
             .disable()
@@ -91,5 +91,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
             .httpBasic();
         // @formatter:on
-    }
+  }
 }

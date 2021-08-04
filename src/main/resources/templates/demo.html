@@ -16,10 +16,9 @@
 		    	if (this.readyState == 4 && this.status == 200) {
 		    		var parser = new DOMParser();
 		    		var respObj = JSON.parse(this.responseText);
-		    		alert(respObj);
-		    		document.getElementById('verid').value = '123'
-		    		document.getElementById('uri').value = respObj;
-		    		new QRCode(document.getElementById("qrcode"), respObj);
+		    		document.getElementById('verid').value = respObj.verificationId;
+		    		document.getElementById('uri').value = respObj.uri;
+		    		new QRCode(document.getElementById("qrcode"), respObj.uri);
 		    	} else if (this.readyState == 4) {
 		    		alert('ERROR:' + this.status);
 		    	}
