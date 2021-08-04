@@ -18,6 +18,7 @@
 		    		var respObj = JSON.parse(this.responseText);
 		    		document.getElementById('verid').value = respObj.verificationId;
 		    		document.getElementById('uri').value = respObj.uri;
+		    		document.getElementById("qrcode").innerHTML = '';
 		    		new QRCode(document.getElementById("qrcode"), respObj.uri);
 		    	} else if (this.readyState == 4) {
 		    		alert('ERROR:' + this.status);
