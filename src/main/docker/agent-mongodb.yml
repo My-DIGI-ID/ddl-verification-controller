@@ -5,8 +5,8 @@ services:
     ports:
       - '27018:27017'
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin123
-      - MONGO_INITDB_ROOT_PASSWORD=pass123
+      - MONGO_INITDB_ROOT_USERNAME={MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD={MONGODB_PASSWORD}
     volumes:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
   adminmongo:
