@@ -13,6 +13,9 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
+import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
+import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,9 +29,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
-import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthFilter;
-import com.esatus.ssi.bkamt.controller.verification.security.apikey.AuthManager;
-import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 
 @Configuration
 @Order(2)
@@ -47,17 +47,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     this.problemSupport = problemSupport;
   }
 
-  @Override
-  public void configure(WebSecurity web) {
-    // @formatter:off
+    @Override
+    public void configure(WebSecurity web) {
+        // @formatter:off
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/api/proof")
-            .antMatchers("/swagger-ui/**")
-            .antMatchers("/test/**")
-            .antMatchers("/demo/**");
-     // @formatter:on
-  }
+            .antMatchers("/api/proof");
+        // @formatter:on
+    }
 
   @Override
   public void configure(HttpSecurity http) throws Exception {
@@ -66,6 +63,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     filter.setAuthenticationManager(new AuthManager(verifierService));
     // @formatter:off
         http
+            .antMatcher("/api/**")
+            .addFilter(filter)
             .csrf()
             .disable()
             .addFilter(filter)
@@ -86,10 +85,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-            .authorizeRequests()
-            .antMatchers("/api/**").authenticated()
-        .and()
-            .httpBasic();
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated();
         // @formatter:on
   }
 }

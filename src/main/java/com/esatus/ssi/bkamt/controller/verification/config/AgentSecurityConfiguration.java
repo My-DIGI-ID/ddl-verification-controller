@@ -37,6 +37,7 @@ public class AgentSecurityConfiguration extends WebSecurityConfigurerAdapter {
         filter.setAuthenticationManager(new AgentAuthManager(apikey));
         // @formatter:off
         httpSecurity
+            .antMatcher("/topic/present_proof")
             .csrf()
             .disable()
             .addFilter(filter)
@@ -48,9 +49,7 @@ public class AgentSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
             .authorizeRequests()
-            .antMatchers("/topic/present_proof").authenticated()
-        .and()
-            .authorizeRequests().anyRequest().permitAll();
+            .anyRequest().authenticated();
         // @formatter:on
     }
 }

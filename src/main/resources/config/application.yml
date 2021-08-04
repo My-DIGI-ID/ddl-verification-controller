@@ -18,13 +18,13 @@ management:
     web:
       base-path: /management
       exposure:
-        include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump']
+        include: ['health']
   endpoint:
     health:
       show-details: when_authorized
       roles: 'ROLE_ADMIN'
     jhimetrics:
-      enabled: true
+      enabled: false
   info:
     git:
       mode: full
@@ -35,7 +35,7 @@ management:
     export:
       # Prometheus is the default metrics backend
       prometheus:
-        enabled: true
+        enabled: false
         step: 60
     enable:
       http: true

@@ -39,9 +39,7 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
         Map<String, Map<String, String>> values = (Map) presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues();
         String issuedDate = values.get(expiryCheckAttribute).get("raw");
 
-        Instant expirationDate = buildExpirationDate();
-
-        boolean isValid = issueDateValid(issuedDate, expiryCheckFormat, expirationDate);
+        boolean isValid = issueDateValid(issuedDate, expiryCheckFormat);
         if (isValid) {
             return new RequestPresentationValidationResult(true, "Verification succeeded");
         } else {
@@ -49,24 +47,26 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
         }
     }
 
-    private Instant buildExpirationDate() {
+    @Override
+    public boolean issueDateValid(String issueDate, String format) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
-        Date d = cal.getTime();
+        Date now = cal.getTime();
 
-        return d.toInstant().plus(Long.parseLong(expiryCheckValidity), ChronoUnit.DAYS);
-    }
-
-    @Override
-    public boolean issueDateValid(String validUntil, String format, Instant expirationDate) {
         DateFormat simpleDateFormat = new SimpleDateFormat(format);
 
         try {
-            Instant validUntilDate = simpleDateFormat.parse(validUntil).toInstant();
-            return validUntilDate.isBefore(expirationDate);
+            Instant dateOfIssuingInstant = simpleDateFormat.parse(issueDate).toInstant();
+
+            Date dateOfIssuing = Date.from(dateOfIssuingInstant);
+
+            Instant start = now.toInstant().minus(Long.parseLong(expiryCheckValidity), ChronoUnit.DAYS);
+            Instant end = now.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
+
+            return dateOfIssuing.before(Date.from(end)) && (dateOfIssuing.after(Date.from(start)) || dateOfIssuing.equals(Date.from(start)));
         } catch (ParseException e) {
             e.printStackTrace();
             return false;
