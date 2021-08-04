@@ -60,7 +60,7 @@ public class RequestProofController {
      *
      * @param verificationId id of the verification
      * @return status {@code 307 (Temporary Redirect)} when the proof was successfully created, with status
-     *         {@code 500 (Internal Server Error)} when creation failed or {@code 404 (Nout found)} when there is no
+     *         {@code 500 (Internal Server Error)} when creation failed or {@code 404 (Not found)} when there is no
      *         verification with the given verification id in the database
      */
     @GetMapping(value = "/proof")
