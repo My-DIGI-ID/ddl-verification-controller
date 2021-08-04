@@ -17,9 +17,12 @@
 package com.esatus.ssi.bkamt.controller.verification.domain;
 
 import com.esatus.ssi.bkamt.controller.verification.models.Data;
-import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -31,6 +34,26 @@ public class VerificationRequest {
     @Id
     private String id;
 
+    @CreatedBy
+    @Field("created_by")
+    @JsonIgnore
+    private String createdBy;
+
+    @CreatedDate
+    @Field("created_date")
+    @JsonIgnore
+    private Instant createdDate = Instant.now();
+
+    @LastModifiedBy
+    @Field("last_modified_by")
+    @JsonIgnore
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Field("last_modified_date")
+    @JsonIgnore
+    private Instant lastModifiedDate = Instant.now();
+
     private String verificationId;
 
     private String presentationExchangeId;
@@ -41,6 +64,7 @@ public class VerificationRequest {
     private String validUntil;
 
     private Data data;
+
 
     public VerificationRequest() {
         this.verificationId = UUID.randomUUID().toString();
@@ -92,5 +116,29 @@ public class VerificationRequest {
 
     public void setVerificationId(String verificationId) {
         this.verificationId = verificationId;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }
