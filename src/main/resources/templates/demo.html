@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+		<style>
+		html{
+			font-family: Arial;
+			font-size: 10pt;
+		}
+		</style>
+		<title>Verification Controller Demo</title>
+		<script>
+			function requestVerification(){			
+				var xhttp = new XMLHttpRequest();
+		  		xhttp.onreadystatechange = function() {
+		    	if (this.readyState == 4 && this.status == 200) {
+		    		var parser = new DOMParser();
+		    		var respObj = JSON.parse(this.responseText);
+		    		alert(respObj);
+		    		document.getElementById('verid').value = '123'
+		    		document.getElementById('uri').value = respObj;
+		    		new QRCode(document.getElementById("qrcode"), respObj);
+		    	} else if (this.readyState == 4) {
+		    		alert('ERROR:' + this.status);
+		    	}
+		  		};
+		  		xhttp.open("POST", "/api/init", true);
+		  		xhttp.setRequestHeader("X-API-Key", document.getElementById('apiKey').value);
+		  		xhttp.setRequestHeader("Content-Type", document.getElementById('contentType').value);
+		  		xhttp.send(document.getElementById('request').value);
+			}
+		</script>
+	</head>
+	<body>
+	<h2>Step 1: Initialize verification</h2>
+	<h3>Request</h3>
+	<label for="apiKey">X-API-Key Header:</label><br />
+	<input type="text" style="width: 100%" id="apiKey" name="apiKey" value="secure" /><br /><br />
+	<label for="contentType">Content-Type Header:</label><br />
+	<input type="text" style="width: 100%" id="contentType" name="contentType" value="application/json;charset=UTF-8" readonly="readonly" /><br /><br />
+	<label for="request">Request Metadata: </label><br />
+	<textarea name="request" id="request" style="width: 100%; height: 50px">
+{
+    "callbackURL": "https://callback.example.org/49f03689-2ff3-4339-9a02-6a5acf1062b3"
+}
+	</textarea><br /><br />
+	<input type="button" value="Request Verification" onclick="requestVerification()" /><br /><br />
+	<h3>Response</h3>
+	<label for="verid">Verification ID: </label><br />
+	<input type="text" id="verid" name="verid" style="width: 100%" /><br /><br />
+	<label for="uri">URI: </label><br />
+	<input type="text" style="width: 100%" id="uri" name="uri" />
+	<h2>Step 2: Scan QR Code & answer proof</h2>
+	<div id="qrcode"></div>
+	<h2>Step 3: Check verification result (sent to given callback URL)</h2>
+	</body>
+</html>
