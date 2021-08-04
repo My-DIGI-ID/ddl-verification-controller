@@ -18,18 +18,17 @@ package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
+import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationResponseDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationRequestsAlreadyExists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
@@ -58,13 +57,12 @@ public class VerifierController {
      * {@code POST /init} : Initialize verification request
      *
      * @param verificationRequestMetadata the verification to create
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
-     *         the body the new presentation requests, or with status
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} with the verification details or with status
      *         {@code 400 (Bad Request)} {@code 400 (Bad Request)} if a presentation request
      *         with the given name does already exist.
      */
     @PostMapping("/init")
-    public URI createPresentationRequest(@Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
+    public ResponseEntity<VerificationResponseDTO> createPresentationRequest(@Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
         boolean isMetaDataCompliant = verifierService.checkMetaDataCompliance(verificationRequestMetadata);
 
         if(!isMetaDataCompliant) {
@@ -73,7 +71,14 @@ public class VerifierController {
 
         try {
             VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestMetadata);
-            return new URI(RETURN_URL + createdVerificationRequest.getId());
+
+            String verificationId = createdVerificationRequest.getVerificationId();
+
+            VerificationResponseDTO response = new VerificationResponseDTO();
+            response.setUri(new URI(RETURN_URL + verificationId));
+            response.setVerificationId(verificationId);
+
+            return ResponseEntity.ok().body(response);
         } catch (PresentationRequestsAlreadyExists e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

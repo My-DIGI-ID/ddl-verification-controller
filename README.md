@@ -2,15 +2,48 @@
 
 ## Prerequisites
 
+### Environment variables
+
+Navigate to `src/main/docker/` and rename the `.env-default` file to `.env`. This file is used by docker to set all
+required environment variables passed into the docker containers.
+
+There are different variables to set:
+
+1. **VERIFY AGENT (ACA-PY)**
+    * `VERIFY_AGENT_GENESIS_URL`: URL of the genesis file the agent uses
+    * `VERIFY_AGENT_WALLET_KEY`:
+    * `VERIFY_AGENT_API_KEY`:
+    * `VERIFY_AGENT_WEBHOOK_APIKEY`: The key the agent uses to interact with our controller. The agent will send this
+      value in X-AUTH-HEADER of the request
+
+2. **Network**
+    * `IP_ADDRESS`: Your current IP-Address
+
+3. **MONGO DB**
+    * `MONGODB_USERNAME`:
+    * `MONGODB_PASSWORD`:
+    * `CONTROLLER_DB_USERNAME`:
+    * `CONTROLLER_DB_PASSWORD`:
+
+4. CONTROLLER CREDENTIALS
+    * `HOTEL_CONTROLLER_ADMIN_USERNAME`
+    * `HOTEL_CONTROLLER_ADMIN_PASSWORD`
+    * `HOTEL_CONTROLLER_AGENT_APIKEY`
+    * `HOTEL_CONTROLLER_AGENT_RECIPIENTKEY`
+    * `HOTEL_AGENT_MASTERID_CREDENTIAL_DEFINITION_IDS`
+    * `HOTEL_AGENT_CORPORATEID_SCHEMA_IDS`
+    * `HOTEL_CONTROLLER_AGENT_CORPORATEID_ISSUER_DIDS`
+    * `HOTEL_CONTROLLER_INTEGRATIONSERVICE_APIKEY`
+
 Add verification-agent-url, verification-agent-key,credential-definition-id in application-dev.yml file.
-For more information refer network/README.MD
 
 ## Development
 
-To start your application in the dev profile, open the terminal, navigate to the `verification-controller` folder and run the following commands:
+To start your application in the dev profile, open the terminal, navigate to the `verification-controller` folder and
+run the following commands:
 
 ```
-docker-compose -f src/main/docker/mongodb.yml up -d
+docker-compose -f src/main/docker/agent-mongodb.yml up -d
 ./mvnw
 ```
 
@@ -24,10 +57,11 @@ Swagger UI will be available at the following URL
 http://localhost:8090/swagger-ui/index.html
 ```
 
-
-Note: The API key can be configured in src/main/resources/config/application-dev.yml (application properties) file which can be used to interact with the API.
+Note: The API key can be configured in ``src/main/resources/config/application-dev.yml`` (application properties) file which
+can be used to interact with the API.
 
 ### Default authentication against the api
+
 If you want to try out the api use the user you configured in ssibk->verification->controller->admin
 
 E.g
@@ -40,11 +74,10 @@ E.g
 
 ```
 
-
-For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
-
 ## MongoDB
-There is an database init script called `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on port 27017. The scripts creates an admin user with username: admin123 and password: pass123.
+
+There is an database init script `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on
+port 27017. The scripts creates an admin user with username: admin123 and password: pass123.
 
 After the connection was established successfull it creates a new user:
 
@@ -53,15 +86,71 @@ username: user123
 password: 123pass
 ```
 
-You can use this user to connect to the database with your favourite MongoDB access tool. Here we use AdminMongo. You will find more information about how to use it below.
+You can use this user to connect to the database with your favourite MongoDB access tool. Here we use AdminMongo. You
+will find more information about how to use it below.
 
 ## AdminMongo
 
 AdminMongo is running in Port 8092
 
+```
 - localhost:8092
 - Connection-Name: Verification Controller
 - Connection-String: mongodb://user123:123pass@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController
+```
+
+### Connect to the database
+
+* Call `http://localhost:8092` in your browser
+* Add the details shown above and click `Add connection`
+  ![AdminMongo create connection](./images/admin_mongo_setup.png)
+* After a page reload the connection is shown. Click connect to open the details view
+  ![AdminMongo connection](./images/admin_mongo_connection.png)
+* You can see all tables and the data
+  ![AdminMongo overview](./images/admin_mongo_overview.png)
+* When you select the verifier (jhi_verifier) table you can see the initial verifier stored by our init script
+  ![AdminMongo overview](./images/admin_mongo_verifier.png)
+
+## Verifier
+
+The database is initialized with a demo verifier with the following values:
+
+```
+name: demo
+password: $2y$10$AW0Zit2JNBcTI0UDpPmc4OM72nm86AyvoOfV7GJOP4iropj9IuyVS
+```
+
+The password in plain text is `secure`. When you try to interact with the api endpoints use the plain value in
+the `X-AUTH-HEADER`.
+
+To create a new verifier you have to create a password hash with bcrypt with a strength factor of 12 Password length may
+not be greater than 72 bytes because that the maxim password length bcrypt supports only
+
+You can use any online bcrypt password generator, e.g. https://www.appdevtools.com/bcrypt-generator
+
+## Endpoints
+
+As mentioned above all endpoints are documented via swagger on `http://localhost:8090/swagger-ui/index.html`
+
+Currently, there are three different security mechanisms for these endpoints:
+
+* `/api/proof`: No Authentication
+* `/topic/present_proof`: The X-AUTH-HEADER is checked against the value configured in the `application-dev.yml`
+  under `ssibk:verification:controller:apikey`
+* `/*`: All requests to any other routes have to include a value in the `X-AUTH-HEADER` which matches the api-key of a
+  verifier stored in the database
+  (remember they are hashed in the database so don`t use the hash in the header, use the plan value instead)
+
+## Testing with your mobile device and the ID Wallet App
+To test the whole application with your mobile phone you need to make sure the following prerequisites are met:
+* You have the ID Wallet app installed on your mobile device
+  * iOS: https://apps.apple.com/at/app/id-wallet/id1564933989 
+  * Android: https://play.google.com/store/apps/details?id=com.digitalenabling.idw&hl=de&gl=US
+* All containers are running without any errors
+* You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of you favourite tools on how to use it
+
+### Start the application and execute ngrok
+
 
 ## Building Docker Image
 
@@ -71,8 +160,8 @@ To build a docker dev image, run:
 ./mvnw package jib:dockerBuild
 ```
 
-This one creates a new docker image with the name verificationcontroller.
-To run the controller + MongoDB and the mongoadmin, run:
+This one creates a new docker image with the name verificationcontroller. To run the controller + MongoDB and the
+mongoadmin, run:
 
 ```
 docker-compose -f src/main/docker/controller-mongo-mongoadmin.yml up -d
@@ -93,8 +182,6 @@ To ensure everything worked, run:
 ```
 java -jar target/*.jar
 ```
-
-Refer to [Using JHipster in production][] for more details.
 
 ### Packaging as war
 
@@ -122,7 +209,9 @@ Sonar is used to analyse code quality. You can start a local Sonar server (acces
 docker-compose -f src/main/docker/sonar.yml up -d
 ```
 
-You can run a Sonar analysis by using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven plugin.
+You can run a Sonar analysis by using
+the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven
+plugin.
 
 Then, run a Sonar analysis:
 
@@ -130,62 +219,15 @@ Then, run a Sonar analysis:
 ./mvnw -Pprod clean verify sonar:sonar
 ```
 
-If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
+If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties
+are loaded from the sonar-project.properties file.
 
 ```
 ./mvnw initialize sonar:sonar
 ```
 
-For more information, refer to the [Code quality page][].
-
-## Using Docker to simplify development (optional)
-
-You can use Docker to improve your JHipster development experience. A number of docker-compose configurations are available in the [src/main/docker](src/main/docker) folder to launch required third party services.
-
-For example, to start a MongoDB database in a Docker container, run:
-
-```
-docker-compose -f src/main/docker/mongodb.yml up -d
-```
-
-To stop it and remove the container, run:
-
-```
-docker-compose -f src/main/docker/mongodb.yml down
-```
-
-You can also fully dockerize your application and all the services that it depends on.
-To achieve this, first build a Docker image of your app by running:
-
-```
-./mvnw -Pprod verify jib:dockerBuild
-```
-
-Then run:
-
-```
-docker-compose -f src/main/docker/app.yml up -d
-```
-
-For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the docker-compose sub-generator (`jhipster docker-compose`), which is able to generate docker configurations for one or several JHipster applications.
-
-## Continuous Integration (optional)
-
-To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
-
-[jhipster homepage and latest documentation]: https://www.jhipster.tech
-[jhipster 6.10.5 archive]: https://www.jhipster.tech/documentation-archive/v6.10.5
-[using jhipster in development]: https://www.jhipster.tech/documentation-archive/v6.10.5/development/
-[using docker and docker-compose]: https://www.jhipster.tech/documentation-archive/v6.10.5/docker-compose
-[using jhipster in production]: https://www.jhipster.tech/documentation-archive/v6.10.5/production/
-[running tests page]: https://www.jhipster.tech/documentation-archive/v6.10.5/running-tests/
-[code quality page]: https://www.jhipster.tech/documentation-archive/v6.10.5/code-quality/
-[setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v6.10.5/setting-up-ci/
-
 ## Troubleshooting
-### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException... 
-- Remove the .m2 folder in your user directory and rebuild with ``mvnw``
 
-## Verifier initialization
-To create a new verifier you have to create a password hash with bcrypt with a strength factor of 12
-Password length may not be greater than 72 bytes because that the maxim password length bcrypt supports only
+### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException...
+
+- Remove the .m2 folder in your user directory and rebuild with ``mvnw``
