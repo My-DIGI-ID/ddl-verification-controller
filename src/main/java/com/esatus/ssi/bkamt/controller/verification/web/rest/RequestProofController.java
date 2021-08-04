@@ -20,8 +20,6 @@ import com.esatus.ssi.bkamt.controller.verification.service.ProofService;
 import com.esatus.ssi.bkamt.controller.verification.service.RequestPresentationValidationService;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.RequestPresentationValidationFailedException;
-import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,26 +55,24 @@ public class RequestProofController {
     @Autowired
     RequestPresentationValidationService requestPresentationValidationService;
 
+    /**
+     * {@code POST  /proof} : Invalidates metadata
+     *
+     * @param verificationId id of the verification
+     * @return status {@code 307 (Temporary Redirect)} when the proof was successfully created, with status
+     *         {@code 500 (Internal Server Error)} when creation failed or {@code 404 (Nout found)} when there is no
+     *         verification with the given verification id in the database
+     */
     @GetMapping(value = "/proof")
-    public ResponseEntity sendRedirect(@RequestParam(name = "verificationId") String verificationId) throws RequestPresentationValidationFailedException, VerificationNotFoundException {
-
+    public ResponseEntity sendRedirect(@RequestParam(name = "verificationId") String verificationId) {
         log.debug("REST request to create a presentation request for verificationId {}", verificationId );
 
-        // We have to validate the data
         Optional<VerificationRequestDTO> verificationRequest = verificationRequestService.getByVerificationId(verificationId);
 
         if(verificationRequest.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        // RequestPresentationValidationResult validationResult = requestPresentationValidationService.validatePresentationExchange(verificationRequest.get());
-
-        // When validation of the metadata failed
-       // if(!validationResult.isValid())
-            //throw new RequestPresentationValidationFailedException(String.format("Validation of verificationRequest failed {}", verificationId));
-
-        // TODO: Catch error when ACA-Py is not available
-        // If validation succeeded create the proof
         try {
             URI proofURI = this.proofService.createProofRequest(verificationId);
             HttpHeaders httpHeaders = new HttpHeaders();
