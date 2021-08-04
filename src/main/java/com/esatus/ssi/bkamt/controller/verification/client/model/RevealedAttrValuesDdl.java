@@ -16,6 +16,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.client.model;
 
+import com.esatus.ssi.bkamt.agent.model.Property;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RevealedAttrValuesDdl {

@@ -16,9 +16,6 @@
 
 package com.esatus.ssi.bkamt.agent.model;
 
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestService;
-import com.esatus.ssi.bkamt.controller.verification.client.model.ProofRequestThread;
-import com.esatus.ssi.bkamt.controller.verification.client.model.RequestPresentationAttach;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -36,7 +33,7 @@ public class ConnectionlessProofRequest {
 
     @JsonProperty("~service")
     @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-    private ProofRequestService service;
+    private CustomService service;
 
     @JsonProperty("~thread")
     @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
@@ -56,7 +53,7 @@ public class ConnectionlessProofRequest {
         this.requestPresentationAttach = requestPresentationAttach;
     }
 
-    public void setService(ProofRequestService service) {
+    public void setService(CustomService service) {
         this.service = service;
     }
 

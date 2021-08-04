@@ -14,36 +14,32 @@
  * limitations under the License.
  */
 
-package com.esatus.ssi.bkamt.controller.verification.client.model;
+package com.esatus.ssi.bkamt.agent.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Arrays;
+public class ProofRequestThread {
 
-public class Presentation {
+    @JsonProperty("thid")
+    private String threadId;
 
-    @JsonProperty("requested_proof")
-    private RequestedProof requestedProof;
+    @JsonProperty("sender_order")
+    private Integer senderOrder = 0;
 
-    @JsonProperty("identifiers")
-    private Identifier[] identifiers;
+    @JsonProperty("received_orders")
+    private EmptyDTO emptyDTO;
 
-    @JsonProperty("proof")
-    private Object proof;
+    public ProofRequestThread() {}
 
-    public Presentation() {
+    public void setThreadId(String threadId) {
+        this.threadId = threadId;
     }
 
-    public RequestedProof getRequestedProof() {
-        return requestedProof;
+    public void setSenderOrder(Integer senderOrder) {
+        this.senderOrder = senderOrder;
     }
 
-    public Identifier[] getIdentifiers() {
-        return identifiers;
-    }
-
-    @Override
-    public String toString() {
-        return "Presentation [identifiers=" + Arrays.toString(identifiers) + ", requestedProof=" + requestedProof + "]";
+    public void setReceivedOrders(EmptyDTO empty) {
+        this.emptyDTO = empty;
     }
 }
