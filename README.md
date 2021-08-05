@@ -11,29 +11,16 @@ There are different variables to set:
 
 1. **VERIFY AGENT (ACA-PY)**
     * `VERIFY_AGENT_GENESIS_URL`: URL of the genesis file the agent uses
-    * `VERIFY_AGENT_WALLET_KEY`:
-    * `VERIFY_AGENT_API_KEY`:
-    * `VERIFY_AGENT_WEBHOOK_APIKEY`: The key the agent uses to interact with our controller. The agent will send this
-      value in X-AUTH-HEADER of the request
+    * `VERIFY_AGENT_WALLET_KEY`: Key to generate the wallet with and unlocks the wallet
+    * `VERIFY_AGENT_API_KEY`: Secures all requests to ACA-Py (Send view X-API-KEY Header)
+    * `VERIFY_AGENT_WEBHOOK_APIKEY`: Send from ACA-Py in X-API-Key the application endpoints
 
 2. **Network**
     * `IP_ADDRESS`: Your current IP-Address
 
 3. **MONGO DB**
-    * `MONGODB_USERNAME`:
-    * `MONGODB_PASSWORD`:
-    * `CONTROLLER_DB_USERNAME`:
-    * `CONTROLLER_DB_PASSWORD`:
-
-4. **CONTROLLER CREDENTIALS**
-    * `HOTEL_CONTROLLER_ADMIN_USERNAME`
-    * `HOTEL_CONTROLLER_ADMIN_PASSWORD`
-    * `HOTEL_CONTROLLER_AGENT_APIKEY`
-    * `HOTEL_CONTROLLER_AGENT_RECIPIENTKEY`
-    * `HOTEL_AGENT_MASTERID_CREDENTIAL_DEFINITION_IDS`
-    * `HOTEL_AGENT_CORPORATEID_SCHEMA_IDS`
-    * `HOTEL_CONTROLLER_AGENT_CORPORATEID_ISSUER_DIDS`
-    * `HOTEL_CONTROLLER_INTEGRATIONSERVICE_APIKEY`
+    * `MONGODB_USERNAME`: Mongodb username (defaults to admin123)
+    * `MONGODB_PASSWORD`: Mongodb password (defaults to pass123)
 
 Add verification-agent-url, verification-agent-key,credential-definition-id in application-dev.yml file.
 
@@ -51,7 +38,7 @@ The first step will deploy a MongoDB instance. The second step will deploy the a
 
 If the container won`t start, or you want to recreate all containers just run
 ```
-docker-compose -f src/main/docker/agent-mongodb.yml down --remove-orphants
+docker-compose -f src/main/docker/agent-mongodb.yml down -v --remove-orphans
 ```
 and rebuild the containers with
 ```
