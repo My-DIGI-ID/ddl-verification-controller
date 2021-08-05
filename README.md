@@ -51,7 +51,7 @@ The first step will deploy a MongoDB instance. The second step will deploy the a
 
 If the container won`t start, or you want to recreate all containers just run
 ```
-docker-compose -f src/main/docker/agent-mongodb.yml down -V --remove-orphants
+docker-compose -f src/main/docker/agent-mongodb.yml down --remove-orphants
 ```
 and rebuild the containers with
 ```
