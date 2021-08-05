@@ -22,14 +22,14 @@ logging:
 ssibk:
   verification:
     controller:
-      apikey: 123
-      endpoint: https://4306bffebb0f.ngrok.io # PORT: 8089
+      apikey: demoAgentApiKey
+      endpoint: https://dcf8d7183850.ngrok.io # PORT: 8089
 
       agent:
         apikey: secure
         apiurl: localhost:10080 # the DDL agent admin url
         recipientkey: CmXTKRddBz5mXxVvJjWv4XzSW8rTotCXPjA9cHdQb6X1 # the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
-        endpoint: https://72a74187ac88.ngrok.io # the DDL agent endpoint | PORT: 10000
+        endpoint: https://22c744481691.ngrok.io # the DDL agent endpoint | PORT: 10000
         endpointName: DDL Verification # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
 
         # The credential definition ids of all ddl ids that will be accepted in the proof
