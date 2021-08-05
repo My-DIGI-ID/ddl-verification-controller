@@ -39,7 +39,14 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
         Map<String, Map<String, String>> values = (Map) presentation.getRequestedProof().getRevealedAttrGroups().getDdl().getValues();
         String issuedDate = values.get(expiryCheckAttribute).get("raw");
 
-        boolean isValid = issueDateValid(issuedDate, expiryCheckFormat);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
+
+        boolean isValid = issueDateValid(issuedDate, expiryCheckFormat, now, "0");
 
         if (isValid) {
             return new RequestPresentationValidationResult(true, "Verification succeeded");
@@ -49,14 +56,7 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
     }
 
     @Override
-    public boolean issueDateValid(String issueDate, String format) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        Date now = cal.getTime();
-
+    public boolean issueDateValid(String issueDate, String format, Date now, String validityValue) {
         DateFormat simpleDateFormat = new SimpleDateFormat(format);
 
         try {
@@ -64,7 +64,7 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
 
             Date dateOfIssuing = Date.from(dateOfIssuingInstant);
 
-            Instant start = now.toInstant().minus(Long.parseLong(expiryCheckValidity), ChronoUnit.DAYS);
+            Instant start = now.toInstant().minus(Long.parseLong(validityValue), ChronoUnit.DAYS);
             Instant end = now.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
 
             return dateOfIssuing.before(Date.from(end)) && (dateOfIssuing.after(Date.from(start)) || dateOfIssuing.equals(Date.from(start)));
