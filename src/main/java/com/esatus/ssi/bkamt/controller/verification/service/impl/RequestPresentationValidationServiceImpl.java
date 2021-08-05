@@ -40,6 +40,7 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
         String issuedDate = values.get(expiryCheckAttribute).get("raw");
 
         boolean isValid = issueDateValid(issuedDate, expiryCheckFormat);
+
         if (isValid) {
             return new RequestPresentationValidationResult(true, "Verification succeeded");
         } else {

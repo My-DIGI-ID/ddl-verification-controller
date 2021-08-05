@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-		<style>
+<head>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+    <style>
 		html{
 			font-family: Arial;
 			font-size: 10pt;
 		}
-		</style>
-		<title>Verification Controller Demo</title>
-		<script>
-			function requestVerification(){			
+
+
+
+
+    </style>
+    <title>Verification Controller Demo</title>
+    <script>
+			function requestVerification(){
 				var xhttp = new XMLHttpRequest();
 		  		xhttp.onreadystatechange = function() {
 		    	if (this.readyState == 4 && this.status == 200) {
@@ -28,30 +33,80 @@
 		  		xhttp.setRequestHeader("X-API-Key", document.getElementById('apiKey').value);
 		  		xhttp.setRequestHeader("Content-Type", document.getElementById('contentType').value);
 		  		xhttp.send(document.getElementById('request').value);
+
+		  		var backUrl = JSON.parse(document.getElementById('request').value);
+
+		  		var a = document.createElement('a');
+		  		a.setAttribute('href',backUrl.callbackURL);
+                a.innerText = backUrl.callbackURL;
+                a.target = "_blank";
+                document.getElementById('callbackUrl').innerHTML = '';
+		  		document.getElementById('callbackUrl').appendChild(a);
 			}
-		</script>
-	</head>
-	<body>
-	<h2>Step 1: Initialize verification</h2>
-	<h3>Request</h3>
-	<label for="apiKey">X-API-Key Header:</label><br />
-	<input type="text" style="width: 100%" id="apiKey" name="apiKey" value="secure" /><br /><br />
-	<label for="contentType">Content-Type Header:</label><br />
-	<input type="text" style="width: 100%" id="contentType" name="contentType" value="application/json;charset=UTF-8" readonly="readonly" /><br /><br />
-	<label for="request">Request Metadata: </label><br />
-	<textarea name="request" id="request" style="width: 100%; height: 50px">
-{
-    "callbackURL": "https://callback.example.org/49f03689-2ff3-4339-9a02-6a5acf1062b3"
-}
-	</textarea><br /><br />
-	<input type="button" value="Request Verification" onclick="requestVerification()" /><br /><br />
-	<h3>Response</h3>
-	<label for="verid">Verification ID: </label><br />
-	<input type="text" id="verid" name="verid" style="width: 100%" /><br /><br />
-	<label for="uri">URI: </label><br />
-	<input type="text" style="width: 100%" id="uri" name="uri" />
-	<h2>Step 2: Scan QR Code & answer proof</h2>
-	<div id="qrcode"></div>
-	<h2>Step 3: Check verification result (sent to given callback URL)</h2>
-	</body>
+
+
+
+
+    </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<div class="container-fluid">
+    <h1>Verification Controller Demo</h1>
+    <hr/>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Step 1: Initialize verification</h2>
+            <hr/>
+            <h3>Request</h3>
+            <div class="form-group">
+                <label for="apiKey">X-API-Key Header:</label>
+                <input class="form-control" type="text" id="apiKey" name="apiKey" value="secure"/>
+            </div>
+            <div class="form-group">
+                <label for="contentType">Content-Type Header:</label>
+                <input class="form-control" type="text" id="contentType" name="contentType"
+                       value="application/json;charset=UTF-8" readonly="readonly"/>
+            </div>
+            <div class="form-group">
+                <label for="request">Request Metadata: </label>
+                <textarea class="form-control" rows="3" name="request" id="request">
+        {
+            "callbackURL": "https://callback.example.org/49f03689-2ff3-4339-9a02-6a5acf1062b3"
+        }
+            </textarea>
+            </div>
+            <input type="button" class="btn btn-primary btn-block" value="Request Verification"
+                   onclick="requestVerification()"/>
+        </div>
+        <div class="col-md-6">
+            <h3>Response</h3>
+            <div>
+                <label for="verid">Verification ID:</label>
+                <input class="form-control" type="text" id="verid" name="verid"/>
+            </div>
+            <div>
+                <label for="uri">URI:</label>
+                <input class="form-control" type="text" id="uri" name="uri"/>
+            </div>
+            <div class="mt-5">
+                <h2>Step 2: Scan QR Code & answer proof</h2>
+                <small class="form-text text-muted">Scan this code with you ID-Wallet App</small>
+                <hr/>
+                <div id="qrcode"></div>
+                <div class="mt-5">
+                    <h2>Step 3: Check verification result (sent to given callback URL)</h2>
+                    <small class="form-text text-muted">URL the data will be send to</small>
+                    <hr/>
+                    <div>
+                        <label for="callbackUrl">Callback-URI:</label>
+                        <div id="callbackUrl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
 </html>
