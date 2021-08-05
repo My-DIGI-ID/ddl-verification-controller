@@ -224,8 +224,6 @@ To launch your application's tests, run:
 ./mvnw verify
 ```
 
-For more information, refer to the [Running tests page][].
-
 ### Code quality
 
 Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
