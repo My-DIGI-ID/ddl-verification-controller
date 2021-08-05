@@ -49,6 +49,15 @@ docker-compose -f src/main/docker/agent-mongodb.yml up -d
 
 The first step will deploy a MongoDB instance. The second step will deploy the application.
 
+If the container won`t start, or you want to recreate all containers just run
+```
+docker-compose -f src/main/docker/agent-mongodb.yml down -V --remove-orphants
+```
+and rebuild the containers with
+```
+docker-compose -f src/main/docker/agent-mongodb.yml up
+```
+
 ## Swagger-Ui
 
 Swagger UI will be available at the following URL
@@ -168,80 +177,15 @@ To see this page call
 
 Ngrok now creates three public endpoints which are tunneled to your local endpoints
 
-## Building Docker Image
+If you currently do not have a service which can accept the request made to the callback url, you could use a service lik `https://webhook.site`.
 
-To build a docker dev image, run:
+Here you can create a temporary endpoint which you can use as a callback url. Just paste the url in the demo page here:
+![Paste callback_url](./images/demo_page_callback_url.png)
 
-```
-./mvnw package jib:dockerBuild
-```
+When everything is working you should see a request made by the application after you scanned the QR Code 
 
-This one creates a new docker image with the name verificationcontroller. To run the controller + MongoDB and the
-mongoadmin, run:
-
-```
-docker-compose -f src/main/docker/controller-mongo-mongoadmin.yml up -d
-```
-
-## Building for production
-
-### Packaging as jar
-
-To build the final jar and optimize the `verification-controller` application for production, run:
-
-```
-./mvnw -Pprod clean verify
-```
-
-To ensure everything worked, run:
-
-```
-java -jar target/*.jar
-```
-
-### Packaging as war
-
-To package your application as a war in order to deploy it to an application server, run:
-
-```
-./mvnw -Pprod,war clean verify
-```
-
-## Testing
-
-To launch your application's tests, run:
-
-```
-./mvnw verify
-```
-
-### Code quality
-
-Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
-
-```
-docker-compose -f src/main/docker/sonar.yml up -d
-```
-
-You can run a Sonar analysis by using
-the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven
-plugin.
-
-Then, run a Sonar analysis:
-
-```
-./mvnw -Pprod clean verify sonar:sonar
-```
-
-If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties
-are loaded from the sonar-project.properties file.
-
-```
-./mvnw initialize sonar:sonar
-```
 
 ## Troubleshooting
 
 ### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException...
-
 - Remove the .m2 folder in your user directory and rebuild with ``mvnw``
