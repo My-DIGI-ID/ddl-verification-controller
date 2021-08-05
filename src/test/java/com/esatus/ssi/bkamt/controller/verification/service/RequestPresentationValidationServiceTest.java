@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -27,77 +25,112 @@ public class RequestPresentationValidationServiceTest {
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseNoDateWasPassed() {
-        Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("", DATE_FORMAT);
+        var isValid = requestPresentationValidationService.issueDateValid("", DATE_FORMAT, new Date(), "0");
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseAnInvalidDateWasPassed() {
-        Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("12.20.2587", DATE_FORMAT);
+        var isValid = requestPresentationValidationService.issueDateValid("12.20.2587", DATE_FORMAT, new Date(), "0");
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnTrueBecauseTheValidityWasSetTo1Day() {
-        Instant expirationDate = new Date().toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid("20210803", DATE_FORMAT);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 4);
+        cal.set(Calendar.MONTH, 7); // January = 0
+        cal.set(Calendar.YEAR, 2021);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
+
+        var isValid = requestPresentationValidationService.issueDateValid("20210803", DATE_FORMAT, now, "1");
         Assertions.assertThat(isValid).isTrue();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnTrue() {
-        Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        String strDate = format.format(date);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 4);
+        cal.set(Calendar.MONTH, 7); // January = 0
+        cal.set(Calendar.YEAR, 2021);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
 
-        Instant expirationDate = date.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT);
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        String strDate = format.format(now);
+
+        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT, now, "0");
         Assertions.assertThat(isValid).isTrue();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneDayBefore() {
-        Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        String strDate = format.format(date);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 5);
+        cal.set(Calendar.MONTH, 7); // January = 0
+        cal.set(Calendar.YEAR, 2021);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
 
-        Instant expirationDate = date.toInstant().minus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT);
+        var isValid = requestPresentationValidationService.issueDateValid("20210803", DATE_FORMAT, now, "1");
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
     public void validateDateOfIssueDate_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneWeekBefore() {
-        Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        String strDate = format.format(date);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 5);
+        cal.set(Calendar.MONTH, 7); // January = 0
+        cal.set(Calendar.YEAR, 2021);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
 
-        Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT);
+        var isValid = requestPresentationValidationService.issueDateValid("20210729", DATE_FORMAT, now, "0");
         Assertions.assertThat(isValid).isFalse();
     }
 
     @Test
     public void validateDateOfIssueDateWithGermanDateFormat_IsValid_ShouldReturnTrue() {
-        Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(DATE_FORMAT_DE);
-        String strDate = format.format(date);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 4);
+        cal.set(Calendar.MONTH, 7); // January = 0
+        cal.set(Calendar.YEAR, 2021);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
 
-        Instant expirationDate = date.toInstant().plus(Long.parseLong("1"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE);
+        var isValid = requestPresentationValidationService.issueDateValid("04.08.2021", DATE_FORMAT_DE, now, "0");
         Assertions.assertThat(isValid).isTrue();
     }
 
     @Test
     public void validateDateOfIssueDateWithGermanDateFormat_IsValid_ShouldReturnFalseBecauseTheExpirationDateIsOneWeekBefore() {
-        Date date = Calendar.getInstance().getTime();
-        DateFormat format = new SimpleDateFormat(DATE_FORMAT_DE);
-        String strDate = format.format(date);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 4);
+        cal.set(Calendar.MONTH, 7); // January = 0
+        cal.set(Calendar.YEAR, 2021);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date now = cal.getTime();
 
-        Instant expirationDate = date.toInstant().minus(Long.parseLong("7"), ChronoUnit.DAYS);
-        var isValid = requestPresentationValidationService.issueDateValid(strDate, DATE_FORMAT_DE);
+        var isValid = requestPresentationValidationService.issueDateValid("29.07.2021", DATE_FORMAT_DE, now, "0");
         Assertions.assertThat(isValid).isFalse();
     }
 }

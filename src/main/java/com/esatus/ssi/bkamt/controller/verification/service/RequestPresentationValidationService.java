@@ -19,7 +19,9 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 import com.esatus.ssi.bkamt.agent.client.model.V10PresentationExchange;
 import com.esatus.ssi.bkamt.controller.verification.domain.RequestPresentationValidationResult;
 
+import java.util.Date;
+
 public interface RequestPresentationValidationService {
     RequestPresentationValidationResult validatePresentationExchange(V10PresentationExchange presentationExchange);
-    boolean issueDateValid(String validUntil, String format);
+    boolean issueDateValid(String validUntil, String format, Date now, String validityValue);
 }
