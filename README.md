@@ -49,6 +49,15 @@ docker-compose -f src/main/docker/agent-mongodb.yml up -d
 
 The first step will deploy a MongoDB instance. The second step will deploy the application.
 
+If the container won`t start, or you want to recreate all containers just run
+```
+docker-compose -f src/main/docker/agent-mongodb.yml down -V --remove-orphants
+```
+and rebuild the containers with
+```
+docker-compose -f src/main/docker/agent-mongodb.yml up
+```
+
 ## Swagger-Ui
 
 Swagger UI will be available at the following URL
