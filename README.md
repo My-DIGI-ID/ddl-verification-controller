@@ -56,26 +56,12 @@ http://localhost:8090/swagger-ui/index.html
 Note: The API key can be configured in ``src/main/resources/config/application-dev.yml`` (application properties) file which
 can be used to interact with the API.
 
-### Default authentication against the api
-
-If you want to try out the api use the user you configured in ssibk->verification->controller->admin
-
-E.g
-
-```
-	ssibk:
-	      admin:
-	        username: verification-username
-	        password: verification-password
-
-```
-
 ## MongoDB
 
-There is an database init script `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on
+There is a database init script `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on
 port 27017. The scripts creates an admin user with username: admin123 and password: pass123.
 
-After the connection was established successfull it creates a new user:
+After the connection was established successful it creates a new user:
 
 ```
 username: user123
