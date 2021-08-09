@@ -19,6 +19,8 @@ public class VerificationRequestDTO {
     private String callbackUrl;
 
     private String verificationId;
+    
+    private String verifier;
 
     private Data data;
 
@@ -73,4 +75,12 @@ public class VerificationRequestDTO {
     public void setVerificationId(String verificationId) {
         this.verificationId = verificationId;
     }
+
+	public String getVerifier() {
+		return verifier;
+	}
+
+	public void setVerifier(String verifier) {
+		this.verifier = verifier;
+	}
 }

@@ -146,16 +146,13 @@ Open three terminals and navigate to the folder ngrok is located in each instanc
 
 ### Open demo page
 When the application runs with dev profile there is demo website where you can generate a QR-Code to scan with your Wallet-ID App.
-To see this page call 
-
-Ngrok now creates three public endpoints which are tunneled to your local endpoints
 
 If you currently do not have a service which can accept the request made to the callback url, you could use a service lik `https://webhook.site`.
 
 Here you can create a temporary endpoint which you can use as a callback url. Just paste the url in the demo page here:
 ![Paste callback_url](./images/demo_page_callback_url.png)
 
-When everything is working you should see a request made by the application after you scanned the QR Code 
+When everything is working you should see a request made by the application after you scanned the QR Code on the callback url
 
 
 ## Troubleshooting

@@ -16,6 +16,7 @@
 
 package com.esatus.ssi.bkamt.controller.verification.web.rest;
 
+import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestService;
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
@@ -37,6 +38,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 /**
  * REST controller for managing verifiers.
@@ -69,15 +71,21 @@ public class VerifierController {
      *         with the given name does already exist.
      */
     @PostMapping("/init")
-    public ResponseEntity<VerificationResponseDTO> createPresentationRequest(@Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
+    public ResponseEntity<VerificationResponseDTO> createPresentationRequest(@RequestHeader(value="X-API-KEY") String verifierApiKey, @Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
         boolean isMetaDataCompliant = verifierService.checkMetaDataCompliance(verificationRequestMetadata);
 
         if(!isMetaDataCompliant) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Meta data compliance check failed");
         }
 
+        Optional<Verifier> verifierOptional = verifierService.getOneByApiKey(verifierApiKey);
+
+        if(verifierOptional.isEmpty()) {
+        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
         try {
-            VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestMetadata);
+            VerificationRequestDTO createdVerificationRequest  = this.verificationRequestService.createVerificationRequest(verificationRequestMetadata, verifierOptional.get().getId());
 
             String verificationId = createdVerificationRequest.getVerificationId();
 
@@ -99,8 +107,20 @@ public class VerifierController {
      *         {@code 400 (Bad Request)} when the invalidation failed
 	 */
 	@PostMapping("/invalidate")
-	public ResponseEntity<Void> invalidateVerification(@RequestParam(name = "verificationId") String verificationId) {
+	public ResponseEntity<Void> invalidateVerification(@RequestHeader(value="X-API-KEY") String verifierApiKey, @RequestParam(name = "verificationId") String verificationId) {
         log.debug("REST request to invalid meta data for verification with id {}", verificationId);
+
+        // Fetch verifier and verification
+        Optional<Verifier> verifierOptional = verifierService.getOneByApiKey(verifierApiKey);
+        Optional<VerificationRequestDTO> verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
+
+        if(verifierOptional.isEmpty() || verificationRequestOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if(!verifierOptional.get().getId().equals(verificationRequestOptional.get().getVerifier())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         try {
             verifierService.invalidateVerification(verificationId);

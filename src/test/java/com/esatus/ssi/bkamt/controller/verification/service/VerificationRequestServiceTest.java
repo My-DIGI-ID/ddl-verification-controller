@@ -55,7 +55,7 @@ public class VerificationRequestServiceTest {
         verificationRequestMetadata.setValidUntil("");
         verificationRequestMetadata.setData(new Data());
 
-        verificationRequestService.createVerificationRequest(verificationRequestMetadata);
+        verificationRequestService.createVerificationRequest(verificationRequestMetadata, "");
 
         Mockito.verify(verificationRepository, Mockito.times(1)).save(Mockito.isA(VerificationRequest.class));
     }
@@ -71,7 +71,7 @@ public class VerificationRequestServiceTest {
         verificationRequestMetadata.setValidUntil("");
         verificationRequestMetadata.setData(new Data());
 
-        verificationRequestService.createVerificationRequest(verificationRequestMetadata);
+        verificationRequestService.createVerificationRequest(verificationRequestMetadata, "");
 
         Mockito.verify(verificationRequestMapper, Mockito.times(1)).verificationRequestToVerificationRequestDTO(Mockito.isA(VerificationRequest.class));
     }
