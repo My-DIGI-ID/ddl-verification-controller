@@ -25,9 +25,12 @@ import com.esatus.ssi.bkamt.controller.verification.service.mapper.VerifierMappe
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for managing verifications.
@@ -56,11 +59,21 @@ public class VerifierServiceImpl implements VerifierService {
     public void invalidateVerification(String verificationId) {
         // TODO: Make sure that only the creator can invalidate the verification
         log.debug("invalidate verification with id {}", verificationId);
-        verificationRequestRepository.deleteById(verificationId);
+        verificationRequestRepository.deleteByVerificationId(verificationId);
     }
 
     @Override
     public boolean checkMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata) {
         return true;
     }
+
+	@Override
+	public Optional<Verifier> getOneByApiKey(String apiKey) {
+		List<Verifier> all = verifierRepository.findAll();
+
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12, new SecureRandom());
+		Optional<Verifier> verifierOptional = all.stream().filter((Verifier verifier) -> bCryptPasswordEncoder.matches(apiKey, verifier.getApiKey())).findFirst();
+
+		return verifierOptional;
+	}
 }

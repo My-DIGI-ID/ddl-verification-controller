@@ -153,8 +153,8 @@ Currently, there are three different security mechanisms for these endpoints:
 ## Testing with your mobile device and the ID Wallet App
 To test the whole application with your mobile phone you need to make sure the following prerequisites are met:
 * You have the ID Wallet app installed on your mobile device
-  * iOS: https://apps.apple.com/at/app/id-wallet/id1564933989 
-  * Android: https://play.google.com/store/apps/details?id=com.digitalenabling.idw&hl=de&gl=US
+    * iOS: https://apps.apple.com/at/app/id-wallet/id1564933989
+    * Android: https://play.google.com/store/apps/details?id=com.digitalenabling.idw&hl=de&gl=US
 * All containers are running without any errors
 * You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of you favourite tools on how to use it
 
@@ -173,7 +173,7 @@ Open three terminals and navigate to the folder ngrok is located in each instanc
 
 ### Open demo page
 When the application runs with dev profile there is demo website where you can generate a QR-Code to scan with your Wallet-ID App.
-To see this page call 
+To see this page call
 
 Ngrok now creates three public endpoints which are tunneled to your local endpoints
 

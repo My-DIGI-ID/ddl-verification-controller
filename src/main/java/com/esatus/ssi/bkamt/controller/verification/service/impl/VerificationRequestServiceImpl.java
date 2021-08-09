@@ -46,8 +46,9 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
     private VerificationRequestMapper verificationRequestMapper;
 
     @Override
-    public VerificationRequestDTO createVerificationRequest(VerificationRequestMetadata verificationRequestMetadata) {
+    public VerificationRequestDTO createVerificationRequest(VerificationRequestMetadata verificationRequestMetadata, String verifierId) {
         VerificationRequest verificationRequest = new VerificationRequest();
+        verificationRequest.setVerifier(verifierId);
         verificationRequest.setCallbackUrl(verificationRequestMetadata.getCallbackURL());
         verificationRequest.setValidUntil(verificationRequestMetadata.getValidUntil());
 

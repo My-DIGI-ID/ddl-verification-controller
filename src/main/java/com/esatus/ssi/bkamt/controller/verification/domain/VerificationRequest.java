@@ -39,6 +39,8 @@ public class VerificationRequest extends AbstractAuditingEntity {
     private String callbackUrl;
 
     private String validUntil;
+    
+    private String verifier;
 
     private Data data;
 
@@ -93,4 +95,12 @@ public class VerificationRequest extends AbstractAuditingEntity {
     public void setVerificationId(String verificationId) {
         this.verificationId = verificationId;
     }
+
+	public String getVerifier() {
+		return verifier;
+	}
+
+	public void setVerifier(String verifier) {
+		this.verifier = verifier;
+	}
 }

@@ -24,7 +24,7 @@ import com.esatus.ssi.bkamt.controller.verification.service.exceptions.Verificat
 import java.util.Optional;
 
 public interface VerificationRequestService {
-    VerificationRequestDTO createVerificationRequest(VerificationRequestMetadata VerificationRequestMetadata) throws PresentationRequestsAlreadyExists;
+    VerificationRequestDTO createVerificationRequest(VerificationRequestMetadata VerificationRequestMetadata, String verifier) throws PresentationRequestsAlreadyExists;
     Optional<VerificationRequestDTO> getById(String id);
     Optional<VerificationRequestDTO> getByPresentationExchangeId(String presentationExchangeId);
     Optional<VerificationRequestDTO> getByVerificationId(String verificationId);

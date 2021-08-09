@@ -22,25 +22,25 @@ logging:
 ssibk:
   verification:
     controller:
-      apikey: demoAgentApiKey
-      endpoint: https://dcf8d7183850.ngrok.io # PORT: 8089
+      apiKey: ${VERIFICATIONCONTROLLER_APIKEY} # apikey: demoAgentApiKey
+      endpoint: ${VERIFICATIONCONTROLLER_ENDPOINT} # endpoint: https://2192847001ad.ngrok.io # PORT: 8089
 
       agent:
-        apikey: secure
-        apiurl: localhost:10080 # the DDL agent admin url
-        recipientkey: CmXTKRddBz5mXxVvJjWv4XzSW8rTotCXPjA9cHdQb6X1 # the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
-        endpoint: https://22c744481691.ngrok.io # the DDL agent endpoint | PORT: 10000
-        endpointName: DDL Verification # the name of the endpoint (visible to end users in the proof request dialog of the wallet app)
+        apikey: ${VERIFICATIONCONTROLLER_AGENT_APIKEY}  # e.g. secure
+        apiurl: ${VERIFICATIONCONTROLLER_AGENT_APIURL} # the DDL agent admin url (e.g. localhost:10080)
+        recipientkey: ${VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY} # the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
+        endpoint: ${VERIFICATIONCONTROLLER_AGENT_ENDPOINT} # the DDL agent endpoint | PORT: 10000
+        endpointName: ${VERIFICATIONCONTROLLER_AGENT_ENDPOINTNAME} # the name of the endpoint (visible to end users in the proof request dialog of the wallet app). e.g.  DDL Verification
 
         # The credential definition ids of all ddl ids that will be accepted in the proof
         ddl:
-          credential_definition_ids: XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
-          requested_attributes: Ausstellungsdatum,Name
+          # credential_definition_ids: e.g. XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
+          credential_definition_ids: ${VERIFICATIONCONTROLLER_CRED_DEFINITION_IDS}
+          requested_attributes: firstName,familyName,dateOfIssuance,dateOfBirth
 
       expiryCheck:
-        attribute: Ausstellungsdatum
-        # format: yyyyMMdd
-        format: dd.MM.yyyy
+        attribute: dateOfIssuance
+        format: yyyyMMdd
         validity: 0
 
 

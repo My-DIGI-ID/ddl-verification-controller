@@ -47,8 +47,17 @@ public class DatabaseInit {
             Verifier verifier = new Verifier();
             verifier.setId(id);
             verifier.setName("esatus AG");
-            verifier.setApiKey("$2y$10$AW0Zit2JNBcTI0UDpPmc4OM72nm86AyvoOfV7GJOP4iropj9IuyVS");
+            verifier.setApiKey("$2y$10$AW0Zit2JNBcTI0UDpPmc4OM72nm86AyvoOfV7GJOP4iropj9IuyVS"); // secure
             verifierRepository.insert(verifier);
+        }
+
+        String id2 = "b8e17511-8b7f-45e9-9212-017773719472";
+        if (!this.verifierRepository.existsById(id2)) {
+            Verifier verifier2 = new Verifier();
+            verifier2.setId(id2);
+            verifier2.setName("Skywalker AG");
+            verifier2.setApiKey("$2a$12$8XTDPXSiuY4bfJp.XZmg0ejbGWj0bz3y7u/4jZPEI3yOJRVhmetbm"); // secure2
+            verifierRepository.insert(verifier2);
         }
     }
 }

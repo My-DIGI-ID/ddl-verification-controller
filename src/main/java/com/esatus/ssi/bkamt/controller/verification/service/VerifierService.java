@@ -20,9 +20,11 @@ import com.esatus.ssi.bkamt.controller.verification.domain.Verifier;
 import com.esatus.ssi.bkamt.controller.verification.models.VerificationRequestMetadata;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface VerifierService {
     List<Verifier> getAll();
+    Optional<Verifier> getOneByApiKey(String apiKey);
     void invalidateVerification(String verificationId);
     boolean checkMetaDataCompliance(VerificationRequestMetadata verificationRequestMetadata);
 }
