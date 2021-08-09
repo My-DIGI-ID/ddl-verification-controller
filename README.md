@@ -45,6 +45,33 @@ and rebuild the containers with
 docker-compose -f src/main/docker/agent-mongodb.yml up
 ```
 
+## Sonar
+Sonar is used to analyse code quality.
+
+1. Start a local Sonar server
+   ```
+   docker-compose -f src/main/docker/sonar.yml up -d
+   ```
+1. Log on to http://localhost:9001 with default credentials `admin/admin`
+1. Create a new empty project called `VerificationController`
+1. Generate an access token an copy it to `sonar-project.properties`, property `sonar.login`
+
+You can run a Sonar analysis by using
+the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven
+plugin.
+
+1. Run a Sonar analysis
+   ```
+   ./mvnw -Pprod clean verify sonar:sonar
+   ```
+   **Note:** To re-run the Sonar phase, make sure to specify the `initialize` phase to load the essential Sonar properties
+   from the `sonar-project.properties` file.
+   ```
+   ./mvnw initialize sonar:sonar
+   ```
+1. Access the results on http://localhost:9001/dashboard?id=VerificationController
+
+
 ## Swagger-Ui
 
 Swagger UI will be available at the following URL
@@ -155,8 +182,7 @@ If you currently do not have a service which can accept the request made to the 
 Here you can create a temporary endpoint which you can use as a callback url. Just paste the url in the demo page here:
 ![Paste callback_url](./images/demo_page_callback_url.png)
 
-When everything is working you should see a request made by the application after you scanned the QR Code 
-
+When everything is working you should see a request made by the application after you scanned the QR Code
 
 ## Troubleshooting
 
