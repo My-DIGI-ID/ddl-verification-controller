@@ -110,7 +110,6 @@ public class VerifierController {
 	public ResponseEntity<Void> invalidateVerification(@RequestHeader(value="X-API-KEY") String verifierApiKey, @RequestParam(name = "verificationId") String verificationId) {
         log.debug("REST request to invalid meta data for verification with id {}", verificationId);
 
-        // Fetch verifier and verification
         Optional<Verifier> verifierOptional = verifierService.getOneByApiKey(verifierApiKey);
         Optional<VerificationRequestDTO> verificationRequestOptional = verificationRequestService.getByVerificationId(verificationId);
 
@@ -118,7 +117,10 @@ public class VerifierController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if(!verifierOptional.get().getId().equals(verificationRequestOptional.get().getVerifier())) {
+        String verifier = verifierOptional.get().getId();
+        String verificationVerifier = verificationRequestOptional.get().getVerifier();
+
+        if(!verifier.equals(verificationVerifier)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

@@ -59,7 +59,7 @@ public class VerifierServiceImpl implements VerifierService {
     public void invalidateVerification(String verificationId) {
         // TODO: Make sure that only the creator can invalidate the verification
         log.debug("invalidate verification with id {}", verificationId);
-        verificationRequestRepository.deleteById(verificationId);
+        verificationRequestRepository.deleteByVerificationId(verificationId);
     }
 
     @Override
@@ -70,10 +70,10 @@ public class VerifierServiceImpl implements VerifierService {
 	@Override
 	public Optional<Verifier> getOneByApiKey(String apiKey) {
 		List<Verifier> all = verifierRepository.findAll();
-		
+
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12, new SecureRandom());
 		Optional<Verifier> verifierOptional = all.stream().filter((Verifier verifier) -> bCryptPasswordEncoder.matches(apiKey, verifier.getApiKey())).findFirst();
-		
+
 		return verifierOptional;
 	}
 }

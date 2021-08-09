@@ -54,7 +54,7 @@ public class DatabaseInit {
         String id2 = "b8e17511-8b7f-45e9-9212-017773719472";
         if (!this.verifierRepository.existsById(id2)) {
             Verifier verifier2 = new Verifier();
-            verifier2.setId(id);
+            verifier2.setId(id2);
             verifier2.setName("Skywalker AG");
             verifier2.setApiKey("$2a$12$8XTDPXSiuY4bfJp.XZmg0ejbGWj0bz3y7u/4jZPEI3yOJRVhmetbm"); // secure2
             verifierRepository.insert(verifier2);

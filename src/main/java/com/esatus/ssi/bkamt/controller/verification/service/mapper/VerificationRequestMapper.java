@@ -36,6 +36,7 @@ public class VerificationRequestMapper {
             verificationRequestDTO.setVerificationId(verificationRequest.getVerificationId());
             verificationRequestDTO.setData(verificationRequest.getData());
             verificationRequestDTO.setCallbackUrl(verificationRequest.getCallbackUrl());
+            verificationRequestDTO.setVerifier(verificationRequest.getVerifier());
 
             return verificationRequestDTO;
         }
