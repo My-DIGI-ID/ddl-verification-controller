@@ -2,7 +2,20 @@
 
 ## Prerequisites
 
-### Environment variables
+### Application Environment variables
+To start the application there are several environment variables to set:
+* ``VERIFICATIONCONTROLLER_APIKEY`` Apikey of the verification controller
+* ``VERIFICATIONCONTROLLER_ENDPOINT`` Endpoint of the verification controller running on Port 8090
+* ``VERIFICATIONCONTROLLER_AGENT_APIKEY`` Api-Key for the agent
+* ``VERIFICATIONCONTROLLER_AGENT_APIURL`` Api-Url of the admin url (e.g. localhost:10080)
+* ``VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY`` the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running 
+* ``VERIFICATIONCONTROLLER_AGENT_ENDPOINT`` the DDL agent endpoint | PORT: 10000
+* ``VERIFICATIONCONTROLLER_AGENT_ENDPOINTNAME`` the name of the endpoint (visible to end users in the proof request dialog of the wallet app). e.g.  DDL Verification
+* ``VERIFICATIONCONTROLLER_CRED_DEFINITION_IDS`` Comma seperated credential definitions
+
+You can see how they are used in the ``application-dev.yml`` file under ``src/main/resources/config/application-dev.yml``
+
+### Docker Environment variables
 
 Navigate to `src/main/docker/` and rename the `.env-default` file to `.env`. This file is used by docker to set all
 required environment variables passed into the docker containers.
