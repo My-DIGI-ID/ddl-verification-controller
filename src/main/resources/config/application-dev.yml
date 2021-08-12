@@ -62,7 +62,7 @@ spring:
       indent-output: true
   data:
     mongodb:
-      uri: mongodb://user123:123pass@localhost:27018/?authSource=VerificationController
+      uri: mongodb://<user>:<password>@localhost:27018/?authSource=VerificationController
       database: VerificationController
       auto-index-creation: false
 
