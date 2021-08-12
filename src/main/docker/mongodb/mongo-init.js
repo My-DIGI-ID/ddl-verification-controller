@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-var db = connect("mongodb://admin123:pass123@localhost:27017/admin");
+// Replace username and password with the values from .env (MONGODB_USERNAME and MONGODB_PASSWORD)
+var db = connect("mongodb://<username>:<password>>@localhost:27017/admin");
 
 db = db.getSiblingDB('VerificationController');
 
+// Replace the <user> and <password> placeholders, this will later be used in the connection string in the adminmongo ui (e.g. mongodb://<user>:<password>@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController)
 db.createUser(
     {
-        user: "user123",
-        pwd: "123pass",
+        user: <user>,
+        pwd: <password>,
         roles: [ { role: "readWrite", db: "VerificationController"} ],
         passwordDigestor: "server",
     }
@@ -45,4 +47,4 @@ db.createRole(
        ],
     roles:[]})
 
-db.grantRolesToUser('user123', ['readWriteSystem'])
+db.grantRolesToUser(<user>, ['readWriteSystem'])
