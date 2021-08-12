@@ -37,6 +37,12 @@ There are different variables to set:
 
 Add verification-agent-url, verification-agent-key,credential-definition-id in application-dev.yml file.
 
+**Important**
+Replace the placeholders in the mongodb init file in ``/src/main/docker/mongodb/mogno-init.js`` with the correct values,
+otherwise the mongodb will not be initialized and the connection will fail.
+
+
+
 ## Development
 
 To start your application in the dev profile, open the terminal, navigate to the `verification-controller` folder and

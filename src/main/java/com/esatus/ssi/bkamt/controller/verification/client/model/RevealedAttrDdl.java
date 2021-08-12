@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RevealedAttrDdl {
 
+
     @JsonProperty("sub_proof_index")
     private Integer subProofIndex;
 
