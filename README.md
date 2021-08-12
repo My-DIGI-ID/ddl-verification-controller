@@ -41,7 +41,14 @@ Add verification-agent-url, verification-agent-key,credential-definition-id in a
 Replace the placeholders in the mongodb init file in ``/src/main/docker/mongodb/mogno-init.js`` with the correct values,
 otherwise the mongodb will not be initialized and the connection will fail.
 
-
+Replace the placeholder for the mongodb connection in applications-dev.yml 
+```
+data:
+  mongodb:
+    uri: mongodb://<user>:<password>@localhost:27018/?authSource=VerificationController
+    database: VerificationController
+    auto-index-creation: false
+```
 
 ## Development
 
