@@ -55,13 +55,14 @@ public class HardwareDidValidationServiceImpl implements HardwareDidValidationSe
         ecdsaVerify.initVerify(publicKey);
         ecdsaVerify.update(hardwareDidProof.getBytes(StandardCharsets.UTF_8));
 
-        byte[] nonceBytes = GetNonce(nonce, 1);
+        byte[] nonceBytes = GetNonce(nonce);
         return ecdsaVerify.verify(Base64.getDecoder().decode(nonceBytes));
     }
 
-    private static byte[] GetNonce(String issuerNonce, Integer endingAsInt)
+    private static byte[] GetNonce(String issuerNonce)
     {
-        byte ending = endingAsInt.byteValue();
+        // TODO: Add reference why the 1 is added to the nonce from the documentation file
+        byte ending = ((Integer) 1).byteValue();
 
         byte[] bytesNonce = Base64.getDecoder().decode(issuerNonce);
         byte[] bytesConst = new byte[] { ending };

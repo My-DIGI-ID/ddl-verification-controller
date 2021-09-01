@@ -39,10 +39,12 @@ public class VerificationRequest extends AbstractAuditingEntity {
     private String callbackUrl;
 
     private String validUntil;
-    
+
     private String verifier;
 
     private Data data;
+
+    private String nonce;
 
     public VerificationRequest() {
         this.verificationId = UUID.randomUUID().toString();
@@ -103,4 +105,12 @@ public class VerificationRequest extends AbstractAuditingEntity {
 	public void setVerifier(String verifier) {
 		this.verifier = verifier;
 	}
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
+    }
 }

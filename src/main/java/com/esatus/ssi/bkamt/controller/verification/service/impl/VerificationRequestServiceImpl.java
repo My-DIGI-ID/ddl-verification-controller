@@ -96,4 +96,21 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
         log.debug("update verification {} and set thread id {}", verificationId, presentationExchangeId);
         this.verificationRequestMapper.verificationRequestToVerificationRequestDTO(vr);
     }
+
+    @Override
+    public void updateNonce(String verificationId, String generatedNonce) throws VerificationNotFoundException {
+        Optional<VerificationRequest> verificationOpt = verificationRepository.findByVerificationId(verificationId);
+
+        if (verificationOpt.isEmpty()) {
+            throw new VerificationNotFoundException();
+        }
+
+        VerificationRequest vr = verificationOpt.get();
+        vr.setNonce(generatedNonce);
+
+        verificationRepository.save(vr);
+
+        log.debug("update verification {} and set nonce {}", verificationId, generatedNonce);
+        this.verificationRequestMapper.verificationRequestToVerificationRequestDTO(vr);
+    }
 }

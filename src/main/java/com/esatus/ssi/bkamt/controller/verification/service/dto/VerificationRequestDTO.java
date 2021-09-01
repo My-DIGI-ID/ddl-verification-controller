@@ -41,6 +41,8 @@ public class VerificationRequestDTO {
 
     private Data data;
 
+    private String nonce;
+
     public VerificationRequestDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -51,6 +53,7 @@ public class VerificationRequestDTO {
         this.callbackUrl = verificationRequest.getCallbackUrl();
         this.data = verificationRequest.getData();
         this.verificationId = verificationRequest.getVerificationId();
+        this.nonce = verificationRequest.getNonce();
     }
 
     public String  getId() {
@@ -100,4 +103,12 @@ public class VerificationRequestDTO {
 	public void setVerifier(String verifier) {
 		this.verifier = verifier;
 	}
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
+    }
 }

@@ -194,7 +194,8 @@ public class ProofServiceImpl implements ProofService {
     return connectionlessProofRequest;
   }
 
-  private V10PresentationCreateRequestRequest createPresentation(VerificationRequestDTO verificationRequest) {
+  private V10PresentationCreateRequestRequest createPresentation(VerificationRequestDTO verificationRequest)
+      throws VerificationNotFoundException {
     Map<String, IndyProofReqAttrSpec> requestedAttributes = createRequestedAttributes(verificationRequest);
 
     // Composing the proof request
@@ -203,7 +204,11 @@ public class ProofServiceImpl implements ProofService {
     proofRequest.setRequestedPredicates(new HashMap<>());
     proofRequest.setRequestedAttributes(requestedAttributes);
     proofRequest.setVersion("0.1");
-    proofRequest.setNonce(generateNonce(80));
+
+    String generatedNonce = generateNonce(80);
+    proofRequest.setNonce(generatedNonce);
+
+    this.verificationRequestService.updateNonce(verificationRequest.getVerificationId(), generatedNonce);
 
     V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
     connectionlessProofCreationRequest.setComment("string");
@@ -214,7 +219,7 @@ public class ProofServiceImpl implements ProofService {
 
   /**
    * Generate a decimal nonce, using SecureRandom and DRBG algorithm
-   * 
+   *
    * @param numberOfBits The length of the nonce in bit
    * @return A string representation of the nonce
    */
