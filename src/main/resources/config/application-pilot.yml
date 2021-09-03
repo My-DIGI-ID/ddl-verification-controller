@@ -1,0 +1,121 @@
+# ===================================================================
+# Spring Boot configuration for the "dev" profile.
+#
+# This configuration overrides the application.yml file.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+logging:
+  level:
+    ROOT: INFO
+    io.github.jhipster: DEBUG
+    com.ibm.ssi.controller.verification: DEBUG
+
+ssibk:
+  verification:
+    controller:
+      apiKey: ${VERIFICATIONCONTROLLER_APIKEY} # apikey: demoAgentApiKey
+      endpoint: ${VERIFICATIONCONTROLLER_ENDPOINT} # endpoint: https://2192847001ad.ngrok.io # PORT: 8089
+
+      agent:
+        apikey: ${VERIFICATIONCONTROLLER_AGENT_APIKEY}  # e.g. secure
+        apiurl: ${VERIFICATIONCONTROLLER_AGENT_APIURL} # the DDL agent admin url (e.g. localhost:10080)
+        recipientkey: ${VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY} # the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running
+        endpoint: ${VERIFICATIONCONTROLLER_AGENT_ENDPOINT} # the DDL agent endpoint | PORT: 10000
+        endpointName: ${VERIFICATIONCONTROLLER_AGENT_ENDPOINTNAME} # the name of the endpoint (visible to end users in the proof request dialog of the wallet app). e.g.  DDL Verification
+
+        # The credential definition ids of all ddl ids that will be accepted in the proof
+        ddl:
+          # credential_definition_ids: e.g. XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
+          credential_definition_ids: ${VERIFICATIONCONTROLLER_CRED_DEFINITION_IDS}
+          requested_attributes: firstName,familyName,dateOfIssuance,dateOfBirth
+
+      expiryCheck:
+        attribute: dateOfIssuance
+        format: yyyyMMdd
+        validity: 0
+
+
+spring:
+  profiles:
+    active: dev
+    include:
+      - swagger
+      # Uncomment to activate TLS for the dev profile
+      #- tls
+  devtools:
+    restart:
+      enabled: true
+      additional-exclude: static/**
+    livereload:
+      enabled: false # we use Webpack dev server + BrowserSync for livereload
+  jackson:
+    serialization:
+      indent-output: true
+  data:
+    mongodb:
+      uri: mongodb://<user>:<password>@localhost:27018/?authSource=VerificationController
+      database: VerificationController
+      auto-index-creation: false
+
+  messages:
+    cache-duration: PT1S # 1 second, see the ISO 8601 standard
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8090
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+  # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
+  cors:
+    allowed-origins: '*'
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Authorization,Link,X-Total-Count'
+    allow-credentials: true
+    max-age: 1800
+  metrics:
+    logs: # Reports metrics in the logs
+      enabled: false
+      report-frequency: 60 # in seconds
+  logging:
+    use-json-format: false # By default, logs are not in Json format
+    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+      enabled: false
+      host: localhost
+      port: 5000
+      queue-size: 512
+  audit-events:
+    retention-period: 30 # Number of days before audit events are deleted.
+
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the JHipsterProperties above
+#
+# More documentation is available at:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# application:
