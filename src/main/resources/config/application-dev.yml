@@ -25,6 +25,8 @@ ssibk:
       apiKey: ${VERIFICATIONCONTROLLER_APIKEY} # apikey: demoAgentApiKey
       endpoint: ${VERIFICATIONCONTROLLER_ENDPOINT} # endpoint: https://2192847001ad.ngrok.io # PORT: 8089
 
+      hardware-binding: ${VERIFICATIONCONTROLLER_HARDWAREBINDING:true} # enable or disable the hardware binding
+
       agent:
         apikey: ${VERIFICATIONCONTROLLER_AGENT_APIKEY}  # e.g. secure
         apiurl: ${VERIFICATIONCONTROLLER_AGENT_APIURL} # the DDL agent admin url (e.g. localhost:10080)
