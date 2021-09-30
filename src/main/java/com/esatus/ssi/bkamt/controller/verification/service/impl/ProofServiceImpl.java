@@ -251,11 +251,11 @@ public class ProofServiceImpl implements ProofService {
     }
 
     IndyProofReqAttrSpec proofRequestDdl = new IndyProofReqAttrSpec();
-    List<String> reqAttributes = Arrays.asList(ddlRequestedAttributes);
+    ArrayList<String> reqAttributes = (ArrayList<String>) Arrays.asList(ddlRequestedAttributes);
     proofRequestDdl.setNames(reqAttributes);
 
     if (hardwareBinding) {
-      reqAttributes.add("hardwareDid");
+       reqAttributes.add("hardwareDid");
     }
 
     // Restriction regarding Revocation
@@ -296,6 +296,7 @@ public class ProofServiceImpl implements ProofService {
   private void addSelfAttestAttributes(VerificationRequestDTO verificationRequest,
       HashMap<String, IndyProofReqAttrSpec> requestedAttributes) {
     List<Object> selfAttestedAttributes = verificationRequest.getSelfAttested();
+
 
     for (Object key : selfAttestedAttributes) {
       var attributeName = (String) key;
