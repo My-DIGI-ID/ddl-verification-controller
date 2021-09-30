@@ -96,7 +96,7 @@ public class RequestPresentationValidationServiceImpl implements RequestPresenta
    * verification requests and concatenates it with 0x2. Then the hardwareDidValidationService is called to check if the
    * nonce from the initial verification request is the same nonce we get from the presentation. After this check
    * succeeds the service checks if the hardware did proof was secured with the hardware did
-   * 
+   *
    * @param presentationExchange
    * @param verificationRequest
    * @param presentation

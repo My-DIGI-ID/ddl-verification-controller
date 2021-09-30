@@ -14,12 +14,13 @@
 
 package com.esatus.ssi.bkamt.controller.verification.service.dto;
 
+import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import com.esatus.ssi.bkamt.controller.verification.domain.VerificationRequest;
-import com.esatus.ssi.bkamt.controller.verification.models.Data;
 
 public class VerificationRequestDTO {
   @Null
@@ -44,6 +45,7 @@ public class VerificationRequestDTO {
 
   public VerificationRequestDTO() {
     // Empty constructor needed for Jackson.
+      this.selfAttested = new ArrayList<>();
   }
 
   public VerificationRequestDTO(VerificationRequest verificationRequest) {
