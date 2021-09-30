@@ -7,6 +7,7 @@ To successfully start the application, several environment variables have to be 
 Find those placeholders in `application-dev.yml` and replace them:
 * ``${{VERIFICATIONCONTROLLER_APIKEY}}`` API key of the verification controller (Example: `0pen$3s4meC0ntroller`)
 * ``${{VERIFICATIONCONTROLLER_ENDPOINT}}`` Endpoint of the verification controller (Example: `https://2192847001ad.ngrok.io`)
+* ``${{VERIFICATIONCONTROLLER_HARDWAREBINDING}}`` Enable or disable hardware binding validation (``true|false``) 
 * ``${{VERIFICATIONCONTROLLER_AGENT_APIKEY}}`` Api-Key for the agent (Example: `0pen$3s4meAgent`)
 * ``${{VERIFICATIONCONTROLLER_AGENT_APIURL}}`` Api-Url of the admin url (Example: `localhost:10080`)
 * ``${{VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY}}`` DDL agent *verkey*, in this case for the seed `000...DDL`; to be retrieved via
@@ -132,7 +133,7 @@ You can use this user to connect to the database with your favorite MongoDB acce
 ```
 - localhost:8092
 - Connection-Name: Verification Controller
-- Connection-String: mongodb://user123:123pass@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController
+- Connection-String: mongodb://user123:123pass@ddl-mongodb:27017/VerificationController?authSource=VerificationController
 ```
 
 * Open `http://localhost:8092` in a browser

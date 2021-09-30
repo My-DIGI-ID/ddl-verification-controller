@@ -1,26 +1,22 @@
 /*
  * Copyright 2021 Bundesrepublik Deutschland
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.esatus.ssi.bkamt.controller.verification.domain;
 
-import com.esatus.ssi.bkamt.controller.verification.models.Data;
-import org.springframework.data.annotation.Id;
-
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
+import org.springframework.data.annotation.Id;
+import com.esatus.ssi.bkamt.controller.verification.models.Data;
 
 /**
  * Represents a presentation request for a digital driver license from any id wallet.
@@ -28,79 +24,89 @@ import java.util.UUID;
 @org.springframework.data.mongodb.core.mapping.Document(collection = "jhi_ddl_verification_request")
 public class VerificationRequest extends AbstractAuditingEntity {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    private String verificationId;
+  private String verificationId;
 
-    private String presentationExchangeId;
+  private String presentationExchangeId;
 
-    @NotNull
-    private String callbackUrl;
+  @NotNull
+  private String callbackUrl;
 
-    private String validUntil;
-    
-    private String verifier;
+  private String validUntil;
 
-    private Data data;
+  private String verifier;
 
-    public VerificationRequest() {
-        this.verificationId = UUID.randomUUID().toString();
-    }
+  private Data data;
 
-    public String  getId() {
-        return id;
-    }
+  private String nonce;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public VerificationRequest() {
+    this.verificationId = UUID.randomUUID().toString();
+  }
 
-    public String getPresentationExchangeId() {
-        return presentationExchangeId;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setPresentationExchangeId(String presentationExchangeId) {
-        this.presentationExchangeId = presentationExchangeId;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public String getCallbackUrl() {
-        return callbackUrl;
-    }
+  public String getPresentationExchangeId() {
+    return presentationExchangeId;
+  }
 
-    public void setCallbackUrl(String callbackUrl) {
-        this.callbackUrl = callbackUrl;
-    }
+  public void setPresentationExchangeId(String presentationExchangeId) {
+    this.presentationExchangeId = presentationExchangeId;
+  }
 
-    public String getValidUntil() {
-        return validUntil;
-    }
+  public String getCallbackUrl() {
+    return callbackUrl;
+  }
 
-    public void setValidUntil(String validUntil) {
-        validUntil = validUntil;
-    }
+  public void setCallbackUrl(String callbackUrl) {
+    this.callbackUrl = callbackUrl;
+  }
 
-    public Data getData() {
-        return data;
-    }
+  public String getValidUntil() {
+    return validUntil;
+  }
 
-    public void setData(Data data) {
-        this.data = data;
-    }
+  public void setValidUntil(String validUntil) {
+    validUntil = validUntil;
+  }
 
-    public String getVerificationId() {
-        return verificationId;
-    }
+  public Data getData() {
+    return data;
+  }
 
-    public void setVerificationId(String verificationId) {
-        this.verificationId = verificationId;
-    }
+  public void setData(Data data) {
+    this.data = data;
+  }
 
-	public String getVerifier() {
-		return verifier;
-	}
+  public String getVerificationId() {
+    return verificationId;
+  }
 
-	public void setVerifier(String verifier) {
-		this.verifier = verifier;
-	}
+  public void setVerificationId(String verificationId) {
+    this.verificationId = verificationId;
+  }
+
+  public String getVerifier() {
+    return verifier;
+  }
+
+  public void setVerifier(String verifier) {
+    this.verifier = verifier;
+  }
+
+  public String getNonce() {
+    return nonce;
+  }
+
+  public void setNonce(String nonce) {
+    this.nonce = nonce;
+  }
 }

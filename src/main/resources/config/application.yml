@@ -141,3 +141,7 @@ jhipster:
 # ===================================================================
 
 # application:
+ssibk:
+  verification:
+    controller:
+      hardware-binding: ${VERIFICATIONCONTROLLER_HARDWAREBINDING:true}

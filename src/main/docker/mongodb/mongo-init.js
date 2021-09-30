@@ -15,7 +15,7 @@
  */
 
 // Replace username and password with the values from .env (MONGODB_USERNAME and MONGODB_PASSWORD)
-var db = connect("mongodb://<username>:<password>>@localhost:27017/admin");
+var db = connect("mongodb://<username>:<password>@localhost:27017/admin");
 
 db = db.getSiblingDB('VerificationController');
 
