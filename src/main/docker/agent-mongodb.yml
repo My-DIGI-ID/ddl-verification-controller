@@ -2,6 +2,7 @@ version: '2'
 services:
   verification-controller-mongodb:
     image: mongo:4.2.7
+    container_name: ddl-mongodb
     ports:
       - '27018:27017'
     environment:
@@ -11,6 +12,7 @@ services:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
   adminmongo:
     image: mrvautin/adminmongo
+    container_name: ddl-adminmongo
     ports:
       - 8092:1234
     depends_on:
