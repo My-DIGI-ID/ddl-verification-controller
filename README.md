@@ -133,7 +133,7 @@ You can use this user to connect to the database with your favorite MongoDB acce
 ```
 - localhost:8092
 - Connection-Name: Verification Controller
-- Connection-String: mongodb://user123:123pass@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController
+- Connection-String: mongodb://user123:123pass@ddl-mongodb:27017/VerificationController?authSource=VerificationController
 ```
 
 * Open `http://localhost:8092` in a browser
