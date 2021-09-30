@@ -1,74 +1,120 @@
+
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
-import com.esatus.ssi.bkamt.controller.verification.domain.ValidationResult;
-import com.esatus.ssi.bkamt.controller.verification.service.HardwareDidValidationService;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.SignatureException;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPublicKeySpec;
 import java.util.Base64;
+import org.bitcoinj.core.Base58;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.ECPointUtil;
+import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
+import org.bouncycastle.jce.spec.ECNamedCurveSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import com.esatus.ssi.bkamt.controller.verification.domain.ValidationResult;
+import com.esatus.ssi.bkamt.controller.verification.service.HardwareDidValidationService;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.HardwareDidMalformedException;
 
+@Service
 public class HardwareDidValidationServiceImpl implements HardwareDidValidationService {
-    private static final String ALGO = "SHA256withECDSA";
 
-    /**
-     *
-     * @param nonce The nonce generate by the verification controller
-     * @param hardwareDid The hardware did. "Represents" the public key
-     * @param hardwareDidProof the hardware did proof.
-     * @return result indicating is the validation succeeded or not
-     */
-    @Override
-    public ValidationResult Validate(String nonce, String hardwareDidProof, String hardwareDid) {
-        try {
-            boolean isValid = this.ValidateSignature(nonce, hardwareDid, hardwareDidProof);
-            return new ValidationResult(isValid);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | UnsupportedEncodingException exception) {
-            return new ValidationResult(false);
-        }
+  private final Logger log = LoggerFactory.getLogger(HardwareDidValidationServiceImpl.class);
+
+  private static final String SIGNATURE_ALGORITHM = "SHA256withECDSA";
+  private static final String KEY_ALGORITHM = "EC";
+  private static final String CURVE = "secp256r1";
+  private static final int FORMAT_BYTES = 2;
+
+  @Override
+  public ValidationResult validate(String hardwareDID, String hardwareDIDProof, String nonce) {
+    try {
+      boolean isValid = this.validateSignature(Base64.getDecoder().decode(hardwareDIDProof), getPublicKey(hardwareDID),
+          deriveNonce(nonce));
+      return new ValidationResult(isValid);
+    } catch (GeneralSecurityException | HardwareDidMalformedException | IllegalArgumentException exception) {
+      return new ValidationResult(false);
+    }
+  }
+
+  private PublicKey getPublicKey(String hardwareDID) throws HardwareDidMalformedException, GeneralSecurityException {
+    byte[] hardwareDIDKey = extractHardwareDidValue(hardwareDID);
+
+    ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(CURVE);
+
+    ECNamedCurveSpec ecparams = new ECNamedCurveSpec(CURVE, spec.getCurve(), spec.getG(), spec.getN());
+    ECPoint point = ECPointUtil.decodePoint(ecparams.getCurve(), hardwareDIDKey);
+
+    PublicKey publicKey = KeyFactory.getInstance(KEY_ALGORITHM).generatePublic(new ECPublicKeySpec(point, ecparams));
+
+    return publicKey;
+  }
+
+  private boolean validateHardwareDID(String hardwareDid) {
+    String[] splitHardwareDid = hardwareDid.split(":");
+
+    if (splitHardwareDid.length != 3) {
+      return false;
     }
 
-    /**
-     *
-     * @param nonce The nonce generate by the verification controller
-     * @param hardwareDid The hardware did. "Represents" the public key
-     * @param hardwareDidProof the hardware did proof.
-     * @return boolean indicating if the validation succeeded
-     */
-    public boolean ValidateSignature(String nonce, String hardwareDid, String hardwareDidProof)
-        throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, UnsupportedEncodingException, SignatureException {
-        Signature ecdsaVerify = Signature.getInstance(ALGO);
-        KeyFactory kf = KeyFactory.getInstance("EC");
+    return true;
+  }
 
-        EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(hardwareDid));
+  private byte[] extractHardwareDidValue(String hardwareDid) throws HardwareDidMalformedException {
+    boolean hardwareDidValid = validateHardwareDID(hardwareDid);
 
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-
-        ecdsaVerify.initVerify(publicKey);
-        ecdsaVerify.update(hardwareDidProof.getBytes(StandardCharsets.UTF_8));
-
-        byte[] nonceBytes = GetNonce(nonce);
-        return ecdsaVerify.verify(Base64.getDecoder().decode(nonceBytes));
+    if (!hardwareDidValid) {
+      throw new HardwareDidMalformedException();
     }
 
-    private static byte[] GetNonce(String issuerNonce)
-    {
-        // TODO: Add reference why the 1 is added to the nonce from the documentation file
-        byte ending = ((Integer) 1).byteValue();
+    int index = hardwareDid.lastIndexOf(":");
+    return extractPublicKey(hardwareDid.substring(index + 2));
+  }
 
-        byte[] bytesNonce = Base64.getDecoder().decode(issuerNonce);
-        byte[] bytesConst = new byte[] { ending };
-        byte[] bytesNonceAndConst = new byte[bytesNonce.length + bytesConst.length];
-        System.arraycopy(bytesNonce, 0, bytesNonceAndConst, 0, bytesNonce.length);
-        System.arraycopy(bytesConst, 0, bytesNonceAndConst, bytesNonce.length, bytesConst.length);
-        return bytesNonceAndConst;
-    }
+  private byte[] extractPublicKey(String hardwareDidValue) {
+    byte[] decodedhDidValue = Base58.decode(hardwareDidValue);
+
+    byte[] result = new byte[decodedhDidValue.length - FORMAT_BYTES];
+
+    System.arraycopy(decodedhDidValue, FORMAT_BYTES, result, 0, result.length);
+
+    return result;
+  }
+
+  private boolean validateSignature(byte[] hardwareDidProofValue, PublicKey publicKey, byte[] hashedNonce)
+      throws GeneralSecurityException {
+    Signature ecdsaVerify = Signature.getInstance(SIGNATURE_ALGORITHM);
+
+    ecdsaVerify.initVerify(publicKey);
+    ecdsaVerify.update(hashedNonce);
+
+    return ecdsaVerify.verify(hardwareDidProofValue);
+  }
+
+
+  private byte[] deriveNonce(String nonce) throws NoSuchAlgorithmException {
+    byte[] challenge = nonce.getBytes(StandardCharsets.UTF_8);
+
+    challenge = Base64.getDecoder().decode(challenge);
+
+    byte[] result = new byte[challenge.length + 1];
+    System.arraycopy(challenge, 0, result, 0, challenge.length);
+
+    result[challenge.length] = 0x2;
+
+    return sha256(result);
+  }
+
+  private byte[] sha256(byte[] challenge) throws NoSuchAlgorithmException {
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+    return digest.digest(challenge);
+  }
 }

@@ -60,6 +60,7 @@ import com.esatus.ssi.bkamt.controller.verification.service.VerificationRequestS
 import com.esatus.ssi.bkamt.controller.verification.service.VerifierService;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.VerificationRequestDTO;
 import com.esatus.ssi.bkamt.controller.verification.service.dto.WebhookPresentProofDTO;
+import com.esatus.ssi.bkamt.controller.verification.service.exceptions.HardwareDidMalformedException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.MetaDataInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.PresentationExchangeInvalidException;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
@@ -95,6 +96,7 @@ public class ProofServiceImpl implements ProofService {
   private @Value("${ssibk.verification.controller.agent.recipientkey}") String agentRecipientKey;
   private @Value("${ssibk.verification.controller.agent.ddl.credential_definition_ids}") String[] ddlCredDefIdsString;
   private @Value("${ssibk.verification.controller.agent.ddl.requested_attributes}") String[] ddlRequestedAttributes;
+  private @Value("${ssibk.verification.controller.hardware-binding}") boolean hardwareBinding;
 
   private static final String DIDCOMM_URL = "didcomm://example.org?m=";
   private static final String ARIES_MESSAGE_TYPE =
@@ -204,10 +206,10 @@ public class ProofServiceImpl implements ProofService {
     proofRequest.setRequestedPredicates(new HashMap<>());
     proofRequest.setRequestedAttributes(requestedAttributes);
     proofRequest.setVersion("0.1");
-
     String generatedNonce = generateNonce(80);
     proofRequest.setNonce(generatedNonce);
 
+    // Update the verification record with the created nonce
     this.verificationRequestService.updateNonce(verificationRequest.getVerificationId(), generatedNonce);
 
     V10PresentationCreateRequestRequest connectionlessProofCreationRequest = new V10PresentationCreateRequestRequest();
@@ -252,6 +254,10 @@ public class ProofServiceImpl implements ProofService {
     List<String> reqAttributes = Arrays.asList(ddlRequestedAttributes);
     proofRequestDdl.setNames(reqAttributes);
 
+    if (hardwareBinding) {
+      reqAttributes.add("hardwareDid");
+    }
+
     // Restriction regarding Revocation
     AllOfIndyProofReqAttrSpecNonRevoked nonRevokedRestriction = new AllOfIndyProofReqAttrSpecNonRevoked();
     // nonRevokedRestriction.setFrom(0);
@@ -282,13 +288,32 @@ public class ProofServiceImpl implements ProofService {
     }
 
     addDDLAttributes(requestedAttributes);
+    addSelfAttestAttributes(verificationRequest, requestedAttributes);
 
     return requestedAttributes;
   }
 
+  private void addSelfAttestAttributes(VerificationRequestDTO verificationRequest,
+      HashMap<String, IndyProofReqAttrSpec> requestedAttributes) {
+    List<Object> selfAttestedAttributes = verificationRequest.getSelfAttested();
+
+    for (Object key : selfAttestedAttributes) {
+      var attributeName = (String) key;
+      var attribute = new IndyProofReqAttrSpec();
+      attribute.setName(attributeName);
+      requestedAttributes.put(attributeName, attribute);
+    }
+
+    if (hardwareBinding) {
+      var attribute = new IndyProofReqAttrSpec();
+      attribute.setName("hardwareDidProof");
+      requestedAttributes.put("hardwareDidProof", attribute);
+    }
+  }
+
   @Override
-  public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO)
-      throws VerificationNotFoundException, MetaDataInvalidException, PresentationExchangeInvalidException {
+  public void handleProofWebhook(WebhookPresentProofDTO webhookPresentProofDTO) throws VerificationNotFoundException,
+      MetaDataInvalidException, PresentationExchangeInvalidException, HardwareDidMalformedException {
     log.debug("presentation exchange record is in state {}", webhookPresentProofDTO.getState());
 
     String currentState = webhookPresentProofDTO.getState();
@@ -300,14 +325,16 @@ public class ProofServiceImpl implements ProofService {
   }
 
   private void handleVerifiedState(WebhookPresentProofDTO webhookPresentProofDTO)
-      throws VerificationNotFoundException, MetaDataInvalidException {
+      throws VerificationNotFoundException, MetaDataInvalidException, HardwareDidMalformedException {
     V10PresentationExchange presentationExchange =
         this.acapyClient.getProofRecord(apikey, webhookPresentProofDTO.getPresentationExchangeId());
 
-    RequestPresentationValidationResult validationResult =
-        requestPresentationValidationService.validatePresentationExchange(presentationExchange);
     VerificationRequestDTO verificationRequest =
         getVerificationRequestByPresentationExchangeId(webhookPresentProofDTO.getPresentationExchangeId());
+
+    RequestPresentationValidationResult validationResult =
+        requestPresentationValidationService.validatePresentationExchange(presentationExchange, verificationRequest);
+
     String callbackUrl = verificationRequest.getCallbackUrl();
 
     if (!validationResult.isValid()) {
