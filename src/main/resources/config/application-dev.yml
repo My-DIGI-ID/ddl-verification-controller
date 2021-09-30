@@ -23,7 +23,7 @@ ssibk:
   verification:
     controller:
       apiKey: ${VERIFICATIONCONTROLLER_APIKEY} # apikey: demoAgentApiKey
-      endpoint: ${VERIFICATIONCONTROLLER_ENDPOINT} # endpoint: https://2192847001ad.ngrok.io # PORT: 8089
+      endpoint: ${VERIFICATIONCONTROLLER_ENDPOINT} # endpoint: https://2192847001ad.ngrok.io # PORT: 8090
 
       hardware-binding: ${VERIFICATIONCONTROLLER_HARDWAREBINDING:true} # enable or disable the hardware binding
 
