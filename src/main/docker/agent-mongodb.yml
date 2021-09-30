@@ -2,6 +2,7 @@ version: '2'
 services:
   verification-controller-mongodb:
     image: mongo:4.2.7
+    container_name: ddl-mongodb
     ports:
       - '27018:27017'
     environment:
@@ -11,6 +12,7 @@ services:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
   adminmongo:
     image: mrvautin/adminmongo
+    container_name: ddl-adminmongo
     ports:
       - 8092:1234
     depends_on:
@@ -38,4 +40,4 @@ services:
       - SSIBK_HOTEL_AGENT_NAME="Verifier"
       - SSIBK_HOTEL_AGENT_LOG_LEVEL=info
       - SSIBK_HOTEL_AGENT_GENESIS_URL=${VERIFY_AGENT_GENESIS_URL}
-      - SSIBK_HOTEL_AGENT_WEBHOOK_APIKEY=${VERIFY_AGENT_WEBHOOK_APIKEY}
+      - SSIBK_HOTEL_AGENT_WEBHOOK_APIKEY=${VERIFY_AGENT_WEBHOOK_API_KEY}

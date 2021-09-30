@@ -107,6 +107,12 @@
 
 	<dependencies>
 		<dependency>
+            <groupId>org.bitcoinj</groupId>
+            <artifactId>bitcoinj-core</artifactId>
+            <version>0.15.10</version>
+            <scope>compile</scope>
+        </dependency>
+		<dependency>
 			<groupId>io.github.jhipster</groupId>
 			<artifactId>jhipster-framework</artifactId>
 		</dependency>

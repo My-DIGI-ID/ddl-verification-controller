@@ -29,4 +29,5 @@ public interface VerificationRequestService {
     Optional<VerificationRequestDTO> getByPresentationExchangeId(String presentationExchangeId);
     Optional<VerificationRequestDTO> getByVerificationId(String verificationId);
     void updatePresentationExchangeId(String verificationId, String threadId) throws VerificationNotFoundException;
+    void updateNonce(String verificationId, String generatedNonce) throws VerificationNotFoundException;
 }

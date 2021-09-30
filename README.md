@@ -3,52 +3,59 @@
 ## Prerequisites
 
 ### Application Environment variables
-To start the application there are several environment variables to set:
-* ``VERIFICATIONCONTROLLER_APIKEY`` Apikey of the verification controller
-* ``VERIFICATIONCONTROLLER_ENDPOINT`` Endpoint of the verification controller running on Port 8090
-* ``VERIFICATIONCONTROLLER_AGENT_APIKEY`` Api-Key for the agent
-* ``VERIFICATIONCONTROLLER_AGENT_APIURL`` Api-Url of the admin url (e.g. localhost:10080)
-* ``VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY`` the DDL agent verkey, here for the seed 000...DDL; can be retrieved via curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: abcdefghijkl" | jq ".results[0]" | jq ".verkey" | sed 's/"//g' once the agent is running 
-* ``VERIFICATIONCONTROLLER_AGENT_ENDPOINT`` the DDL agent endpoint | PORT: 10000
-* ``VERIFICATIONCONTROLLER_AGENT_ENDPOINTNAME`` the name of the endpoint (visible to end users in the proof request dialog of the wallet app). e.g.  DDL Verification
-* ``VERIFICATIONCONTROLLER_CRED_DEFINITION_IDS`` Comma seperated credential definitions
-
-You can see how they are used in the ``application-dev.yml`` file under ``src/main/resources/config/application-dev.yml``
+To successfully start the application, several environment variables have to be defined.
+Find those placeholders in `application-dev.yml` and replace them:
+* ``${{VERIFICATIONCONTROLLER_APIKEY}}`` API key of the verification controller (Example: `0pen$3s4meC0ntroller`)
+* ``${{VERIFICATIONCONTROLLER_ENDPOINT}}`` Endpoint of the verification controller (Example: `https://2192847001ad.ngrok.io`)
+* ``${{VERIFICATIONCONTROLLER_HARDWAREBINDING}}`` Enable or disable hardware binding validation (``true|false``) 
+* ``${{VERIFICATIONCONTROLLER_AGENT_APIKEY}}`` Api-Key for the agent (Example: `0pen$3s4meAgent`)
+* ``${{VERIFICATIONCONTROLLER_AGENT_APIURL}}`` Api-Url of the admin url (Example: `localhost:10080`)
+* ``${{VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY}}`` DDL agent *verkey*, in this case for the seed `000...DDL`; to be retrieved via
+  ```
+  curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: <VERIFICATIONCONTROLLER_AGENT_APIKEY>" | jq ".results[0]" | jq ".verkey" | sed 's/"//g'
+  ```
+  after the DDL agent has been started 
+* ``${{VERIFICATIONCONTROLLER_AGENT_ENDPOINT`` DDL agent endpoint *URL / IP* (Example: `localhost:10000`)
+* ``${{VERIFICATIONCONTROLLER_AGENT_ENDPOINTNAME`` DDL agent endpoint *name* (shown to credential holders in the Proof Request presentation dialog in the ID Wallet app). (Example: `Big Corporate`)
+* ``${{VERIFICATIONCONTROLLER_CRED_DEFINITION_IDS`` Comma separated credential definitions (Example: `XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein`)
 
 ### Docker Environment variables
 
-Navigate to `src/main/docker/` and rename the `.env-default` file to `.env`. This file is used by docker to set all
-required environment variables passed into the docker containers.
+Navigate to `src/main/docker/` and rename `.env-default` file to `.env`.
+This file is used by Docker to set all required environment variables for the Docker containers.
 
-There are different variables to set:
-
-1. **VERIFY AGENT (ACA-PY)**
-    * `VERIFY_AGENT_GENESIS_URL`: URL of the genesis file the agent uses
-    * `VERIFY_AGENT_WALLET_KEY`: Key to generate the wallet with and unlocks the wallet
-    * `VERIFY_AGENT_API_KEY`: Secures all requests to ACA-Py (Send view X-API-KEY Header)
-    * `VERIFY_AGENT_WEBHOOK_APIKEY`: Send from ACA-Py in X-API-Key the application endpoints
+1. **Verify Agent (ACA-Py)**
+    * `VERIFY_AGENT_GENESIS_URL`: URL of the genesis file the agent uses (Example: `https://raw.githubusercontent.com/My-DIGI-ID/Ledger-Genesis-Files/main/Test/pool_transactions_genesis`)
+    * `VERIFY_AGENT_WALLET_KEY`: Key to generate the wallet with and unlocks the wallet (Example: Random number)
+    * `VERIFY_AGENT_API_KEY`: Secures all requests to ACA-Py (used in `x-api-key` header) (Example: Random number)
+    * `VERIFY_AGENT_WEBHOOK_API_KEY`: Send from ACA-Py in `x-api-key` header to the client application endpoints (Example: `0pen$3s4meWebhook`)
 
 2. **Network**
-    * `IP_ADDRESS`: Your current IP-Address
+    * `IP_ADDRESS`: The IP-Address of the system, the controller runs on 
 
-3. **MONGO DB**
-    * `MONGODB_USERNAME`: Mongodb username (defaults to admin123)
-    * `MONGODB_PASSWORD`: Mongodb password (defaults to pass123)
+3. **MongoDB**
+    * `MONGODB_USERNAME`: Mongodb username (defaults to `admin123`)
+    * `MONGODB_PASSWORD`: Mongodb password (defaults to `pass123`)
+    
+   **Important**
+   Replace the placeholders in the MongoDB init file in ``/src/main/docker/mongodb/mogno-init.js`` with the correct values,
+otherwise the mongodb will not be initialized and the connection will fail:
+   * `var db = connect("[...]`
+   * ```
+     db.createUser(
+     {
+     user: <user>,
+     pwd: <password>,
+     [...]
+     ```
+   * `db.grantRolesToUser(<user>,[...]`
 
-Add verification-agent-url, verification-agent-key,credential-definition-id in application-dev.yml file.
-
-**Important**
-Replace the placeholders in the mongodb init file in ``/src/main/docker/mongodb/mogno-init.js`` with the correct values,
-otherwise the mongodb will not be initialized and the connection will fail.
-
-Replace the placeholder for the mongodb connection in applications-dev.yml 
-```
-data:
-  mongodb:
-    uri: mongodb://<user>:<password>@localhost:27018/?authSource=VerificationController
-    database: VerificationController
-    auto-index-creation: false
-```
+   Replace the placeholder for the mongodb connection in `src/main/resources/config/application-dev.yml`: 
+   ```
+   data:
+     mongodb:
+       uri: mongodb://<user>:<password>@localhost:27018/?authSource=VerificationController
+   ```
 
 ## Development
 
@@ -57,12 +64,13 @@ run the following commands:
 
 ```
 docker-compose -f src/main/docker/agent-mongodb.yml up -d
+
 ./mvnw
 ```
 
 The first step will deploy a MongoDB instance. The second step will deploy the application.
 
-If the container won`t start, or you want to recreate all containers just run
+If the container doesn't start, or you want to recreate all containers, try
 ```
 docker-compose -f src/main/docker/agent-mongodb.yml down -v --remove-orphans
 ```
@@ -72,7 +80,7 @@ docker-compose -f src/main/docker/agent-mongodb.yml up
 ```
 
 ## Sonar
-Sonar is used to analyse code quality.
+Sonar is used to analyze code quality.
 
 1. Start a local Sonar server
    ```
@@ -80,7 +88,7 @@ Sonar is used to analyse code quality.
    ```
 1. Log on to http://localhost:9001 with default credentials `admin/admin`
 1. Create a new empty project called `VerificationController`
-1. Generate an access token an copy it to `sonar-project.properties`, property `sonar.login`
+1. Generate an access token and copy it to `sonar-project.properties`, property `sonar.login`
 
 You can run a Sonar analysis by using
 the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven
@@ -100,43 +108,35 @@ plugin.
 
 ## Swagger-Ui
 
-Swagger UI will be available at the following URL
-
-```
-http://localhost:8090/swagger-ui/index.html
-```
+Swagger UI can be accessed using this URL: http://localhost:8090/swagger-ui/index.html
 
 Note: The API key can be configured in ``src/main/resources/config/application-dev.yml`` (application properties) file which
 can be used to interact with the API.
 
 ## MongoDB
 
-There is a database init script `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the mongodb on
-port 27017. The scripts creates an admin user with username: admin123 and password: pass123.
+There is a database init script `mongo-init.js` located in `src/main/docker/mongodb/` which connects to the MongoDB on
+port 27017. The script creates an admin user with username `admin123` and password `pass123` (It is highly recommended to replace the default values)..
 
-After the connection was established successful it creates a new user:
-
+After the connection was established successful, a new user is created:
 ```
 username: user123
 password: 123pass
 ```
 
-You can use this user to connect to the database with your favourite MongoDB access tool. Here we use AdminMongo. You
-will find more information about how to use it below.
+You can use this user to connect to the database with your favorite MongoDB access tool. We recommend using AdminMongo (see next chapter).
 
 ## AdminMongo
 
-AdminMongo is running in Port 8092
+### Connect to the database
 
 ```
 - localhost:8092
 - Connection-Name: Verification Controller
-- Connection-String: mongodb://user123:123pass@docker_verification-controller-mongodb_1:27017/VerificationController?authSource=VerificationController
+- Connection-String: mongodb://user123:123pass@ddl-mongodb:27017/VerificationController?authSource=VerificationController
 ```
 
-### Connect to the database
-
-* Call `http://localhost:8092` in your browser
+* Open `http://localhost:8092` in a browser
 * Add the details shown above and click `Add connection`
   ![AdminMongo create connection](./images/admin_mongo_setup.png)
 * After a page reload the connection is shown. Click connect to open the details view
@@ -182,7 +182,7 @@ To test the whole application with your mobile phone you need to make sure the f
     * iOS: https://apps.apple.com/at/app/id-wallet/id1564933989
     * Android: https://play.google.com/store/apps/details?id=com.digitalenabling.idw&hl=de&gl=US
 * All containers are running without any errors
-* You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of you favourite tools on how to use it
+* You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of you favorite tools on how to use it
 
 ### Configure your IP Address
 Make sure the correct IP Address of your PC in `/src/main/docker/.env`
@@ -199,11 +199,11 @@ Open three terminals and navigate to the folder ngrok is located in each instanc
 
 ### Open demo page
 When the application runs with dev profile there is demo website where you can generate a QR-Code to scan with your Wallet-ID App.
-To see this page call
+To open this page, navigate to http://localhost:8090/demo/
 
 Ngrok now creates three public endpoints which are tunneled to your local endpoints
 
-If you currently do not have a service which can accept the request made to the callback url, you could use a service lik `https://webhook.site`.
+If you currently do not have a service that can accept the request made to the callback url, you could use a service such as `https://webhook.site`.
 
 Here you can create a temporary endpoint which you can use as a callback url. Just paste the url in the demo page here:
 ![Paste callback_url](./images/demo_page_callback_url.png)

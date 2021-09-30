@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "uuidv4": "^6.2.12"
+  }
+}
