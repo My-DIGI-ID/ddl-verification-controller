@@ -14,6 +14,7 @@
 package com.esatus.ssi.bkamt.controller.verification.service.impl;
 
 import java.util.Optional;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,4 +116,15 @@ public class VerificationRequestServiceImpl implements VerificationRequestServic
     log.debug("update verification {} and set nonce {}", verificationId, generatedNonce);
     this.verificationRequestMapper.verificationRequestToVerificationRequestDTO(vr);
   }
+
+  @Override
+  public boolean checkVerificationIdCompliance(String verificationId) {
+    try {
+      UUID.fromString(verificationId);
+      return true;
+    } catch (IllegalArgumentException ex) {
+      return false;
+    }
+  }
+
 }
