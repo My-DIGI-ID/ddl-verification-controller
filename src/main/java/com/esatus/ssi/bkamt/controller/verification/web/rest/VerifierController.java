@@ -71,7 +71,7 @@ public class VerifierController {
    *         {@code 400 (Bad Request)} {@code 400 (Bad Request)} if a presentation request with the given name does
    *         already exist.
    */
-  @PostMapping("/init")
+  @PostMapping("/init", consumes="application/json", produces = "application/json")
   public ResponseEntity<VerificationResponseDTO> createPresentationRequest(
       @RequestHeader(value = "X-API-KEY") String verifierApiKey,
       @Valid @RequestBody VerificationRequestMetadata verificationRequestMetadata) throws URISyntaxException {
@@ -110,7 +110,7 @@ public class VerifierController {
    * @return status {@code 200 (Ok)} when the invalidation was successful or with status {@code 400 (Bad Request)} when
    *         the invalidation failed
    */
-  @PostMapping("/invalidate")
+  @PostMapping("/invalidate", consumes="application/json", produces = "application/json")
   public ResponseEntity<Void> invalidateVerification(@RequestHeader(value = "X-API-KEY") String verifierApiKey,
       @RequestParam(name = "verificationId") String verificationId) {
     log.debug("REST request to invalid meta data for verification with id {}", verificationId);
