@@ -48,7 +48,7 @@ public class WebhookController {
   @Autowired
   ProofService proofService;
 
-  @PostMapping("/present_proof")
+  @PostMapping("/present_proof", consumes="application/json", produces = "application/json")
   @SecurityRequirements({@SecurityRequirement(name = "X-API-Key")})
   public ResponseEntity<Void> onProofRequestWebhook(@RequestBody WebhookPresentProofDTO webhookPresentProofDTO)
       throws JsonProcessingException, HardwareDidMalformedException {
