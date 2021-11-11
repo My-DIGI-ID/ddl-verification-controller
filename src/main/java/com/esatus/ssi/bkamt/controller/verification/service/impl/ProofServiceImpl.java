@@ -236,7 +236,8 @@ public class ProofServiceImpl implements ProofService {
     if (rand != null) {
       rand.nextBytes(nonce);
     }
-    BigInteger r = new BigInteger(nonce);
+    // 2021-09-11: Fix to generate only non-negative values. Kudos to @PaulWen
+    BigInteger r = new BigInteger(1, nonce);
 
     return r.toString();
   }

@@ -3,6 +3,7 @@ package com.esatus.ssi.bkamt.controller.verification.service;
 import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.esatus.ssi.bkamt.controller.verification.service.impl.ProofServiceImpl;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -67,5 +68,18 @@ public class ProofServiceTest {
     @Test
     public void HandleProofWebhook_() {
         // Parse WebhookDTO from a json file
+    }
+
+    @org.junit.jupiter.api.Test
+    public void validNonceGeneratorTest() throws Exception {
+        ProofServiceImpl proofSvc = new ProofServiceImpl();
+
+        int n = 10;
+        for (int i = 1; i <= n; ++i) {
+            String nonce = proofSvc.generateNonce(80);
+            String nonceFirstChar = nonce.substring(0, 1);
+            // Nonce must not be negative
+            Assertions.assertThat(nonceFirstChar).doesNotMatch("-");
+        }
     }
 }
