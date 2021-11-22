@@ -65,12 +65,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .antMatcher("/api/**")
             .addFilter(filter)
-            .csrf()
-            .disable()
-            .addFilter(filter)
             .exceptionHandling()
                 .authenticationEntryPoint(problemSupport)
                 .accessDeniedHandler(problemSupport)
+        .and()
+            .csrf()
         .and()
             .headers()
             .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
@@ -85,9 +84,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated();
+            .authorizeRequests()
+            .anyRequest()
+            .authenticated();
         // @formatter:on
   }
 }

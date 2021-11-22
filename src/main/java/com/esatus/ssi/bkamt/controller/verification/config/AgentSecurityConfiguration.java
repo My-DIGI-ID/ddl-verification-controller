@@ -55,12 +55,12 @@ public class AgentSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // @formatter:off
         httpSecurity
             .antMatcher("/topic/present_proof")
-            .csrf()
-            .disable()
             .addFilter(filter)
             .exceptionHandling()
                 .authenticationEntryPoint(problemSupport)
                 .accessDeniedHandler(problemSupport)
+        .and()
+            .csrf()
         .and()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
