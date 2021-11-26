@@ -59,7 +59,7 @@ public class RequestProofController {
    *         {@code 500 (Internal Server Error)} when creation failed or {@code 404 (Not found)} when there is no
    *         verification with the given verification id in the database
    */
-  @GetMapping(value = "/proof", consumes="application/plain", produces = "application/json")
+  @GetMapping(value = "/proof", produces = "application/json")
   public ResponseEntity sendRedirect(@RequestParam(name = "verificationId") String verificationId) {
     log.debug("REST request to create a presentation request for verificationId {}", verificationId);
 
