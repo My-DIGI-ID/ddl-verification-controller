@@ -245,6 +245,8 @@ public class ProofServiceImpl implements ProofService {
   private void addDDLAttributes(Map<String, IndyProofReqAttrSpec> requestedAttributes) {
     List<Map<String, String>> ddlRestrictions = new ArrayList<>(ddlCredDefIdsString.length);
 
+    log.debug("addDDLAttributes: " + ddlCredDefIdsString);
+
     for (String s : ddlCredDefIdsString) {
       Map<String, String> temp = new HashMap<>();
       temp.put("cred_def_id", s);
@@ -252,7 +254,8 @@ public class ProofServiceImpl implements ProofService {
     }
 
     IndyProofReqAttrSpec proofRequestDdl = new IndyProofReqAttrSpec();
-    ArrayList<String> reqAttributes = (ArrayList<String>) Arrays.asList(ddlRequestedAttributes);
+    // ArrayList<String> reqAttributes = (ArrayList<String>) Arrays.asList(ddlRequestedAttributes);
+    ArrayList<String> reqAttributes = new ArrayList<>(Arrays.asList(ddlRequestedAttributes));
     proofRequestDdl.setNames(reqAttributes);
 
     if (hardwareBinding) {
@@ -268,8 +271,6 @@ public class ProofServiceImpl implements ProofService {
     proofRequestDdl.setRestrictions(ddlRestrictions);
     requestedAttributes.put("ddl", proofRequestDdl);
   }
-
-
 
   private Map<String, IndyProofReqAttrSpec> createRequestedAttributes(VerificationRequestDTO verificationRequest) {
     Data data = verificationRequest.getData();
@@ -297,7 +298,6 @@ public class ProofServiceImpl implements ProofService {
   private void addSelfAttestAttributes(VerificationRequestDTO verificationRequest,
       HashMap<String, IndyProofReqAttrSpec> requestedAttributes) {
     List<Object> selfAttestedAttributes = verificationRequest.getSelfAttested();
-
 
     for (Object key : selfAttestedAttributes) {
       var attributeName = (String) key;

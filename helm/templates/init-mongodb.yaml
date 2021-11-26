@@ -1,0 +1,104 @@
+{{- $fullName := include "ddl-verification-controller.fullname" . -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-init-mongo-script
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Chart.Name }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+data:
+  init-mongodb.js: |
+    /*   
+    * Copyright 2021 Bundesrepublik Deutschland
+    *
+    * Licensed under the Apache License, Version 2.0 (the "License");
+    * you may not use this file except in compliance with the License.
+    * You may obtain a copy of the License at
+    *
+    *     http://www.apache.org/licenses/LICENSE-2.0
+    *
+    * Unless required by applicable law or agreed to in writing, software
+    * distributed under the License is distributed on an "AS IS" BASIS,
+    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    * See the License for the specific language governing permissions and
+    * limitations under the License.
+    */
+    db = db.getSiblingDB('{{ .Values.mongodb.auth.database }}');
+    try {
+    db.createUser(
+        {
+            user: '{{ .Values.mongodb.auth.username }}',
+            pwd: '{{ .Values.mongodb.auth.password }}',
+            roles: [ { role: "readWrite", db: "{{ .Values.mongodb.auth.database }}"} ],
+            passwordDigestor: "server",
+        }
+    )
+    } catch(e) { }
+    try{
+    db.createRole(
+      {
+        role : "readWriteSystem",
+        privileges:
+          [
+            {
+              resource:
+                {
+                  db: "{{ .Values.mongodb.auth.database }}",
+                  collection: "system.indexes"
+                },
+              actions:
+                [ "changeStream", "collStats", "convertToCapped", "createCollection", "createIndex", "dbHash", "dbStats", "dropCollection", "dropIndex", "emptycapped", "find", "insert", "killCursors", "listCollections", "listIndexes", "planCacheRead", "remove", "renameCollectionSameDB", "update"
+                ]
+            }
+          ],
+        roles:[]})
+
+    } catch(e) { }
+    db.grantRolesToUser('{{ .Values.mongodb.auth.username }}', ['readWriteSystem']);
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $fullName }}-init-mongodb
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Chart.Name }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-weight": "0"
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-init-mongodb"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mongodb-init
+        image: {{ .Values.mongodb.image.repository }}
+        envFrom: 
+          - configMapRef:
+              name: {{ $fullName }}-config
+          - secretRef:
+              name: {{ $fullName }}-secret 
+        command:
+          - sh 
+          - -c 
+          - |
+            until $(curl --fail -si --output /dev/null $VERIFICATIONCONTROLLER_MONGODB_HOST:$VERIFICATIONCONTROLLER_MONGODB_PORT); do sleep 5; done;
+            MONGODB_CONNECTION=mongodb://${VERIFICATIONCONTROLLER_MONGODB_ROOT_USERNAME}:${VERIFICATIONCONTROLLER_MONGODB_ROOT_PASSWORD}@${VERIFICATIONCONTROLLER_MONGODB_HOST}:${VERIFICATIONCONTROLLER_MONGODB_PORT}/admin
+            mongo $MONGODB_CONNECTION /scripts/init-mongodb.js;
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /scripts
+      volumes:
+        - name: init-scripts
+          configMap:
+            defaultMode: 0555
+            name: {{ $fullName }}-init-mongo-script
+

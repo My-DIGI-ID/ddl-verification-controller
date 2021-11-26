@@ -1,0 +1,94 @@
+{{- $fullName := include "ddl-verification-controller.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ddl-verification-controller.fullname" . }}
+  labels:
+    {{- include "ddl-verification-controller.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ddl-verification-controller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ddl-verification-controller.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ddl-verification-controller.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: verification-controller
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8090
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          envFrom: 
+            - configMapRef:
+                name: {{ $fullName }}-config
+            - secretRef:
+                name: {{ $fullName }}-secret 
+          env:
+            - name: MONGODB_CONNECTION
+              {{- if  .Values.mongodb.host }}
+              value: mongodb://{{.Values.mongodb.auth.username}}:{{.Values.mongodb.auth.password}}@{{.Values.mongodb.host}}:{{.Values.mongodb.service.port}}/{{.Values.mongodb.auth.database}}
+              {{- else }}
+              value: mongodb://{{.Values.mongodb.auth.username}}:{{.Values.mongodb.auth.password}}@{{.Release.Name}}-mongodb:{{.Values.mongodb.service.port}}/{{.Values.mongodb.auth.database}}
+              {{- end }}
+            {{- include "helpers.list-env-variables" . | indent 12 }}
+
+      initContainers:
+      - name: wait-for-mongo
+        image: curlimages/curl
+        env:  
+        - name: MONGODB_URL
+          {{- if  .Values.mongodb.host }}
+          value: {{.Values.mongodb.host}}:{{.Values.mongodb.service.port}}
+          {{- else }}
+          value: {{.Release.Name}}-mongodb:{{.Values.mongodb.service.port}}
+          {{- end }}
+        command:
+          - sh
+          - -c
+          - until $(curl --fail -si --output /dev/null $MONGODB_URL); do sleep 5; done;
+         
+      # - name: wait-for-agent
+      #   image: curlimages/curl
+      #   command:
+      #     - sh
+      #     - -c
+      #     {{- if  .Values.mongodb.host }}
+      #     - curl --fail -si {{.Values.mongodb.host}}:{{.Values.mongodb.service.port}}
+      #     {{- else }}
+      #     - curl --fail -si {{.Release.Name}}-mongodb:{{.Values.mongodb.service.port}}
+      #     {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

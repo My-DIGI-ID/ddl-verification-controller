@@ -1,0 +1,128 @@
+# Default values for ddl-verification-controller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+APIkey:
+
+image:
+  repository: ghcr.io/my-digi-id/ssi-ddl-verification-controller
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.0.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+credentialDefinitionIDs: 
+  - XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
+
+hardwareBinding: true
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8090
+
+ingress:
+  enabled: true
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - localhost
+    secretName: tls-secret
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+
+agent:
+  verkey: 
+  webHookAPIKey: 
+  APIKey: 
+  ariesAttachID: libindy-request-presentation-0
+  url: ddl-agent-ssi-aca-py
+  port: "11080"
+  endpoint: http://ddl-agent-ssi-aca-py:11000
+
+
+mongodb:
+  ## If false values must be set to a hosted
+  ## MongoDB installation.  
+  ## If false VERI_MONGODB_HOST MUST BE SET in the env section
+  enabled: true
+  host:
+  image:
+    tag: 4.2.16-debian-10-r3
+  auth:
+    rootUser: root
+    username: mongouser
+    database: VerificationController
+    authDatabase: VerificationController
+
+  persistence:
+    storageClass: 
+    size: 10Gi
+
+  ## MongoDB architecture (`standalone` or `replicaset`)
+  architecture: standalone
+
+  ## Enable MongoDB pod(s) Security Context
+  podSecurityContext:
+   enabled: false
+
+  ## Enable MongoDB container(s) Security Context
+  containerSecurityContext:
+    enabled: false
+
+  volumePermissions:
+    enabled: false
+    securityContext:
+      runAsUser: "auto"
+
+commonAnnotations: {}
