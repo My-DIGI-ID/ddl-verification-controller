@@ -156,3 +156,4 @@ src/main/docker/.env
 # Jenc
 ######################
 .java-version
+helm/secrets.yaml
