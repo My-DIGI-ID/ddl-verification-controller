@@ -16,7 +16,6 @@
 logging:
   level:
     ROOT: ${LOGGING_LEVEL_ROOT:INFO}
-    io.github.jhipster: ${LOGGING_LEVEL_JHIPSTER:INFO}
     com.ibm.ssi.controller.verification: ${LOGGING_LEVEL_VERIFICATIONCONTROLLER:INFO}
 
 ssibk:

@@ -16,8 +16,6 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
-import io.github.jhipster.config.JHipsterConstants;
-
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import com.esatus.ssi.bkamt.controller.verification.aop.logging.LoggingAspect;
@@ -27,7 +25,7 @@ import com.esatus.ssi.bkamt.controller.verification.aop.logging.LoggingAspect;
 public class LoggingAspectConfiguration {
 
     @Bean
-    @Profile(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
+    @Profile("dev")
     public LoggingAspect loggingAspect(Environment env) {
         return new LoggingAspect(env);
     }

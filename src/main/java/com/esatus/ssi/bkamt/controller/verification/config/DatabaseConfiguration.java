@@ -16,11 +16,8 @@
 
 package com.esatus.ssi.bkamt.controller.verification.config;
 
-import io.github.jhipster.config.JHipsterConstants;
 import com.github.mongobee.Mongobee;
 import com.mongodb.MongoClient;
-import io.github.jhipster.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
-import io.github.jhipster.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
@@ -42,7 +39,7 @@ import java.util.List;
 
 @Configuration
 @EnableMongoRepositories("com.esatus.ssi.bkamt.controller.verification.repository")
-@Profile("!" + JHipsterConstants.SPRING_PROFILE_CLOUD)
+@Profile("!cloud")
 @Import(value = MongoAutoConfiguration.class)
 @EnableMongoAuditing(auditorAwareRef = "springSecurityAuditorAware")
 public class DatabaseConfiguration {
@@ -62,8 +59,6 @@ public class DatabaseConfiguration {
     @Bean
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(DateToZonedDateTimeConverter.INSTANCE);
-        converters.add(ZonedDateTimeToDateConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 

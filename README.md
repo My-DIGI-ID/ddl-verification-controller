@@ -1,6 +1,10 @@
 # Verification-Controller
 
 ## Prerequisites
+To load the application properties set the environment variable for spring to ``dev``
+```yaml
+SPRING_PROFILES_ACTIVE = dev
+```
 
 ### Application Environment variables
 To successfully start the application, several environment variables have to be defined.

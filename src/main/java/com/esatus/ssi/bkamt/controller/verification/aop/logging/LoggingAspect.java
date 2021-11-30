@@ -16,8 +16,6 @@
 
 package com.esatus.ssi.bkamt.controller.verification.aop.logging;
 
-import io.github.jhipster.config.JHipsterConstants;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -83,7 +81,7 @@ public class LoggingAspect {
      */
     @AfterThrowing(pointcut = "applicationPackagePointcut() && springBeanPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
-        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
+        if (env.acceptsProfiles(Profiles.of("dev"))) {
             logger(joinPoint)
                 .error(
                     "Exception in {}() with cause = '{}' and exception = '{}'",

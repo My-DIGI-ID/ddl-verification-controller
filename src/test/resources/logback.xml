@@ -22,8 +22,6 @@
 
     <logger name="com.esatus.ssi.bkamt.controller.verification" level="INFO"/>
 
-    <logger name="io.github.jhipster" level="WARN"/>
-
     <logger name="javax.activation" level="WARN"/>
     <logger name="javax.mail" level="WARN"/>
     <logger name="javax.xml.bind" level="WARN"/>
