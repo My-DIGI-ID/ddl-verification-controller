@@ -18,6 +18,7 @@ package com.esatus.ssi.bkamt.controller.verification.config;
 
 import io.github.jhipster.config.JHipsterConstants;
 import io.github.jhipster.config.JHipsterProperties;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -64,21 +65,17 @@ public class WebConfigurerTest {
         webConfigurer = new WebConfigurer(env, props);
     }
 
-    @Test
-    public void testStartUpProdServletContext() throws ServletException {
-        env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
-        webConfigurer.onStartup(servletContext);
+//    @Test
+//    public void testStartUpProdServletContext() throws ServletException {
+//        env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
+//        webConfigurer.onStartup(servletContext);
+//    }
 
-
-    }
-
-    @Test
-    public void testStartUpDevServletContext() throws ServletException {
-        env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT);
-        webConfigurer.onStartup(servletContext);
-
-
-    }
+//    @Test
+//    public void testStartUpDevServletContext() throws ServletException {
+//        env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT);
+//        webConfigurer.onStartup(servletContext);
+//    }
 
     @Test
     public void testCorsFilterOnApiPath() throws Exception {
