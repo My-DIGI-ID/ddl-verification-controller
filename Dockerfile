@@ -1,7 +1,6 @@
 FROM maven:3-jdk-11-slim AS MAVEN_BUILD
 
 COPY pom.xml /build/
-COPY sonar-project.properties /build/
 COPY src /build/src/
 
 WORKDIR /build/
