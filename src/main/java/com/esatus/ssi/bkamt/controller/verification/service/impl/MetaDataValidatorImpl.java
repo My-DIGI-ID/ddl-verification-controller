@@ -27,13 +27,15 @@ public class MetaDataValidatorImpl implements MetaDataValidator {
     public boolean validateMetaData(VerificationRequestDTO verificationRequest) {
         Data data = verificationRequest.getData();
 
-        if(data == null) {
-            return true;
-        }
-
-        if(data.getAdditionalProperties().size() == 0) {
-            return true;
-        }
+//        Commented. Reason: not yet implemented
+//
+//        if(data == null) {
+//            return true;
+//        }
+//
+//        if(data.getAdditionalProperties().size() == 0) {
+//            return true;
+//        }
 
         return true;
     }
