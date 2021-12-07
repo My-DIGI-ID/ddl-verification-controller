@@ -10,7 +10,7 @@ This chart is for installing the verification controller, some key facts:
 The values assume that aca-py agent is installed as verifier in the same namespace with the [helm chart](https://github.com/My-DIGI-ID/ssi-helm-charts/tree/main/charts/ssi-aca-py) and release name ddl-agent
 
 ```yaml
-APIkey: APIKEY
+APIKey: APIKEY
 
 agent:
   verkey: VERKEY

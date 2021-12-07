@@ -4,7 +4,7 @@
 
 replicaCount: 1
 
-APIkey:
+APIKey:
 
 image:
   repository: ghcr.io/my-digi-id/ssi-ddl-verification-controller
@@ -16,7 +16,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-credentialDefinitionIDs: 
+credentialDefinitionIDs:
   - XnGEZ7gJxDNfxwnZpkkVcs:3:CL:988:Digitaler Führerschein
 
 hardwareBinding: true
@@ -82,9 +82,9 @@ autoscaling:
 
 
 agent:
-  verkey: 
-  webHookAPIKey: 
-  APIKey: 
+  verkey:
+  webHookAPIKey:
+  APIKey:
   ariesAttachID: libindy-request-presentation-0
   url: ddl-agent-ssi-aca-py
   port: "11080"
@@ -93,7 +93,7 @@ agent:
 
 mongodb:
   ## If false values must be set to a hosted
-  ## MongoDB installation.  
+  ## MongoDB installation.
   ## If false VERI_MONGODB_HOST MUST BE SET in the env section
   enabled: true
   host:
@@ -106,7 +106,7 @@ mongodb:
     authDatabase: VerificationController
 
   persistence:
-    storageClass: 
+    storageClass:
     size: 10Gi
 
   ## MongoDB architecture (`standalone` or `replicaset`)
