@@ -214,6 +214,13 @@ Here you can create a temporary endpoint which you can use as a callback url. Ju
 
 When everything is working you should see a request made by the application after you scanned the QR Code
 
+## Dependencies
+You can use the plugin ``dependency-check`` to check if the used dependencies are out of date or have some kind of
+security issues.
+
+You can find a tutorial on how to use the plugin on the official website: ``https://jeremylong.github.io/DependencyCheck/dependency-check-maven/``
+
+
 ## Troubleshooting
 
 ### Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException...
