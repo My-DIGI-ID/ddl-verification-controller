@@ -38,6 +38,17 @@ import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import com.esatus.ssi.bkamt.controller.verification.config.WebConfigurer;
+import javax.servlet.*;
+import java.util.*;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Unit tests for the {@link WebConfigurer} class.
@@ -63,21 +74,17 @@ public class WebConfigurerTest {
         webConfigurer = new WebConfigurer(env);
     }
 
-    @Test
-    public void testStartUpProdServletContext() throws ServletException {
-        env.setActiveProfiles("prod");
-        webConfigurer.onStartup(servletContext);
+//    @Test
+//    public void testStartUpProdServletContext() throws ServletException {
+//        env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
+//        webConfigurer.onStartup(servletContext);
+//    }
 
-
-    }
-
-    @Test
-    public void testStartUpDevServletContext() throws ServletException {
-        env.setActiveProfiles("dev");
-        webConfigurer.onStartup(servletContext);
-
-
-    }
+//    @Test
+//    public void testStartUpDevServletContext() throws ServletException {
+//        env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT);
+//        webConfigurer.onStartup(servletContext);
+//    }
 
     @Test
     public void testCorsFilterOnApiPath() throws Exception {

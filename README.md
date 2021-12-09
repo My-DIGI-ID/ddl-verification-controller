@@ -92,7 +92,7 @@ Sonar is used to analyze code quality.
    ```
 1. Log on to http://localhost:9001 with default credentials `admin/admin`
 1. Create a new empty project called `VerificationController`
-1. Generate an access token and copy it to `sonar-project.properties`, property `sonar.login`
+1. Follow the wizard instructions, copy the maven command at the end to perform the analysis
 
 You can run a Sonar analysis by using
 the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven
