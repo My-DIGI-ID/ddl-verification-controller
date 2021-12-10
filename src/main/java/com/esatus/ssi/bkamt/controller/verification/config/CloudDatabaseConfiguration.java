@@ -17,10 +17,6 @@
 package com.esatus.ssi.bkamt.controller.verification.config;
 
 import com.github.mongobee.Mongobee;
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
-import io.github.jhipster.domain.util.JSR310DateConverters.DurationToLongConverter;
-import io.github.jhipster.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.Cloud;
@@ -45,7 +41,7 @@ import java.util.List;
 
 @Configuration
 @EnableMongoRepositories("com.esatus.ssi.bkamt.controller.verification.repository")
-@Profile(JHipsterConstants.SPRING_PROFILE_CLOUD)
+@Profile("cloud")
 public class CloudDatabaseConfiguration extends AbstractCloudConfig {
 
     private final Logger log = LoggerFactory.getLogger(CloudDatabaseConfiguration.class);
@@ -68,9 +64,6 @@ public class CloudDatabaseConfiguration extends AbstractCloudConfig {
     @Bean
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converterList = new ArrayList<>();
-        converterList.add(DateToZonedDateTimeConverter.INSTANCE);
-        converterList.add(ZonedDateTimeToDateConverter.INSTANCE);
-        converterList.add(DurationToLongConverter.INSTANCE);
         return new MongoCustomConversions(converterList);
     }
 

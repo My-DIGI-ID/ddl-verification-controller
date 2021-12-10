@@ -1,6 +1,10 @@
 # Verification-Controller
 
 ## Prerequisites
+To load the application properties set the environment variable for spring to ``dev``
+```yaml
+SPRING_PROFILES_ACTIVE = dev
+```
 
 ### Application Environment variables
 To successfully start the application, several environment variables have to be defined.
@@ -209,6 +213,13 @@ Here you can create a temporary endpoint which you can use as a callback url. Ju
 ![Paste callback_url](./images/demo_page_callback_url.png)
 
 When everything is working you should see a request made by the application after you scanned the QR Code
+
+## Dependencies
+You can use the plugin ``dependency-check`` to check if the used dependencies are out of date or have some kind of
+security issues.
+
+You can find a tutorial on how to use the plugin on the official website: ``https://jeremylong.github.io/DependencyCheck/dependency-check-maven/``
+
 
 ## Troubleshooting
 
