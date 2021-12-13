@@ -1,6 +1,10 @@
 # Verification-Controller
 
 ## Prerequisites
+To load the application properties set the environment variable for spring to ``dev``
+```yaml
+SPRING_PROFILES_ACTIVE = dev
+```
 
 ### Application Environment variables
 To successfully start the application, several environment variables have to be defined.
@@ -88,7 +92,7 @@ Sonar is used to analyze code quality.
    ```
 1. Log on to http://localhost:9001 with default credentials `admin/admin`
 1. Create a new empty project called `VerificationController`
-1. Generate an access token and copy it to `sonar-project.properties`, property `sonar.login`
+1. Follow the wizard instructions, copy the maven command at the end to perform the analysis
 
 You can run a Sonar analysis by using
 the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the Maven
@@ -209,6 +213,13 @@ Here you can create a temporary endpoint which you can use as a callback url. Ju
 ![Paste callback_url](./images/demo_page_callback_url.png)
 
 When everything is working you should see a request made by the application after you scanned the QR Code
+
+## Dependencies
+You can use the plugin ``dependency-check`` to check if the used dependencies are out of date or have some kind of
+security issues.
+
+You can find a tutorial on how to use the plugin on the official website: ``https://jeremylong.github.io/DependencyCheck/dependency-check-maven/``
+
 
 ## Troubleshooting
 

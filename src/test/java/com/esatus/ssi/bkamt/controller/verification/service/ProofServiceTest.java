@@ -4,6 +4,7 @@ import com.esatus.ssi.bkamt.controller.verification.client.AgentClient;
 import com.esatus.ssi.bkamt.controller.verification.service.exceptions.VerificationNotFoundException;
 import com.esatus.ssi.bkamt.controller.verification.service.impl.ProofServiceImpl;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -65,10 +66,10 @@ public class ProofServiceTest {
 //            .thenReturn(Optional.of(verificationRequest));
 //    }
 
-    @Test
-    public void HandleProofWebhook_() {
-        // Parse WebhookDTO from a json file
-    }
+//    @Test
+//    public void HandleProofWebhook_() {
+//        // Parse WebhookDTO from a json file
+//    }
 
     @org.junit.jupiter.api.Test
     public void validNonceGeneratorTest() throws Exception {
