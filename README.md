@@ -1,4 +1,32 @@
-# Verification-Controller
+# Digital Driver's License: Verification-Controller
+
+- [Digital Driver's License: Verification-Controller](#digital-drivers-license-verification-controller)
+  - [Prerequisites](#prerequisites)
+    - [Application Environment variables](#application-environment-variables)
+    - [Docker Environment variables](#docker-environment-variables)
+  - [Development](#development)
+  - [Sonar](#sonar)
+  - [Swagger-Ui](#swagger-ui)
+  - [MongoDB](#mongodb)
+  - [AdminMongo](#adminmongo)
+    - [Connect to the database](#connect-to-the-database)
+  - [Verifier](#verifier)
+  - [Endpoints](#endpoints)
+  - [Testing with your mobile device and the ID Wallet App](#testing-with-your-mobile-device-and-the-id-wallet-app)
+    - [Configure your IP Address](#configure-your-ip-address)
+    - [Start the application and execute ngrok](#start-the-application-and-execute-ngrok)
+    - [Open demo page](#open-demo-page)
+  - [Dependencies](#dependencies)
+  - [Recommendations and best practices](#recommendations-and-best-practices)
+    - [Keep dependencies up to date](#keep-dependencies-up-to-date)
+    - [Penetration testing](#penetration-testing)
+    - [Least Privilege](#least-privilege)
+    - [Random Number Generation & Strong Passwords](#random-number-generation--strong-passwords)
+    - [Authentication](#authentication)
+    - [Hardening](#hardening)
+    - [Sealed Secrets](#sealed-secrets)
+  - [Troubleshooting](#troubleshooting)
+    - [Error: javax.management.beanserver: Exception calling isInstanceOf java.lang.ClassNotFoundException...](#error-javaxmanagementbeanserver-exception-calling-isinstanceof-javalangclassnotfoundexception)
 
 ## Prerequisites
 To load the application properties set the environment variable for spring to ``dev``
@@ -16,7 +44,7 @@ Find those placeholders in `application-dev.yml` and replace them:
 * ``${{VERIFICATIONCONTROLLER_AGENT_APIURL}}`` Api-Url of the admin url (Example: `localhost:10080`)
 * ``${{VERIFICATIONCONTROLLER_AGENT_RECIPIENTKEY}}`` DDL agent *verkey*, in this case for the seed `000...DDL`; to be retrieved via
   ```
-  curl -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: <VERIFICATIONCONTROLLER_AGENT_APIKEY>" | jq ".results[0]" | jq ".verkey" | sed 's/"//g'
+  cURL -X GET "http://localhost:10080/wallet/did" -H  "accept: application/json" -H "X-Api-Key: <VERIFICATIONCONTROLLER_AGENT_APIKEY>" | jq ".results[0]" | jq ".verkey" | sed 's/"//g'
   ```
   after the DDL agent has been started 
 * ``${{VERIFICATIONCONTROLLER_AGENT_ENDPOINT`` DDL agent endpoint *URL / IP* (Example: `localhost:10000`)
@@ -30,7 +58,7 @@ This file is used by Docker to set all required environment variables for the Do
 
 1. **Verify Agent (ACA-Py)**
     * `VERIFY_AGENT_GENESIS_URL`: URL of the genesis file the agent uses (Example: `https://raw.githubusercontent.com/My-DIGI-ID/Ledger-Genesis-Files/main/Test/pool_transactions_genesis`)
-    * `VERIFY_AGENT_WALLET_KEY`: Key to generate the wallet with and unlocks the wallet (Example: Random number)
+    * `VERIFY_AGENT_WALLET_KEY`: Key to generate the wallet with and to unlock the wallet (Example: Random number)
     * `VERIFY_AGENT_API_KEY`: Secures all requests to ACA-Py (used in `x-api-key` header) (Example: Random number)
     * `VERIFY_AGENT_WEBHOOK_API_KEY`: Send from ACA-Py in `x-api-key` header to the client application endpoints (Example: `0pen$3s4meWebhook`)
 
@@ -43,7 +71,7 @@ This file is used by Docker to set all required environment variables for the Do
     
    **Important**
    Replace the placeholders in the MongoDB init file in ``/src/main/docker/mongodb/mogno-init.js`` with the correct values,
-otherwise the mongodb will not be initialized and the connection will fail:
+otherwise, MongoDB will not be initialized and the connection will fail:
    * `var db = connect("[...]`
    * ```
      db.createUser(
@@ -54,7 +82,7 @@ otherwise the mongodb will not be initialized and the connection will fail:
      ```
    * `db.grantRolesToUser(<user>,[...]`
 
-   Replace the placeholder for the mongodb connection in `src/main/resources/config/application-dev.yml`: 
+   Replace the placeholder for the MongoDB connection in `src/main/resources/config/application-dev.yml`: 
    ```
    data:
      mongodb:
@@ -159,7 +187,7 @@ name: demo
 password: $2y$10$AW0Zit2JNBcTI0UDpPmc4OM72nm86AyvoOfV7GJOP4iropj9IuyVS
 ```
 
-The password in plain text is `secure`. When you try to interact with the api endpoints use the plain value in
+The password in plain text is `secure`. When you try to interact with the API endpoints use the plain value in
 the `X-AUTH-HEADER`.
 
 To create a new verifier you have to create a password hash with bcrypt with a strength factor of 12 Password length may
@@ -186,7 +214,7 @@ To test the whole application with your mobile phone you need to make sure the f
     * iOS: https://apps.apple.com/at/app/id-wallet/id1564933989
     * Android: https://play.google.com/store/apps/details?id=com.digitalenabling.idw&hl=de&gl=US
 * All containers are running without any errors
-* You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of you favorite tools on how to use it
+* You have a tool like ngrok installed on your system (https://ngrok.com/). You can use any other tool which provides the same functionality but this how-to uses ngrok. See the docs of your favorite tools on how to use it
 
 ### Configure your IP Address
 Make sure the correct IP Address of your PC in `/src/main/docker/.env`
@@ -207,19 +235,50 @@ To open this page, navigate to http://localhost:8090/demo/
 
 Ngrok now creates three public endpoints which are tunneled to your local endpoints
 
-If you currently do not have a service that can accept the request made to the callback url, you could use a service such as `https://webhook.site`.
+If you currently do not have a service that can accept the request made to the callback URL, you could use a service such as `https://webhook.site`.
 
-Here you can create a temporary endpoint which you can use as a callback url. Just paste the url in the demo page here:
+Here you can create a temporary endpoint which you can use as a callback URL. Just paste the URL in the demo page here:
 ![Paste callback_url](./images/demo_page_callback_url.png)
 
 When everything is working you should see a request made by the application after you scanned the QR Code
 
 ## Dependencies
 You can use the plugin ``dependency-check`` to check if the used dependencies are out of date or have some kind of
-security issues.
+security issue.
 
 You can find a tutorial on how to use the plugin on the official website: ``https://jeremylong.github.io/DependencyCheck/dependency-check-maven/``
 
+## Recommendations and best practices
+
+This section covers common topics to consider for operating this component in a pilot or production environment.
+
+### Keep dependencies up to date
+
+Perform regular dependency checks and update libraries as soon as they become deprecated or disclose vulnerabilities.
+Integrate dependency checking tools into your automated DevOps pipeline (e.g. [OWASP Dependency-Check](https://owasp.org/www-project-dependency-check/)).
+
+### Penetration testing
+
+Perform regular penetration tests, especially when operating this component outside of your local or company-internal network.
+
+### Least Privilege
+
+The principle of least privilege defines that all stakeholders must be restricted to access functions, data files, URLs, controllers, services, and other resources, for which they possess specific authorization. This implies protection against spoofing and elevation of privilege. Access to sensitive records is restricted, such that only authorized objects or data is accessible to each user (for example, protect against users tampering with a parameter to see or alter another user's account). If the application is multi-tenant, this segregation of users and access must be verified. The application must use strong random anti-CSRF tokens or has another transaction protection mechanism.
+
+### Random Number Generation & Strong Passwords
+
+Follow the recommendations from [BSI TR-02102 Cryptographic Mechanisms](https://www.bsi.bund.de/EN/Service-Navi/Publications/TechnicalGuidelines/tr02102/tr02102_node.html)
+
+### Authentication
+Verify, that all connections to applications that contain customer information or functions are authenticated.
+
+Calls to the application need to have an API key set in X-API-Key header otherwise the request is rejected with 401 (Unauthorized).
+
+### Hardening
+Follow common hardening best practices such as Patching, Error management, Logging, Monitoring, Backup.
+
+### Sealed Secrets
+Implement Sealed Secrets or similar techniques for keeping infrastructure passwords and API keys safe.
 
 ## Troubleshooting
 
